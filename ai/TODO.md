@@ -57,7 +57,7 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
 - **Verweise:** PR rauchstefan/ha-ff-agent#1
 
 ### 261016-ffagent-klaerung – Ausgehende FF-Agent-Schnittstelle klären
-- **Status:** in Arbeit (lokal-2026-10-16-hacs-recherche, 2026-10-16) – Nutzerantworten in docs/projekt-brief.md, Vertiefungsrecherche läuft
+- **Status:** in Arbeit (lokal-2026-10-16-hacs-recherche, 2026-10-16) – wartet auf Web-UI-Antworten (docs/recherche/261016-ffagent-webhook-zusage.md, Abschnitt 6) und Hersteller
 - **Priorität:** hoch
 - **Rolle(n):** Nutzer, Projektleiter
 - **Beschreibung:** Öffentlich ist keine Schnittstelle dokumentiert, die Alarme an HA

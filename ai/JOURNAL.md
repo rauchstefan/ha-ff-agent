@@ -22,6 +22,26 @@ Das Journal ist Verlauf, keine Wissensbasis: Dauerhaftes gehört nach `docs/` od
 
 <!-- Neue Einträge direkt unter dieser Zeile einfügen -->
 
+## 2026-10-16 – lokal-2026-10-16-hacs-recherche – Vertiefung Webhook und Zusage
+- **Nutzer-Auftrag:** Antworten des Nutzers, siehe docs/projekt-brief.md:
+  - Admin, aber die Integration ist für Einsatzkräfte gedacht
+  - PRO-Lizenz mit Gateway
+  - persönliche Webhooks vorhanden
+  - MVP: Alarm, Zusage, Einsatzdetails
+  - Hersteller ist angefragt
+- **Delegiert:** researcher (Sonnet, Standard).
+- **Erledigt:** docs/recherche/261016-ffagent-webhook-zusage.md.
+  - Persönliche Webhooks sind öffentlich nicht dokumentiert.
+  - Für die Zusage wurde kein Endpunkt gefunden.
+  - Neu gefunden: ein persönlicher iCal-Feed (Einsatzverlauf) und ein öffentliches
+    Homepage-Widget der Einheit.
+- **Offen / Übergabe:**
+  - Das ADR zum Integrationsweg ist bewusst zurückgestellt, bis die Web-UI-Fragen
+    (Abschnitt 6 des Dokuments) und die Antwort des Herstellers vorliegen.
+  - TODO 261016-ffagent-klaerung bleibt in Arbeit.
+- **Für die nächste Session:** Den Homey-Bundle herunterladen oder App-Verkehr mitschneiden
+  nur nach ausdrücklicher Nutzerfreigabe.
+
 ## 2026-10-16 – lokal-2026-10-16-hacs-recherche – Recherche FF-Agent-Schnittstellen
 - **Nutzer-Auftrag:** „Starte die Recherche zu den FF-Agent-Schnittstellen (API, Webhooks,
   Alarmformate).“
