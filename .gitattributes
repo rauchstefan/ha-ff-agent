@@ -1,0 +1,6 @@
+* text=auto eol=lf
+*.bat text eol=crlf
+*.ps1 text eol=crlf
+# Journal ist append-only: parallele Eintraege werden beim Merge beide uebernommen.
+# Bewusst NICHT fuer ai/TODO.md - dort ist ein Konflikt das Signal fuer eine doppelte Uebernahme.
+ai/JOURNAL.md merge=union

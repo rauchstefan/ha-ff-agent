@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+*.egg-info/
+
+# Home Assistant Testkonfiguration
+config/
+*.db
+*.log
+
+# Secrets / lokale Einstellungen
+.env
+secrets.yaml
+.mcp.json
+.claude/settings.local.json
+
+# Editor / OS
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store
