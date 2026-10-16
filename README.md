@@ -13,6 +13,9 @@ auf einem Dashboard anzuzeigen. Details: [docs/projekt-brief.md](docs/projekt-br
 
 ## Installation (sobald verfügbar)
 
+Das Repository ist noch privat; die Installation über HACS funktioniert erst nach der
+Veröffentlichung.
+
 1. In HACS „Benutzerdefinierte Repositories“ öffnen und dieses Repository als Typ
    „Integration“ hinzufügen.
 2. „FF Agent“ installieren und Home Assistant neu starten.

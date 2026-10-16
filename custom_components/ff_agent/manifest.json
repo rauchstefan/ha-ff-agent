@@ -1,0 +1,13 @@
+{
+  "domain": "ff_agent",
+  "name": "FF Agent",
+  "codeowners": ["@rauchstefan"],
+  "config_flow": true,
+  "documentation": "https://github.com/rauchstefan/ha-ff-agent",
+  "integration_type": "hub",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/rauchstefan/ha-ff-agent/issues",
+  "requirements": [],
+  "single_config_entry": true,
+  "version": "0.1.0"
+}

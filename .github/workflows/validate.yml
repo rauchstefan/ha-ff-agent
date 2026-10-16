@@ -1,0 +1,54 @@
+name: Validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    # Weekly while the repository is private; switch to daily once it is public.
+    - cron: "0 3 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  hassfest:
+    name: Hassfest
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: home-assistant/actions/hassfest@50baf3a307f87100cf550d4ae127746595030d5d # master
+
+  # HACS cannot read private repositories. Determine the visibility first so the
+  # HACS job is skipped (not failed) while the repository is private.
+  visibility:
+    name: Repository visibility
+    runs-on: ubuntu-latest
+    outputs:
+      private: ${{ steps.visibility.outputs.private }}
+    steps:
+      - id: visibility
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          private=$(gh api "repos/${REPO}" --jq .private)
+          echo "Repository private: ${private}"
+          # Fail loudly instead of silently skipping HACS if the API result is unusable.
+          if [[ "${private}" != "true" && "${private}" != "false" ]]; then
+            echo "::error::Unexpected visibility value: '${private}'"
+            exit 1
+          fi
+          echo "private=${private}" >> "$GITHUB_OUTPUT"
+
+  hacs:
+    name: HACS validation
+    needs: visibility
+    if: needs.visibility.outputs.private == 'false'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: hacs/action@1ebf01c408f29afcb6406bd431bc98fd8cbb15aa # main (2026-06-08), releases are outdated
+        with:
+          category: integration

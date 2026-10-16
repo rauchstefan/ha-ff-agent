@@ -1,0 +1,13 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "FF Agent",
+        "description": "Die Integration FF Agent einrichten. Zugangsdaten werden in einer späteren Version abgefragt."
+      }
+    },
+    "abort": {
+      "single_instance_allowed": "FF Agent ist bereits eingerichtet. Es ist nur eine Instanz erlaubt."
+    }
+  }
+}
