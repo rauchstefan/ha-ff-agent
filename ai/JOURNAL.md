@@ -22,6 +22,27 @@ Das Journal ist Verlauf, keine Wissensbasis: Dauerhaftes gehört nach `docs/` od
 
 <!-- Neue Einträge direkt unter dieser Zeile einfügen -->
 
+## 2026-10-16 – lokal-2026-10-16-hacs-recherche – HACS-Grundgerüst + CI
+- **Nutzer-Auftrag:** „Repo bleibt vorerst privat. Bau zuerst das HACS-Grundgerüst mit CI.“
+- **Delegiert:** entwickler (Sonnet), dann tester (Sonnet) und reviewer (Opus) parallel,
+  danach Review-Nacharbeit durch den entwickler. Alle mit Standardmodell.
+- **Erledigt:** PR rauchstefan/ha-ff-agent#1 per Squash gemergt (1d9ac86). tester: PASS,
+  reviewer: freigegeben, CI grün, der HACS-Job wird wegen des privaten Repos
+  übersprungen.
+- **Annahmen des Projektleiters:**
+  - HA-Mindestversion 2026.3.0 wegen des `brand/`-Ordners
+  - `iot_class: cloud_polling` vorläufig
+  - `single_config_entry`
+  - Config-Flow ohne Felder
+  - Platzhalter-Icon statt FF-Agent-Logo
+- **Eigene Korrektur:** Der entwickler hatte `hacs/action` auf das Release 22.5.0 von 2022
+  gepinnt. Der Projektleiter hat auf die SHA von `main` (2026-06-08) umgestellt, sonst
+  liefen veraltete HACS-Checks.
+- **Offen / Übergabe:** 261016-repo-oeffentlich (Nutzer), 261016-hacs-oeffentlich-pruefen.
+- **Für die nächste Session:** pytest-homeassistant-custom-component 0.13.372 entspricht
+  HA 2026.10.1 und Python 3.14. Wenn Dependabot es anhebt, kann sich die Python-Version
+  ändern; dann `PYTHON_VERSION` in tests.yml anpassen.
+
 ## 2026-10-16 – lokal-2026-10-16-hacs-recherche – Recherche HACS-Kompatibilität
 - **Nutzer-Auftrag:** „vollständige Recherche, was notwendig ist, um eine Integration HACS
   kompatibel zu machen. Wie muss das Repo aussehen, was wird wo definiert“

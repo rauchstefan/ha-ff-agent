@@ -43,26 +43,34 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
   und hat Beschreibung und Topics.
 - **Verweise:** docs/recherche/261016-hacs-anforderungen.md, Abschnitt 3.6
 
-### 261016-hacs-geruest – HACS-konformes Grundgerüst + CI
-- **Status:** in Arbeit (lokal-2026-10-16-hacs-recherche, 2026-10-16)
-- **Priorität:** hoch
-- **Rolle(n):** architekt (Mindest-HA-Version, iot_class), entwickler, tester, reviewer
-- **Beschreibung:** `custom_components/ff_agent/` mit manifest.json, translations/en.json
-  und brand/icon.png anlegen. In hacs.json `render_readme` und `content_in_root`
-  entfernen, `homeassistant` ggf. auf 2026.3.0 setzen. `.github/workflows/validate.yml`
-  (hacs/action + hassfest) und dependabot.yml anlegen.
-- **Definition of Done:** validate.yml läuft ohne `ignore` grün (erst möglich, wenn das
-  Repo öffentlich ist).
-- **Verweise:** docs/recherche/261016-hacs-anforderungen.md, Abschnitte 4 bis 6
+### 261016-hacs-oeffentlich-pruefen – HACS-Job nach Veröffentlichung prüfen
+- **Status:** offen (wartet auf 261016-repo-oeffentlich)
+- **Priorität:** mittel
+- **Rolle(n):** tester, entwickler
+- **Beschreibung:** Solange das Repo privat ist, überspringt validate.yml den HACS-Job.
+  Nach der Veröffentlichung prüfen, ob er ohne `ignore` grün läuft (Brands-Check,
+  Beschreibung, Topics). Dann den Cron in validate.yml wieder auf täglich stellen.
+  `hacs/action` ist auf eine SHA von `main` gepinnt, weil das letzte Release von 2022
+  ist. Dependabot aktualisiert solche Branch-Pins nicht, also gelegentlich von Hand
+  nachziehen. Dasselbe gilt für hassfest@master.
+- **Definition of Done:** HACS-Job grün, Cron täglich.
+- **Verweise:** PR rauchstefan/ha-ff-agent#1
 
 Vorschläge des Projektleiters für den Einstieg (noch nicht beauftragt):
 1. Recherche der FF-Agent-Schnittstellen (`researcher`), siehe Fragen in
-   `docs/projekt-brief.md`.
+   `docs/projekt-brief.md`. Danach `iot_class` im Manifest festlegen (derzeit vorläufig
+   `cloud_polling`).
 2. MVP-Umfang mit dem Nutzer festlegen, danach Architektur-ADR (`architekt`).
-3. Grundgerüst der Integration mit CI (hassfest, HACS-Action, pytest, ruff)
-   (`entwickler`, `tester`).
 
 ## Erledigt
+
+### 261016-hacs-geruest – HACS-konformes Grundgerüst + CI
+- **Status:** erledigt (2026-10-16, PR rauchstefan/ha-ff-agent#1, 1d9ac86)
+- **Rolle(n):** entwickler, tester, reviewer
+- **Beschreibung:** custom_components/ff_agent (Manifest, Config-Flow mit
+  Bestätigungsschritt, Übersetzungen, Platzhalter-Icons), bereinigte hacs.json,
+  Workflows validate.yml und tests.yml, dependabot.yml, Tests.
+- **Verweise:** docs/recherche/261016-hacs-anforderungen.md
 
 ### 261016-hacs-anforderungen – Recherche: HACS-Kompatibilität
 - **Status:** erledigt (2026-10-16, 1aa83ea)
