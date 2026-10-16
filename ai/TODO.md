@@ -31,7 +31,16 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
 
 ## Offen
 
-_Noch keine Aufgaben. Die erste Aufgabe gibt der Nutzer vor._
+### 261016-hacs-anforderungen – Recherche: HACS-Kompatibilität
+- **Status:** in Arbeit (lokal-2026-10-16-hacs-recherche, 2026-10-16)
+- **Priorität:** hoch
+- **Rolle(n):** researcher
+- **Beschreibung:** Vollständig klären, was eine Integration HACS-kompatibel macht:
+  Repo-Struktur, `hacs.json`, `manifest.json`, Releases/Versionen, Brands, Validierung
+  (HACS-Action, hassfest), Aufnahme in den Default-Store vs. Custom Repository.
+- **Definition of Done:** `docs/recherche/261016-hacs-anforderungen.md` mit belegten
+  Quellen, Checkliste und Abgleich mit dem aktuellen Repo.
+- **Verweise:** –
 
 Vorschläge des Projektleiters für den Einstieg (noch nicht beauftragt):
 1. Recherche der FF-Agent-Schnittstellen (`researcher`), siehe Fragen in
