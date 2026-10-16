@@ -44,7 +44,7 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
 - **Verweise:** docs/recherche/261016-hacs-anforderungen.md, Abschnitt 3.6
 
 ### 261016-hacs-geruest – HACS-konformes Grundgerüst + CI
-- **Status:** offen
+- **Status:** in Arbeit (lokal-2026-10-16-hacs-recherche, 2026-10-16)
 - **Priorität:** hoch
 - **Rolle(n):** architekt (Mindest-HA-Version, iot_class), entwickler, tester, reviewer
 - **Beschreibung:** `custom_components/ff_agent/` mit manifest.json, translations/en.json
