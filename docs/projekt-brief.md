@@ -22,10 +22,24 @@ Alles unten ist **offen** und wird über die ersten Aufgaben geklärt.
 - Gibt es bereits Community-Lösungen (Integrationen, Node-RED-Flows, Skripte)?
 
 ### An den Nutzer
-- Welche Rolle hat der Nutzer in FF Agent (Einsatzkraft, Admin der Einheit)? Welche
-  Zugänge und Lizenzen sind vorhanden?
-- Welche Funktionen sind Pflicht für eine erste Version (MVP)?
 - Soll die Integration später öffentlich (HACS-Default-Repository) angeboten werden?
+
+### Antworten des Nutzers (2026-10-16)
+- **Rolle:** Der Nutzer ist Admin seiner Einheit. Die Integration ist aber **für
+  Einsatzkräfte** gedacht, also für Nutzer ohne Admin-Rechte.
+- **Lizenz der Einheit:** PRO, ein Gateway ist vorhanden.
+- **Persönliche Webhooks:** Es gibt sie in der Web-UI im Bereich „Automatisierung“,
+  neben „Einsatzrückmeldungen“, „Partnerbenachrichtigungen“ und „MoWaS“. Jeder Nutzer
+  kann bis zu 3 anlegen, mit Spalten Name, Bemerkung und Zeitplan (Wochentage/Zeit).
+  Die Felder im Dialog „Webhook hinzufügen“ und das Format des Aufrufs sind noch unbekannt.
+- **MVP:**
+  1. Alarm erkennen, um darauf reagieren zu können
+  2. Zusage senden
+  3. Einsatzdetails anzeigen, soweit verfügbar
+- **Erreichbarkeit von HA:** Sie hängt vom einzelnen Nutzer ab. Die Integration muss mit
+  und ohne Nabu Casa bzw. externe URL umgehen können.
+- **Hersteller-Anfrage:** Der Nutzer hat beim Hersteller eine detailliertere API-Doku
+  angefragt; Antwort steht aus.
 
 ## Vorläufige Leitplanken
 
