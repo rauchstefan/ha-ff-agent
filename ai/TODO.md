@@ -56,21 +56,31 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
 - **Definition of Done:** HACS-Job grün, Cron täglich.
 - **Verweise:** PR rauchstefan/ha-ff-agent#1
 
-### 261016-ffagent-schnittstellen – Recherche: FF-Agent-Schnittstellen
-- **Status:** in Arbeit (lokal-2026-10-16-hacs-recherche, 2026-10-16)
+### 261016-ffagent-klaerung – Ausgehende FF-Agent-Schnittstelle klären
+- **Status:** offen (wartet auf Nutzer)
 - **Priorität:** hoch
-- **Rolle(n):** researcher
-- **Beschreibung:** API, Webhooks, Monitor- und Drittsystem-Schnittstellen, Authentifizierung,
-  Alarmformate, Push oder Polling, Nutzungsbedingungen, Community-Lösungen (Fragen aus
-  docs/projekt-brief.md). Danach `iot_class` festlegen.
-- **Definition of Done:** docs/recherche/261016-ffagent-schnittstellen.md mit Quellen
-  und Bewertung der Integrationswege.
-- **Verweise:** docs/projekt-brief.md
+- **Rolle(n):** Nutzer, Projektleiter
+- **Beschreibung:** Öffentlich ist keine Schnittstelle dokumentiert, die Alarme an HA
+  liefert. Zu klären:
+  - Rolle und Lizenz des Nutzers
+  - Was die Web-UI zeigt: Webhook, Reiter „Fireboard-API“, Status-Seiten, Gateway PLUS.
+    Screenshots ohne Tokens.
+  - ob die Hersteller-Anfrage gestellt wird (Fragen in der Recherche, Abschnitt 4.2)
+  - MVP-Umfang
+
+  Danach `iot_class` und den Integrationsweg per ADR festlegen (`architekt`).
+- **Definition of Done:** Integrationsweg entschieden, ADR geschrieben.
+- **Verweise:** docs/recherche/261016-ffagent-schnittstellen.md
 
 Vorschläge des Projektleiters für den Einstieg (noch nicht beauftragt):
 1. MVP-Umfang mit dem Nutzer festlegen, danach Architektur-ADR (`architekt`).
 
 ## Erledigt
+
+### 261016-ffagent-schnittstellen – Recherche: FF-Agent-Schnittstellen
+- **Status:** erledigt (2026-10-16, siehe Commit „docs: add FF Agent interface research“)
+- **Rolle(n):** researcher, Projektleiter (PDFs gelesen)
+- **Verweise:** docs/recherche/261016-ffagent-schnittstellen.md
 
 ### 261016-hacs-geruest – HACS-konformes Grundgerüst + CI
 - **Status:** erledigt (2026-10-16, PR rauchstefan/ha-ff-agent#1, 1d9ac86)

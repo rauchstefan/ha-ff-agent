@@ -22,6 +22,24 @@ Das Journal ist Verlauf, keine Wissensbasis: Dauerhaftes gehört nach `docs/` od
 
 <!-- Neue Einträge direkt unter dieser Zeile einfügen -->
 
+## 2026-10-16 – lokal-2026-10-16-hacs-recherche – Recherche FF-Agent-Schnittstellen
+- **Nutzer-Auftrag:** „Starte die Recherche zu den FF-Agent-Schnittstellen (API, Webhooks,
+  Alarmformate).“
+- **Delegiert:** researcher (Sonnet, Standard).
+- **Erledigt:**
+  - docs/recherche/261016-ffagent-schnittstellen.md
+  - Der researcher konnte die Hersteller-PDFs nicht lesen. Der Projektleiter hat sie über
+    WebFetch geladen, mit dem Read-Tool gelesen und als Abschnitt 0 nachgetragen.
+  - Kenntnisstand in docs/architektur.md übernommen.
+- **Ergebnis:**
+  - Die WebAPI ist nur eingehend und für Admins der Einheit.
+  - Instant Commands (2019) haben keinen Alarm-Auslöser und keine HTTP-Aktion.
+  - Eine ausgehende Schnittstelle zu HA ist öffentlich nicht dokumentiert. Es gibt Hinweise
+    auf einen Webhook (Homey) und einen Reiter „Fireboard-API“.
+- **Offen / Übergabe:** 261016-ffagent-klaerung wartet auf Antworten des Nutzers.
+- **Für die nächste Session:** PDFs lassen sich mit WebFetch laden (die Datei landet in
+  tool-results) und dann mit dem Read-Tool ohne `pages`-Parameter lesen. pdftoppm fehlt.
+
 ## 2026-10-16 – lokal-2026-10-16-hacs-recherche – HACS-Grundgerüst + CI
 - **Nutzer-Auftrag:** „Repo bleibt vorerst privat. Bau zuerst das HACS-Grundgerüst mit CI.“
 - **Delegiert:** entwickler (Sonnet), dann tester (Sonnet) und reviewer (Opus) parallel,
