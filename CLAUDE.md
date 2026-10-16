@@ -87,7 +87,7 @@ Weitere Ablagen: `docs/plaene/` (Umsetzungspläne), `docs/adr/` (Architekturents
   `test:`, `chore:`).
 - **Keine Secrets committen:** FF-Agent-Zugangsdaten, API-Keys, Webhook-URLs, echte
   Einsatzdaten. Vor jedem Commit `git status` prüfen.
-- Auth lokal über den Git Credential Manager / `gh` (Account `AldiTuete93`).
+- Auth lokal über den Git Credential Manager / `gh` (Account `rauchstefan`, hieß bis 2026-10 `AldiTuete93`).
 
 ## Freigaben
 
