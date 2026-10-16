@@ -56,11 +56,19 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
 - **Definition of Done:** HACS-Job grün, Cron täglich.
 - **Verweise:** PR rauchstefan/ha-ff-agent#1
 
+### 261016-ffagent-schnittstellen – Recherche: FF-Agent-Schnittstellen
+- **Status:** in Arbeit (lokal-2026-10-16-hacs-recherche, 2026-10-16)
+- **Priorität:** hoch
+- **Rolle(n):** researcher
+- **Beschreibung:** API, Webhooks, Monitor- und Drittsystem-Schnittstellen, Authentifizierung,
+  Alarmformate, Push oder Polling, Nutzungsbedingungen, Community-Lösungen (Fragen aus
+  docs/projekt-brief.md). Danach `iot_class` festlegen.
+- **Definition of Done:** docs/recherche/261016-ffagent-schnittstellen.md mit Quellen
+  und Bewertung der Integrationswege.
+- **Verweise:** docs/projekt-brief.md
+
 Vorschläge des Projektleiters für den Einstieg (noch nicht beauftragt):
-1. Recherche der FF-Agent-Schnittstellen (`researcher`), siehe Fragen in
-   `docs/projekt-brief.md`. Danach `iot_class` im Manifest festlegen (derzeit vorläufig
-   `cloud_polling`).
-2. MVP-Umfang mit dem Nutzer festlegen, danach Architektur-ADR (`architekt`).
+1. MVP-Umfang mit dem Nutzer festlegen, danach Architektur-ADR (`architekt`).
 
 ## Erledigt
 
