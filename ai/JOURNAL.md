@@ -22,6 +22,20 @@ Das Journal ist Verlauf, keine Wissensbasis: Dauerhaftes gehört nach `docs/` od
 
 <!-- Neue Einträge direkt unter dieser Zeile einfügen -->
 
+## 2026-10-16 – lokal-2026-10-16-hacs-recherche – Recherche HACS-Kompatibilität
+- **Nutzer-Auftrag:** „vollständige Recherche, was notwendig ist, um eine Integration HACS
+  kompatibel zu machen. Wie muss das Repo aussehen, was wird wo definiert“
+- **Delegiert:** researcher (Sonnet, Standard).
+- **Erledigt:** docs/recherche/261016-hacs-anforderungen.md (1aa83ea). Der Projektleiter
+  hat zwei Kernaussagen an den Primärquellen nachgeprüft: Private Repos funktionieren
+  nicht mit HACS, und Custom-Integrationen haben ab HA 2026.3 einen eigenen
+  `brand/`-Ordner.
+- **Offen / Übergabe:** Neue TODOs 261016-repo-oeffentlich (Entscheidung des Nutzers) und
+  261016-hacs-geruest.
+- **Für die nächste Session:** Solange das Repo privat ist, lässt sich nichts über HACS
+  testen. Auf diesem Rechner ist kein `python` im PATH, für Skripte Git Bash oder die
+  Edit-Tools verwenden.
+
 ## 2026-10-16 – lokal-2026-10-16-projektsetup – Projektsetup
 - **Nutzer-Auftrag:** Neues Projekt für eine HACS-Integration „FF Agent für Home
   Assistant“ aufsetzen, mit Orchestrierung über Rollen-Subagenten (Planen, Recherche,

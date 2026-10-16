@@ -31,16 +31,29 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
 
 ## Offen
 
-### 261016-hacs-anforderungen – Recherche: HACS-Kompatibilität
-- **Status:** in Arbeit (lokal-2026-10-16-hacs-recherche, 2026-10-16)
+### 261016-repo-oeffentlich – Entscheidung: Repo öffentlich machen
+- **Status:** offen (wartet auf Nutzer)
 - **Priorität:** hoch
-- **Rolle(n):** researcher
-- **Beschreibung:** Vollständig klären, was eine Integration HACS-kompatibel macht:
-  Repo-Struktur, `hacs.json`, `manifest.json`, Releases/Versionen, Brands, Validierung
-  (HACS-Action, hassfest), Aufnahme in den Default-Store vs. Custom Repository.
-- **Definition of Done:** `docs/recherche/261016-hacs-anforderungen.md` mit belegten
-  Quellen, Checkliste und Abgleich mit dem aktuellen Repo.
-- **Verweise:** –
+- **Rolle(n):** Nutzer, Projektleiter
+- **Beschreibung:** HACS funktioniert nur mit öffentlichen GitHub-Repos, auch als Custom
+  Repository. Die Sichtbarkeit zu ändern braucht die Freigabe des Nutzers. Danach
+  Beschreibung, Topics und Issues setzen. Außerdem klären, ob Name und Logo von FF Agent
+  verwendet werden dürfen.
+- **Definition of Done:** Entscheidung dokumentiert. Bei Zustimmung ist das Repo öffentlich
+  und hat Beschreibung und Topics.
+- **Verweise:** docs/recherche/261016-hacs-anforderungen.md, Abschnitt 3.6
+
+### 261016-hacs-geruest – HACS-konformes Grundgerüst + CI
+- **Status:** offen
+- **Priorität:** hoch
+- **Rolle(n):** architekt (Mindest-HA-Version, iot_class), entwickler, tester, reviewer
+- **Beschreibung:** `custom_components/ff_agent/` mit manifest.json, translations/en.json
+  und brand/icon.png anlegen. In hacs.json `render_readme` und `content_in_root`
+  entfernen, `homeassistant` ggf. auf 2026.3.0 setzen. `.github/workflows/validate.yml`
+  (hacs/action + hassfest) und dependabot.yml anlegen.
+- **Definition of Done:** validate.yml läuft ohne `ignore` grün (erst möglich, wenn das
+  Repo öffentlich ist).
+- **Verweise:** docs/recherche/261016-hacs-anforderungen.md, Abschnitte 4 bis 6
 
 Vorschläge des Projektleiters für den Einstieg (noch nicht beauftragt):
 1. Recherche der FF-Agent-Schnittstellen (`researcher`), siehe Fragen in
@@ -50,6 +63,13 @@ Vorschläge des Projektleiters für den Einstieg (noch nicht beauftragt):
    (`entwickler`, `tester`).
 
 ## Erledigt
+
+### 261016-hacs-anforderungen – Recherche: HACS-Kompatibilität
+- **Status:** erledigt (2026-10-16, 1aa83ea)
+- **Rolle(n):** researcher
+- **Beschreibung:** Klären, was eine Integration HACS-kompatibel macht: Repo-Struktur,
+  hacs.json, manifest.json, Releases, Brands, CI, Custom Repository und Default-Store.
+- **Verweise:** docs/recherche/261016-hacs-anforderungen.md
 
 ### 261016-projektsetup – Projekt aufsetzen
 - **Status:** erledigt (2026-10-16, Initial-Commit)
