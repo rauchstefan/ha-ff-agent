@@ -68,7 +68,7 @@ Gemeinsame Angaben für alle sechs Schritte:
 - **Priorität:** hoch
 
 ### 261017-mvp-2-webhook – Webhook-Empfang, Zusatz-Token, Diagnostics
-- **Status:** in Arbeit (lokal-2026-10-16-hacs-recherche, 2026-10-17)
+- **Status:** erledigt (2026-10-17, PR rauchstefan/ha-ff-agent#3, bb533a8)
 - **Priorität:** hoch
 - **Beschreibung:** Danach ist der erste echte Test möglich (Annahmen A1–A5, A12), nur mit
   Nutzerfreigabe.
@@ -86,10 +86,14 @@ Gemeinsame Angaben für alle sechs Schritte:
 ### 261017-mvp-5-options-reconfigure – Options Flow und Reconfigure
 - **Status:** offen
 - **Priorität:** mittel
+- **Zusätzlich (aus PR 1/2):**
+  - Texte `internal` und `path_only` vom Rat „Eintrag neu anlegen“ auf Reconfigure umstellen
+  - Repair-Issue `webhook_token_rejected` im Setup löschen, wenn `require_token` aus ist
 
 ### 261017-mvp-6-doku-qualitaet – README/Einrichtungsanleitung, Quality Scale, Abdeckung
 - **Status:** offen
 - **Priorität:** mittel
+- **Zusätzlich (aus PR 2):** In der Nutzerdoku warnen, dass HA Core die Webhook-ID in Debug-Logs von `homeassistant.components.webhook` und `.http` schreibt; solche Logs nicht teilen.
 
 ### 261017-python-target – Python-Mindestversion vs. ruff-Ziel prüfen
 - **Status:** erledigt (2026-10-17, ohne Codeänderung: HA 2026.3.0 verlangt Python ≥ 3.14.2, passt zu ruff py314; siehe docs/architektur.md)

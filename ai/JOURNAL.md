@@ -22,6 +22,35 @@ Das Journal ist Verlauf, keine Wissensbasis: Dauerhaftes gehört nach `docs/` od
 
 <!-- Neue Einträge direkt unter dieser Zeile einfügen -->
 
+## 2026-10-17 – lokal-2026-10-16-hacs-recherche – Python-Ziel und MVP PR 2 (Webhook)
+- **Nutzer-Auftrag:** „Kläre zuerst die Python-Mindestversion (261017-python-target),
+  dann PR 2.“
+- **Python-Ziel:** Ohne Code erledigt. Laut PyPI verlangt HA ab 2026.3.0
+  Python ≥ 3.14.2. Das passt zu ruff `py314` und ist in docs/architektur.md vermerkt.
+- **Delegiert:**
+  - entwickler (Sonnet): Umsetzung und Nacharbeit
+  - tester (Sonnet) und reviewer (Opus) parallel
+  - Standardmodelle
+- **Erledigt:**
+  - PR rauchstefan/ha-ff-agent#3 per Squash gemergt (bb533a8)
+  - tester: PASS, 14 Randfall-Tests ergänzt; reviewer: freigegeben
+  - Nacharbeit: persistentes Repair-Issue, Content-Type nur als Medientyp, Diagnostics
+    bei nicht geladenem Eintrag
+  - Doku zu den Punkten K2 und K6 im ADR bzw. Plan
+  - 215 Tests, Abdeckung 100 %
+- **Panne:**
+  - Der Doku-Commit des Projektleiters ist auf dem Feature-Branch gelandet, weil der
+    entwickler ihn im gemeinsamen Arbeitsverzeichnis ausgecheckt hatte.
+  - Folgen: keine, der Commit kam per Squash nach main.
+  - Fallstrick in CLAUDE.md ergänzt.
+- **Offen / Übergabe:**
+  - nächster Schritt 261017-mvp-3-alarm-entitaeten
+  - erster echter Test (Anleitung im PR-3-Bericht des entwicklers, siehe PR-Beschreibung)
+    nur mit Nutzerfreigabe
+  - für PR 5: Repair-Issue beim Setup löschen, wenn `require_token` aus ist
+- **Für die nächste Session:** HA Core loggt die Webhook-ID selbst auf DEBUG/INFO/WARNING.
+  Das muss in PR 6 in die Nutzerdoku (Debug-Logs von webhook und http nicht teilen).
+
 ## 2026-10-17 – lokal-2026-10-16-hacs-recherche – MVP PR 1 (Config Flow)
 - **Nutzer-Auftrag:** „ADR 0002 ist freigegeben. Starte mit PR 1 (Config Flow).“
 - **Delegiert:**

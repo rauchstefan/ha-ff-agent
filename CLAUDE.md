@@ -107,3 +107,9 @@ PRs nach bestandenem Qualitäts-Gate mergen, `ai/`-Dateien pflegen, GitHub-Issue
   UTF-8, setzt BOM). Edit/Write-Tools oder Git Bash verwenden.
 - Der Ordner liegt in OneDrive: virtuelle Umgebungen (`.venv/`) und Caches sind
   gitignored, sollten aber möglichst außerhalb von OneDrive liegen.
+- **Subagenten teilen sich das Arbeitsverzeichnis.** Checkt ein `entwickler` oder `tester`
+  einen Feature-Branch aus, landen Commits des Projektleiters auf diesem Branch. Vor
+  direkten Commits auf `main` deshalb `git branch --show-current` prüfen. Während ein
+  schreibender Agent läuft, nichts direkt committen.
+- **Lokal gibt es kein Python** (nur den Store-Platzhalter `python3`). Tests, ruff und
+  hassfest laufen ausschließlich in GitHub Actions.
