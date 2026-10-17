@@ -58,7 +58,7 @@ Status: `done` (erfüllt, mit Beleg), `exempt` (nicht zutreffend, mit Begründun
 | Regel | Status | Beleg bzw. Begründung |
 |---|---|---|
 | `devices` | done | `entity.py`: ein Gerät je Eintrag, `DeviceEntryType.SERVICE`; `tests/test_entities.py` |
-| `diagnostics` | done | `diagnostics.py`, redigiert über `TO_REDACT` (`const.py`); `tests/test_diagnostics.py`, `tests/test_privacy.py`, `tests/test_privacy_lifecycle.py` |
+| `diagnostics` | done | `diagnostics.py`, redigiert über `TO_REDACT` (`const.py`), mit `alarm_source` und ntfy-Block (Thema, Entity-UUID und `entity_id` redigiert); `tests/test_diagnostics.py`, `tests/test_privacy.py`, `tests/test_privacy_lifecycle.py` |
 | `discovery` | exempt | Cloud-Dienst, nichts zu entdecken |
 | `discovery-update-info` | exempt | Cloud-Dienst, nichts zu entdecken |
 | `docs-data-update` | done | README, Abschnitt „Was die Integration tut und was nicht“ (Push-Datenfluss) |
@@ -75,8 +75,8 @@ Status: `done` (erfüllt, mit Beleg), `exempt` (nicht zutreffend, mit Begründun
 | `entity-translations` | done | `translation_key` je Entität, `translations/de.json` und `en.json`; `tests/test_metadata.py` (gleiche Schlüssel) |
 | `exception-translations` | done | Abschnitt `exceptions` in den Übersetzungen, genutzt in `reply.py` |
 | `icon-translations` | done | `icons.json` |
-| `reconfiguration-flow` | done | `async_step_reconfigure` in `config_flow.py`; `tests/test_reconfigure.py` |
-| `repair-issues` | done | Issue `webhook_token_rejected` in `webhook.py`, Übersetzung unter `issues`; `tests/test_webhook.py` |
+| `reconfiguration-flow` | done | `async_step_reconfigure` in `config_flow.py`, inklusive Wechsel des Alarmwegs (Webhook/ntfy, ADR 0003); `tests/test_reconfigure.py` |
+| `repair-issues` | done | Issue `webhook_token_rejected` in `webhook.py` und `ntfy_entity_missing` in `__init__.py` (ntfy-Entität fehlt, fremd oder deaktiviert), Übersetzungen unter `issues`; `tests/test_webhook.py`, `tests/test_ntfy_source.py` |
 | `stale-devices` | exempt | Das Gerät ist an den Eintrag gebunden |
 
 ## Platin (3)

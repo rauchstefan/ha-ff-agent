@@ -1,6 +1,7 @@
 # ADR 0002: Integrationsweg über persönlichen Webhook und persönliche Rückmelde-URL
 
-- **Status:** angenommen (Nutzer, 2026-10-17; vorgeschlagen vom Architekten am selben Tag). Gilt unter dem Vorbehalt der Annahmen
+- **Status:** angenommen (Nutzer, 2026-10-17; vorgeschlagen vom Architekten am selben Tag);
+  ergänzt durch ADR 0003 (Alarmquelle Webhook oder ntfy). Gilt unter dem Vorbehalt der Annahmen
   am Ende; sie werden beim ersten echten Test geprüft.
 - **Datum:** 2026-10-17
 - **TODO:** `261016-ffagent-klaerung`
@@ -110,6 +111,9 @@ Für die HA-APIs gilt der Stand von HA 2026.3.0 (Mindestversion laut `hacs.json`
   mit verschiedenen Zeitplänen. Die Deduplizierung fängt Doppelaufrufe ab.
 
 ### 3. Config Flow
+
+> Ergänzt durch ADR 0003: Nach dem Schritt `user` wählt der Nutzer den Alarmweg (Home
+> Assistant Cloud bzw. eigene Adresse oder ntfy), je Pfad mit Einrichtungsdialog.
 
 - **`user`**: Felder `name` (Anzeigename, Standard „FF Agent“) und `reply_url`. Akzeptiert
   werden die Zusage- oder die Absage-URL oder die blanke UUID.
@@ -327,6 +331,9 @@ Zusätzlich gelten diese Regeln aus Silber und Gold, weil sie fast nichts kosten
 | Eigener iCal-Abruf | Nutzen für laufende Alarme unklar; die Core-Integration Remote Calendar deckt den Fall ab |
 
 ## Konsequenzen
+
+- Ergänzt durch ADR 0003: Ohne Home Assistant Cloud und ohne externe URL gibt es mit ntfy
+  einen kostenlosen Alarmweg, für den HA nicht von außen erreichbar sein muss.
 
 - Die Einrichtung braucht zwei manuelle Kopiervorgänge: die Rückmelde-URL von FF Agent nach
   HA und die Webhook-URL von HA nach FF Agent. Optional kommt das Header-Token dazu. Die
