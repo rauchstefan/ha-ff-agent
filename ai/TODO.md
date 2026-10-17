@@ -93,7 +93,7 @@ Gemeinsame Angaben für alle sechs Schritte:
   - Entscheiden und dokumentieren, ob ein Reload den laufenden Alarm behalten soll (heute: nein)
 
 ### 261017-mvp-6-doku-qualitaet – README/Einrichtungsanleitung, Quality Scale, Abdeckung
-- **Status:** offen
+- **Status:** in Arbeit (lokal-2026-10-16-hacs-recherche, 2026-10-17)
 - **Priorität:** mittel
 - **Zusätzlich (aus PR 2):** In der Nutzerdoku warnen, dass HA Core die Webhook-ID in Debug-Logs von `homeassistant.components.webhook` und `.http` schreibt; solche Logs nicht teilen.
 - **Zusätzlich (aus PR 3):** Beispiel-Automation nur mit `not_from`/`not_to: [unavailable, unknown]` (siehe docs/architektur.md, HA-Fallstricke). Hinweis, dass Options-Änderungen einen laufenden Alarm zurücksetzen.
