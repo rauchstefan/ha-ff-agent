@@ -5,19 +5,22 @@ Session. Von Hand gepflegt.
 
 - **Version:** 0.1.0 im Manifest, kein Release
 - **Integration:** MVP in Arbeit (ADR 0002, Plan docs/plaene/261017-mvp-alarm-zusage.md).
-  Erledigt sind PR 1 bis 3 von 6:
+  Erledigt sind PR 1 bis 4 von 6:
   - Config Flow (eine Person je Eintrag), Parser für die Rückmelde-URL, Webhook-URL
     (Cloudhook, extern, intern)
   - Webhook-Empfang (GET/POST) mit optionalem Zusatz-Token und Repair-Issue; erfasst wird
     nur die Form des Aufrufs, Diagnostics sind redigiert
   - Alarm-Logik (Dedup 30 s, Rücksetzzeit) mit den Entitäten Event „Alarm“, Binary-Sensor
     „Alarm aktiv“ und Sensor „Letzter Alarm“, alle an einem Gerät je Person
+  - Rückmeldung: Buttons „Zusagen“/„Absagen“, Actions `ff_agent.accept`/`ff_agent.reject`
+    (Verkehrsmittel `car`, optional Standort), Sensor „Letzte Rückmeldung“, Schutz vor
+    Doppelklick
 
-  Es fehlen noch Rückmeldung (PR 4), Options/Reconfigure (PR 5) und Doku (PR 6).
+  Es fehlen noch Options/Reconfigure (PR 5) und Doku (PR 6).
 - **CI:** `validate.yml` (hassfest, HACS-Action) und `tests.yml` (ruff, pytest mit
   pytest-homeassistant-custom-component, Python 3.14, Abdeckung mindestens 95 %),
   Dependabot
-- **Letzte Änderung:** 2026-10-17 – MVP PR 3 (rauchstefan/ha-ff-agent#4)
+- **Letzte Änderung:** 2026-10-17 – MVP PR 4 (rauchstefan/ha-ff-agent#5)
 
 ## Was funktioniert
 

@@ -78,7 +78,7 @@ Gemeinsame Angaben für alle sechs Schritte:
 - **Priorität:** hoch
 
 ### 261017-mvp-4-rueckmeldung – Rückmelde-Client, Buttons, Actions
-- **Status:** in Arbeit (lokal-2026-10-16-hacs-recherche, 2026-10-17)
+- **Status:** erledigt (2026-10-17, PR rauchstefan/ha-ff-agent#5, bba8b34)
 - **Priorität:** hoch
 - **Beschreibung:** Den echten Test (A6–A9) nur während eines Testalarms und nur mit
   Nutzerfreigabe.
@@ -110,6 +110,26 @@ Gemeinsame Angaben für alle sechs Schritte:
     HA-Mindestversion anheben.
   - Bis dahin weichen PRs mit einer Tupel-Variable aus (Hinweis aus PR 2).
 - **Definition of Done:** ruff-Ziel und HA-Mindestversion passen zusammen.
+
+### 261017-reply-redirects – Redirect-Verhalten der Rückmelde-URL härten
+- **Status:** offen (nach erstem echten Test, A6)
+- **Priorität:** mittel
+- **Rolle(n):** entwickler, reviewer
+- **Beschreibung:** `reply.py` folgt Redirects heute zu jedem Host und auch zu http
+  (`allow_redirects=True`). Nach dem echten Test entscheiden:
+  - Leitet FF Agent nicht um, `allow_redirects=False` setzen; ein 3xx gilt dann als
+    Fehler.
+  - Leitet es um, Redirects selbst folgen (höchstens 3) und nur `https` auf
+    `*.ff-agent.com` zulassen.
+- **Definition of Done:** Verhalten entschieden, umgesetzt und getestet.
+
+### 261017-reply-test-k5 – Test „Erfolg, Fehler, gleiche Aktion“ ergänzen
+- **Status:** offen
+- **Priorität:** niedrig
+- **Rolle(n):** tester
+- **Beschreibung:** Zu testender Ablauf: Zusagen klappt, Absagen schlägt fehl, eine erneute
+  Zusage innerhalb von 10 s wird übersprungen. Das Verhalten ist korrekt, aber nicht
+  festgeschrieben. Kann mit PR 5 erledigt werden.
 
 ### 261017-token-default – Zusatz-Token standardmäßig an?
 - **Status:** offen (nach erstem echten Test)

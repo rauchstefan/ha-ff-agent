@@ -103,7 +103,7 @@ gibt es nicht.
 - **`data`** (alles Geheimnisse außer `reply_host` und `cloudhook`): `reply_id`,
   `reply_host`, `webhook_id`, `cloudhook`, `cloudhook_url`, `header_token`
 - **`options`:** `require_token` (Standard aus), `reset_minutes`, `default_transport`
-  (belegt ist nur `CAR`), `location_entity` (optional, `person` oder `device_tracker`)
+  (gespeichert als `car`, an FF Agent als `CAR` gesendet; belegt ist nur dieser Wert), `location_entity` (optional, `person` oder `device_tracker`)
 - **Flows:**
   - `user` mit Name und Rückmelde-URL; ohne Online-Test, weil jeder Test eine echte
     Rückmeldung wäre
@@ -153,6 +153,7 @@ gibt es nicht.
 - **Dedup und Uhrzeit:** Eine negative Zeitdifferenz (Uhr springt zurück, z. B. durch
   NTP) gilt als neuer Alarm. Der Rücksetz-Timer läuft über die monotone Loop-Uhr.
 
+- **Validierung: voluptuous und probatio.** Seit HA 2026.9 ist `probatio` die Validierungsbibliothek, `voluptuous` wird nicht mehr installiert. `homeassistant/__init__.py` setzt beim Start per `probatio.compat.install_as_voluptuous()` einen Alias in `sys.modules`. Deshalb funktioniert `import voluptuous as vol` für Custom-Integrationen weiter, offiziell unterstützt und ohne Abkündigung (contributors.home-assistant.io/blog/2026/09/30/probatio-validation-engine/). Vor 2026.9 ist es das echte voluptuous. Wir nutzen einheitlich `import voluptuous as vol`. Optionsschlüssel von Selektoren (Übersetzung) müssen `[a-z0-9-_]` sein, deshalb heißt das Verkehrsmittel intern `car`.
 - **Python-Version:** Laut `requires_python` auf PyPI verlangt HA 2026.1/2026.2
   Python ≥ 3.13.2 und HA ab 2026.3.0 Python ≥ 3.14.2. Unsere Mindestversion
   (`hacs.json`: 2026.3.0) passt deshalb zu ruff `target-version = "py314"`. Syntax ab

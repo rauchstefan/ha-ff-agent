@@ -22,6 +22,33 @@ Das Journal ist Verlauf, keine Wissensbasis: Dauerhaftes gehört nach `docs/` od
 
 <!-- Neue Einträge direkt unter dieser Zeile einfügen -->
 
+## 2026-10-17 – lokal-2026-10-16-hacs-recherche – MVP PR 4 (Zusage/Absage)
+- **Nutzer-Auftrag:** „Ja, starte mit PR 4 (Rückmeldung: Zusage/Absage).“
+- **Delegiert:**
+  - entwickler (Sonnet): Umsetzung und zwei Nacharbeitsrunden
+  - tester (Sonnet) und reviewer (Opus) parallel, danach eine gezielte Nachprüfung durch
+    den reviewer
+  - Standardmodelle
+- **Unterbrechung:** Ein API-Limit hat den entwickler mitten in der Arbeit gestoppt. Seine
+  uncommitteten Änderungen blieben im Arbeitsverzeichnis, und er hat nach dem Reset per
+  SendMessage mit Kontext weitergemacht.
+- **Erledigt:**
+  - PR rauchstefan/ha-ff-agent#5 per Squash gemergt (bba8b34), 404 Tests, Abdeckung 100 %.
+  - Der reviewer hatte im ersten Durchlauf **nicht freigegeben**, wegen B1: Der
+    Wiederholungsschutz merkte sich den Erfolg je Aktion, deshalb wurde bei „Zusagen →
+    Absagen → Zusagen“ die dritte Rückmeldung still verschluckt. Behoben: Es zählt nur
+    noch der letzte Erfolg; Plan korrigiert. Nachprüfung: freigegeben.
+  - Transport in der Action als `car` (übersetzbar, hassfest-konform), Abbildung auf
+    `CAR` für FF Agent.
+- **Erkenntnis:** HA nutzt seit 2026.9 `probatio`, voluptuous ist nicht mehr installiert.
+  `homeassistant/__init__.py` setzt per `probatio.compat.install_as_voluptuous()` einen
+  Alias, deshalb funktioniert `import voluptuous as vol` für Custom-Integrationen weiter
+  (Blog der HA-Entwickler vom 30.09.2026). Nachgetragen in docs/architektur.md.
+- **Offen / Übergabe:**
+  - nächster Schritt 261017-mvp-5-options-reconfigure
+  - neu: 261017-reply-redirects, 261017-reply-test-k5
+  - der echte Test steht weiter aus
+
 ## 2026-10-17 – lokal-2026-10-16-hacs-recherche – MVP PR 3 (Alarm-Logik und Entitäten)
 - **Nutzer-Auftrag:** „Starte mit PR 3 (Alarm-Logik und Entitäten). Den echten Test machen
   wir später.“
