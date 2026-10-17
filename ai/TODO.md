@@ -90,7 +90,9 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
   Klärung der Markenrechte am Namen „FF Agent“ mit dem Hersteller.
 
 ### 261017-fundort-transport – Fundort der Rückmelde-URL korrigieren, Verkehrsmittel erweitern
-- **Status:** in Arbeit (lokal-2026-10-16-hacs-recherche, 2026-10-17)
+- **Status:** geparkt. PR rauchstefan/ha-ff-agent#4 ist offen, die CI grün. tester und
+  reviewer stehen noch aus. Der Nutzer will Implementierungen erst nach Ende seines Tests
+  (2026-10-17), deshalb nicht mergen, bis er das Signal gibt.
 - **Priorität:** hoch (Finding des Nutzers aus dem echten Test)
 - **Rolle(n):** entwickler, tester, reviewer
 - **Beschreibung:**
@@ -99,6 +101,76 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
   - Verkehrsmittel `feet` und `bicycle` ergänzen (FF Agent: `FEET`, `BICYCLE`).
   - Annahmen A8 und A9 in ADR 0002 und architektur.md als geklärt eintragen.
 - **Verweise:** docs/recherche/261016-ffagent-webhook-zusage.md, Abschnitt 3.7
+
+### 261017-erreichbarkeit-recherche – Wege, HA für FF Agent erreichbar zu machen
+- **Status:** erledigt (2026-10-17, docs/recherche/261017-erreichbarkeit.md; My-Link und ntfy-Integration vom Projektleiter geprüft)
+- **Priorität:** hoch (Hürde für normale Nutzer)
+- **Rolle(n):** researcher, danach architekt
+- **Beschreibung:** Nabu Casa (Link zur Einrichtung), Alternativen wie Tunnel-Add-ons
+  und kostenlose Webhook-Relays, sowie Wege ohne eingehende Verbindung, bewertet nach
+  Aufwand für normale Nutzer, Kosten, Zuverlässigkeit, Latenz und Datenschutz.
+- **Definition of Done:** docs/recherche/261017-erreichbarkeit.md mit Empfehlung.
+
+### 261017-ux-erreichbarkeit – Alarmquelle wählbar (Webhook/Nabu Casa oder ntfy), verständlicher Hinweis
+- **Status:** in Arbeit (lokal-2026-10-16-hacs-recherche, 2026-10-17). Auftrag des Nutzers:
+  „bitte 1 und 2 umsetzen, und dem Nutzer die Wahl geben“. Gemeint sind (1) Nabu Casa
+  mit Einrichtungslink und verständlichem Text, (2) ntfy.sh als kostenlose Alternative.
+  Der Nutzer hält den Alarmeingang nicht für kritisch. Merge erst nach seinem Okay
+  (der Test läuft noch).
+- **Priorität:** hoch
+- **Rolle(n):** architekt, entwickler, doku
+- **Beschreibung:** Finding des Nutzers vom 2026-10-17: Der Abschlussdialog bei interner
+  URL bzw. nur Pfad (`internal`/`path_only`) und der Options-Text sind zu technisch.
+  - Ziel: Ein normaler Nutzer versteht, was zu tun ist.
+  - Für Nabu Casa einen direkten Link zur Einrichtungsseite (z. B. My-Home-Assistant-Link,
+    zu prüfen).
+  - Alternativen laut Recherche 261017-erreichbarkeit-recherche kurz nennen.
+  - README entsprechend.
+- **Definition of Done:** neue Texte de/en, README, Tests.
+
+### 261017-geraeteinfo-hersteller – Kein Herstellername in der Geräte-Info
+- **Status:** offen (nach Ende des Tests des Nutzers)
+- **Priorität:** hoch (Rechtliches, sichtbar in der HA-UI)
+- **Rolle(n):** entwickler, tester, reviewer, doku
+- **Beschreibung:** Vorgabe des Nutzers vom 2026-10-17: „Erwähne nicht mackoy consulting
+  hier, ich besitze nicht die Rechte daran. Es ist eine inoffizielle Integration.“
+  - Heute zeigt die Geräte-Info in HA unter dem Gerätenamen den Hersteller
+    „mackoy consulting“: `const.py` `MANUFACTURER`, genutzt in `entity.py`
+    (`DeviceInfo`); Test `tests/test_entities.py` Zeile 163.
+  - Vorschlag:
+    - `manufacturer` ganz weglassen oder einen neutralen Eintrag wählen, etwa
+      „ha-ff-agent (inoffiziell)“; der Nutzer entscheidet.
+    - `model` „FF Agent“ und `configuration_url` prüfen. Nur der Produktname als
+      Beschreibung, kein Hinweis auf eine offizielle Herkunft.
+  - Auch Plan (docs/plaene/261017-mvp-alarm-zusage.md, Schritt Gerät) und die Doku
+    anpassen. Recherche-Fakten in docs/recherche/ bleiben unverändert.
+  - Grundsatz für alle Texte, die Nutzer sehen (UI, README, Release-Notes): keine Namen
+    des Herstellers bzw. Betreibers; Hinweis „inoffizielles Community-Projekt“.
+- **Definition of Done:** Die Geräte-Info zeigt keinen Herstellernamen mehr, die Tests
+  sind angepasst, und eine Regel im CLAUDE.md-Abschnitt „Fallstricke“ bzw. im Plan legt
+  den Grundsatz fest.
+
+### 261017-zusage-standort-transport – Standort aus HA und Verkehrsmittel beim Zusagen wählen
+- **Status:** offen (Feature-Wunsch des Nutzers; erst nach Ende seines Tests planen)
+- **Priorität:** mittel
+- **Rolle(n):** architekt, entwickler, tester, reviewer
+- **Beschreibung:** Wunsch des Nutzers vom 2026-10-17:
+  1. Die Koordinaten der Zusage-URL sollen auf den **Home-Assistant-Standort** gesetzt
+     werden können.
+     - Heute gibt es nur die Option „Standort-Entität“ (`person`/`device_tracker`).
+     - Neu wäre die Quelle `zone.home` bzw. der in HA konfigurierte Standort, als
+       Auswahl „kein Standort / HA-Standort / Entität“.
+  2. Das **Verkehrsmittel soll beim Zusagen wählbar** sein, nicht nur als Standard in den
+     Optionen. Mögliche Umsetzungen:
+     - eine Select-Entität „Verkehrsmittel“, die der Button „Zusagen“ verwendet
+     - je ein Button pro Verkehrsmittel
+     - Feld der Action (gibt es bereits)
+
+     Der architekt bewertet die Varianten; der Nutzer entscheidet.
+
+  Baut auf PR rauchstefan/ha-ff-agent#4 auf (drei Verkehrsmittel). Datenschutz beachten:
+  Der HA-Standort ist die Wohnadresse und geht nur auf ausdrückliche Wahl an FF Agent.
+- **Definition of Done:** Entscheidung des Nutzers, ADR-Ergänzung, umgesetzt und getestet.
 
 ### 261017-ha-zugriff – Lesezugriff auf die HA-Instanz des Nutzers (MCP/SSH)
 - **Status:** zurückgestellt (Nutzer, 2026-10-17)
