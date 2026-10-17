@@ -92,7 +92,7 @@ Gemeinsame Angaben für alle sechs Schritte:
 - **Priorität:** mittel
 
 ### 261017-python-target – Python-Mindestversion vs. ruff-Ziel prüfen
-- **Status:** offen
+- **Status:** erledigt (2026-10-17, ohne Codeänderung: HA 2026.3.0 verlangt Python ≥ 3.14.2, passt zu ruff py314; siehe docs/architektur.md)
 - **Priorität:** mittel
 - **Rolle(n):** entwickler
 - **Beschreibung:**

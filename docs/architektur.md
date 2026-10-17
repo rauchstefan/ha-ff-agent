@@ -140,6 +140,12 @@ gibt es nicht.
 
 ## HA-Fallstricke (geprüft 2026-10-17, HA 2026.3.0 und dev)
 
+- **Python-Version:** Laut `requires_python` auf PyPI verlangt HA 2026.1/2026.2
+  Python ≥ 3.13.2 und HA ab 2026.3.0 Python ≥ 3.14.2. Unsere Mindestversion
+  (`hacs.json`: 2026.3.0) passt deshalb zu ruff `target-version = "py314"`. Syntax ab
+  3.14, etwa `except A, B:` ohne Klammern, ist erlaubt. Wird die HA-Mindestversion je
+  unter 2026.3 gesenkt, muss das ruff-Ziel mit.
+
 - Cloudhook-Aufrufe kommen als `MockRequest`. Es gibt **kein `request.read()`**; stattdessen
   `request.text()` verwenden.
 - `webhook.async_register`:
