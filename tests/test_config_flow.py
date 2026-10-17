@@ -104,7 +104,7 @@ async def test_user_flow_creates_entry_with_external_url(
     }
     assert entry.options == {
         CONF_RESET_MINUTES: 30,
-        CONF_DEFAULT_TRANSPORT: "CAR",
+        CONF_DEFAULT_TRANSPORT: "car",
         CONF_REQUIRE_TOKEN: False,
     }
     assert entry.state is ConfigEntryState.LOADED

@@ -29,14 +29,40 @@ ISSUE_TOKEN_REJECTED: Final = "webhook_token_rejected_{entry_id}"
 DEFAULT_RESET_MINUTES: Final = 30
 MIN_RESET_MINUTES: Final = 1
 MAX_RESET_MINUTES: Final = 1440
-DEFAULT_TRANSPORT: Final = "CAR"
+DEFAULT_TRANSPORT: Final = "car"
+# The transports of the actions and the options are lower case, because translation
+# keys must be (hassfest). FF Agent gets the upper case value. Only verified values;
+# CAR is the only one seen so far. Extend after a check (A9).
+TRANSPORT_API_VALUES: Final = {"car": "CAR"}
+TRANSPORTS: Final = tuple(TRANSPORT_API_VALUES)
+# Entries from the first version stored the value for FF Agent as default transport.
+LEGACY_TRANSPORTS: Final = {api: key for key, api in TRANSPORT_API_VALUES.items()}
 
 # Calls within this time after the last recognized alarm are only counted (A3).
 DEDUP_SECONDS: Final = 30
 
+# Reply to FF Agent: GET <host>/app2/missionreplies/<reply_id>/<accept|reject> (A6).
+REPLY_PATH: Final = "/app2/missionreplies/{reply_id}/{action}"
+REPLY_TIMEOUT_SECONDS: Final = 10
+# The same reply right after a success is not sent a second time (double click).
+REPLY_REPEAT_GUARD_SECONDS: Final = 10
+
+# Values of the sensor "last reply".
+REPLY_STATE_ACCEPTED: Final = "accepted"
+REPLY_STATE_REJECTED: Final = "rejected"
+REPLY_STATE_FAILED: Final = "failed"
+REPLY_OPTIONS: Final = (REPLY_STATE_ACCEPTED, REPLY_STATE_REJECTED, REPLY_STATE_FAILED)
+
+# Actions of the integration.
+SERVICE_ACCEPT: Final = "accept"
+SERVICE_REJECT: Final = "reject"
+ATTR_TRANSPORT: Final = "transport"
+
 # Dispatcher signals of the alarm manager, one pair per config entry.
 SIGNAL_ALARM: Final = "ff_agent_alarm_{entry_id}"  # payload AlarmEvent
 SIGNAL_ALARM_STATE: Final = "ff_agent_alarm_state_{entry_id}"
+# Dispatcher signal of the reply client, one per config entry.
+SIGNAL_REPLY: Final = "ff_agent_reply_{entry_id}"  # payload ReplyResult
 
 # The event type of the event entity "alarm".
 EVENT_TYPE_ALARM: Final = "alarm"

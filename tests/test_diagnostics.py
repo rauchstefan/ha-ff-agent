@@ -4,13 +4,14 @@ from __future__ import annotations
 
 import json
 from http import HTTPStatus
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import pytest
 from homeassistant.components import webhook
 from homeassistant.components.diagnostics import REDACTED
 from homeassistant.core import HomeAssistant
 from homeassistant.core_config import async_process_ha_core_config
+from homeassistant.exceptions import HomeAssistantError
 from homeassistant.setup import async_setup_component
 from homeassistant.util.aiohttp import MockRequest
 from pytest_homeassistant_custom_component.common import MockConfigEntry
@@ -20,11 +21,27 @@ from pytest_homeassistant_custom_component.components.diagnostics import (
 
 from custom_components.ff_agent.const import TOKEN_HEADER
 from custom_components.ff_agent.diagnostics import async_get_config_entry_diagnostics
+from custom_components.ff_agent.models import ReplyAction
+from custom_components.ff_agent.reply import async_send_reply
 from custom_components.ff_agent.reply_url import reply_unique_id
 
-from .const import CLOUDHOOK_URL, HEADER_TOKEN, INTERNAL_URL, REPLY_ID, WEBHOOK_ID
+from .const import (
+    ACCEPT_URL,
+    CLOUDHOOK_URL,
+    HEADER_TOKEN,
+    INTERNAL_URL,
+    LATITUDE,
+    LOCATION_ENTITY,
+    LONGITUDE,
+    REJECT_URL,
+    REPLY_ID,
+    WEBHOOK_ID,
+)
 
 if TYPE_CHECKING:
+    from pytest_homeassistant_custom_component.test_util.aiohttp import (
+        AiohttpClientMocker,
+    )
     from pytest_homeassistant_custom_component.typing import ClientSessionGenerator
 
 BODY_VALUE = "STICHWORT-PLATZHALTER"
@@ -210,5 +227,111 @@ async def test_diagnostics_of_an_unloaded_entry(
 
     assert result["stats"] is None
     assert result["alarm"] is None
+    assert result["reply"] is None
     assert result["webhook"]["url_kind"] == "cloud"
     assert result["entry"]["data"]["webhook_id"] == REDACTED
+
+
+# --- Replies --------------------------------------------------------------------
+
+
+async def test_diagnostics_without_any_reply(
+    hass: HomeAssistant,
+    hass_client: ClientSessionGenerator,
+    mock_config_entry: MockConfigEntry,
+) -> None:
+    """Before the first reply the counters are zero and there is no result."""
+    await _setup(hass, mock_config_entry)
+
+    result = await get_diagnostics_for_config_entry(
+        hass, hass_client, mock_config_entry
+    )
+
+    assert result["reply"] == {
+        "attempts_total": 0,
+        "succeeded_total": 0,
+        "failed_total": 0,
+        "skipped_total": 0,
+        "repeat_guard_seconds": 10,
+        "last_result": None,
+    }
+
+
+async def test_diagnostics_show_the_outcome_of_the_last_reply(
+    hass: HomeAssistant,
+    hass_client: ClientSessionGenerator,
+    aioclient_mock: AiohttpClientMocker,
+    location_entry: MockConfigEntry,
+) -> None:
+    """A reply shows up with its outcome, but without address or coordinates."""
+    aioclient_mock.get(ACCEPT_URL, headers={"Content-Type": "text/html"})
+    hass.states.async_set(
+        LOCATION_ENTITY, "home", {"latitude": LATITUDE, "longitude": LONGITUDE}
+    )
+    await _setup(hass, location_entry)
+    await async_send_reply(hass, location_entry, ReplyAction.ACCEPT)
+    # The second one is skipped by the repeat guard and only counted.
+    await async_send_reply(hass, location_entry, ReplyAction.ACCEPT)
+
+    result = await get_diagnostics_for_config_entry(hass, hass_client, location_entry)
+
+    reply = result["reply"]
+    assert reply["attempts_total"] == 1
+    assert reply["succeeded_total"] == 1
+    assert reply["failed_total"] == 0
+    assert reply["skipped_total"] == 1
+    last = reply["last_result"]
+    assert set(last) == {
+        "action",
+        "at",
+        "success",
+        "status",
+        "content_type",
+        "error_type",
+    }
+    assert last["action"] == "accept"
+    assert last["success"] is True
+    assert last["status"] == 200
+    assert last["content_type"] == "text/html"
+    assert last["error_type"] is None
+    assert last["at"]
+    dumped = json.dumps(result)
+    for secret in (REPLY_ID, str(LATITUDE), str(LONGITUDE), LOCATION_ENTITY):
+        assert secret not in dumped
+    assert result["entry"]["options"]["location_entity"] == REDACTED
+
+
+@pytest.mark.parametrize(
+    ("kwargs", "status", "error_type"),
+    [
+        ({"status": 404}, 404, None),
+        ({"exc": TimeoutError()}, None, "TimeoutError"),
+    ],
+)
+async def test_diagnostics_show_a_failed_reply(
+    hass: HomeAssistant,
+    hass_client: ClientSessionGenerator,
+    aioclient_mock: AiohttpClientMocker,
+    mock_config_entry: MockConfigEntry,
+    kwargs: dict[str, Any],
+    status: int | None,
+    error_type: str | None,
+) -> None:
+    """A failed reply shows the status or the error class, never an address."""
+    aioclient_mock.get(REJECT_URL, **kwargs)
+    await _setup(hass, mock_config_entry)
+    with pytest.raises(HomeAssistantError):
+        await async_send_reply(hass, mock_config_entry, ReplyAction.REJECT)
+
+    result = await get_diagnostics_for_config_entry(
+        hass, hass_client, mock_config_entry
+    )
+
+    reply = result["reply"]
+    assert (reply["attempts_total"], reply["failed_total"]) == (1, 1)
+    last = reply["last_result"]
+    assert last["action"] == "reject"
+    assert last["success"] is False
+    assert last["status"] == status
+    assert last["error_type"] == error_type
+    assert REPLY_ID not in json.dumps(result)

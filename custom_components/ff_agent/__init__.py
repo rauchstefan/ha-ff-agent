@@ -8,11 +8,15 @@ from contextlib import suppress
 from homeassistant.components import webhook as ha_webhook
 from homeassistant.const import CONF_WEBHOOK_ID, Platform
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers import issue_registry as ir
+from homeassistant.helpers.typing import ConfigType
 
 from .alarm import AlarmManager
 from .const import (
     CONF_CLOUDHOOK,
+    CONF_REPLY_HOST,
+    CONF_REPLY_ID,
     CONF_RESET_MINUTES,
     DEFAULT_RESET_MINUTES,
     DOMAIN,
@@ -20,9 +24,25 @@ from .const import (
     WEBHOOK_ALLOWED_METHODS,
 )
 from .models import FFAgentConfigEntry, FFAgentData
+from .reply import ReplyClient
+from .services import async_setup_services
 from .webhook import async_build_handler
 
-PLATFORMS: list[Platform] = [Platform.BINARY_SENSOR, Platform.EVENT, Platform.SENSOR]
+# The integration is set up through config entries only.
+CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
+
+PLATFORMS: list[Platform] = [
+    Platform.BINARY_SENSOR,
+    Platform.BUTTON,
+    Platform.EVENT,
+    Platform.SENSOR,
+]
+
+
+async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
+    """Register the actions once; they work on the entry that is named in the call."""
+    async_setup_services(hass)
+    return True
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: FFAgentConfigEntry) -> bool:
@@ -32,7 +52,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: FFAgentConfigEntry) -> b
         entry.entry_id,
         entry.options.get(CONF_RESET_MINUTES, DEFAULT_RESET_MINUTES),
     )
-    entry.runtime_data = FFAgentData(alarm=alarm)
+    reply = ReplyClient(
+        hass, entry.entry_id, entry.data[CONF_REPLY_HOST], entry.data[CONF_REPLY_ID]
+    )
+    entry.runtime_data = FFAgentData(alarm=alarm, reply=reply)
     entry.async_on_unload(alarm.async_shutdown)
 
     # FF Agent calls from the internet, so the webhook must not be local only. GET and

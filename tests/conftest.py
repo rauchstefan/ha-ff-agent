@@ -16,6 +16,7 @@ from custom_components.ff_agent.const import (
     CONF_CLOUDHOOK_URL,
     CONF_DEFAULT_TRANSPORT,
     CONF_HEADER_TOKEN,
+    CONF_LOCATION_ENTITY,
     CONF_REPLY_HOST,
     CONF_REPLY_ID,
     CONF_REQUIRE_TOKEN,
@@ -28,7 +29,16 @@ from custom_components.ff_agent.const import (
 from custom_components.ff_agent.reply_url import reply_unique_id
 
 from .common import patch_cloud
-from .const import CLOUDHOOK_URL, EXTERNAL_URL, HEADER_TOKEN, REPLY_ID, WEBHOOK_ID
+from .const import (
+    CLOUDHOOK_URL,
+    EXTERNAL_URL,
+    HEADER_TOKEN,
+    LOCATION_ENTITY,
+    OTHER_REPLY_ID,
+    OTHER_WEBHOOK_ID,
+    REPLY_ID,
+    WEBHOOK_ID,
+)
 
 
 @pytest.fixture(autouse=True)
@@ -115,4 +125,37 @@ def token_entry(
         unique_id=mock_config_entry.unique_id,
         data=entry_data,
         options={**mock_config_entry.options, CONF_REQUIRE_TOKEN: True},
+    )
+
+
+@pytest.fixture
+def location_entry(
+    mock_config_entry: MockConfigEntry, entry_data: dict[str, Any]
+) -> MockConfigEntry:
+    """Return a config entry whose acceptance sends the location of an entity."""
+    return MockConfigEntry(
+        domain=DOMAIN,
+        title=mock_config_entry.title,
+        unique_id=mock_config_entry.unique_id,
+        data=entry_data,
+        options={**mock_config_entry.options, CONF_LOCATION_ENTITY: LOCATION_ENTITY},
+    )
+
+
+@pytest.fixture
+def other_entry(
+    mock_config_entry: MockConfigEntry, entry_data: dict[str, Any]
+) -> MockConfigEntry:
+    """Return the config entry of a second person (other reply ID, other webhook)."""
+    return MockConfigEntry(
+        domain=DOMAIN,
+        title="FF Agent Other",
+        unique_id=reply_unique_id(OTHER_REPLY_ID),
+        data={
+            **entry_data,
+            CONF_REPLY_ID: OTHER_REPLY_ID,
+            CONF_WEBHOOK_ID: OTHER_WEBHOOK_ID,
+            CONF_HEADER_TOKEN: HEADER_TOKEN + "-other",
+        },
+        options=dict(mock_config_entry.options),
     )

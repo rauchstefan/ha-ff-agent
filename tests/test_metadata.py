@@ -7,8 +7,9 @@ import struct
 from pathlib import Path
 
 import pytest
+from homeassistant.util import yaml as yaml_util
 
-from custom_components.ff_agent.const import DOMAIN
+from custom_components.ff_agent.const import DOMAIN, TRANSPORTS
 
 ROOT = Path(__file__).parent.parent
 INTEGRATION = ROOT / "custom_components" / DOMAIN
@@ -175,3 +176,75 @@ def test_translations_name_the_alarm_entities(
     assert entities["sensor"]["last_alarm"]["name"] == names[2]
     event_type = entities["event"]["alarm"]["state_attributes"]["event_type"]
     assert event_type["state"]["alarm"] == "Alarm"
+
+
+def test_icons_cover_the_reply_entities_and_actions() -> None:
+    """The buttons, the sensor and both actions have an icon."""
+    icons = _load(INTEGRATION / "icons.json")
+    assert icons["entity"]["button"]["accept"] == {"default": "mdi:check-circle"}
+    assert icons["entity"]["button"]["reject"] == {"default": "mdi:close-circle"}
+    assert icons["entity"]["sensor"]["last_reply"] == {
+        "default": "mdi:message-reply-text"
+    }
+    assert icons["services"] == {
+        "accept": {"service": "mdi:check-circle"},
+        "reject": {"service": "mdi:close-circle"},
+    }
+
+
+@pytest.mark.parametrize("language", ["en", "de"])
+def test_translations_cover_replies_actions_and_exceptions(language: str) -> None:
+    """Buttons, sensor states, actions and errors are translated."""
+    texts = _load(INTEGRATION / "translations" / f"{language}.json")
+    entity = texts["entity"]
+    assert entity["button"]["accept"]["name"]
+    assert entity["button"]["reject"]["name"]
+    last_reply = entity["sensor"]["last_reply"]
+    assert last_reply["name"]
+    assert set(last_reply["state"]) == {"accepted", "rejected", "failed"}
+    assert "{status}" in texts["exceptions"]["reply_http_error"]["message"]
+    assert "{transport}" in texts["exceptions"]["invalid_transport"]["message"]
+    assert texts["selector"]["transport"]["options"]["car"]
+    assert texts["exceptions"]["reply_connection_error"]["message"]
+    for service in ("accept", "reject"):
+        assert texts["services"][service]["name"]
+        assert texts["services"][service]["description"]
+    fields = texts["services"]["accept"]["fields"]
+    assert set(fields) == {"config_entry_id", "transport", "latitude", "longitude"}
+    assert set(texts["services"]["reject"]["fields"]) == {"config_entry_id"}
+    for field in fields.values():
+        assert field["name"]
+        assert field["description"]
+
+
+@pytest.mark.parametrize("language", ["en", "de"])
+def test_error_messages_do_not_contain_addresses(language: str) -> None:
+    """The translated errors name no URL and no ID."""
+    texts = _load(INTEGRATION / "translations" / f"{language}.json")
+    for error in texts["exceptions"].values():
+        assert "http://" not in error["message"].lower()
+        assert "https://" not in error["message"].lower()
+        assert "uuid" not in error["message"].lower()
+
+
+def test_services_yaml_matches_the_translations_and_the_schemas() -> None:
+    """Every field of services.yaml is translated and the transport list matches."""
+    services = yaml_util.load_yaml(str(INTEGRATION / "services.yaml"))
+    assert set(services) == {"accept", "reject"}
+    assert set(services["accept"]["fields"]) == {
+        "config_entry_id",
+        "transport",
+        "latitude",
+        "longitude",
+    }
+    assert set(services["reject"]["fields"]) == {"config_entry_id"}
+    for service in services.values():
+        entry = service["fields"]["config_entry_id"]
+        assert entry["required"] is True
+        assert entry["selector"] == {"config_entry": {"integration": DOMAIN}}
+    transport = services["accept"]["fields"]["transport"]["selector"]["select"]
+    assert transport["options"] == list(TRANSPORTS)
+    assert transport["translation_key"] == "transport"
+    assert list(TRANSPORTS) == ["car"]
+    for key in ("latitude", "longitude"):
+        assert services["accept"]["fields"][key]["selector"]["number"]["step"] == "any"

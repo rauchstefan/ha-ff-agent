@@ -36,6 +36,14 @@
         "name": "Alarm active"
       }
     },
+    "button": {
+      "accept": {
+        "name": "Accept"
+      },
+      "reject": {
+        "name": "Decline"
+      }
+    },
     "event": {
       "alarm": {
         "name": "Alarm",
@@ -51,6 +59,66 @@
     "sensor": {
       "last_alarm": {
         "name": "Last alarm"
+      },
+      "last_reply": {
+        "name": "Last reply",
+        "state": {
+          "accepted": "Accepted",
+          "rejected": "Declined",
+          "failed": "Failed"
+        }
+      }
+    }
+  },
+  "exceptions": {
+    "reply_connection_error": {
+      "message": "FF Agent could not be reached or did not answer in time. The reply was probably not sent. Check the internet connection and try again."
+    },
+    "reply_http_error": {
+      "message": "FF Agent answered with HTTP status {status}. The reply was probably not recorded. Check in FF Agent whether a reply is possible for the current mission."
+    },
+    "invalid_transport": {
+      "message": "The mode of transport \"{transport}\" is not supported. Only car is supported."
+    }
+  },
+  "selector": {
+    "transport": {
+      "options": {
+        "car": "Car"
+      }
+    }
+  },
+  "services": {
+    "accept": {
+      "name": "Accept",
+      "description": "Accepts the current mission for one person. Without a mode of transport the default of the entry is used; a location is only sent if you enter it here or set a location entity in the options.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Entry",
+          "description": "The FF Agent entry of the person who accepts."
+        },
+        "transport": {
+          "name": "Mode of transport",
+          "description": "How the person gets to the mission. Only car is supported."
+        },
+        "latitude": {
+          "name": "Latitude",
+          "description": "Latitude of the current location. Needs the longitude as well. Leave both empty to send no location."
+        },
+        "longitude": {
+          "name": "Longitude",
+          "description": "Longitude of the current location. Needs the latitude as well."
+        }
+      }
+    },
+    "reject": {
+      "name": "Decline",
+      "description": "Declines the current mission for one person.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Entry",
+          "description": "The FF Agent entry of the person who declines."
+        }
       }
     }
   },

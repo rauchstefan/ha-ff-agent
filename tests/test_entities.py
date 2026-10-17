@@ -184,8 +184,12 @@ async def test_unique_ids_contain_the_entry_id_but_no_secret(
     assert {entry.unique_id for entry in entries} == {
         f"{mock_config_entry.entry_id}_alarm",
         f"{mock_config_entry.entry_id}_last_alarm",
+        f"{mock_config_entry.entry_id}_accept",
+        f"{mock_config_entry.entry_id}_reject",
+        f"{mock_config_entry.entry_id}_last_reply",
     }
-    assert len(entries) == 3
+    # Binary sensor and event share the key "alarm".
+    assert len(entries) == 6
     for entry in entries:
         for secret in (REPLY_ID, WEBHOOK_ID, HEADER_TOKEN):
             assert secret not in entry.unique_id

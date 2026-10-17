@@ -1,0 +1,40 @@
+accept:
+  fields:
+    config_entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: ff_agent
+    transport:
+      required: false
+      example: car
+      selector:
+        select:
+          options:
+            - car
+          translation_key: transport
+    latitude:
+      required: false
+      example: 1.2345
+      selector:
+        number:
+          min: -90
+          max: 90
+          step: any
+          mode: box
+    longitude:
+      required: false
+      example: 6.789
+      selector:
+        number:
+          min: -180
+          max: 180
+          step: any
+          mode: box
+reject:
+  fields:
+    config_entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: ff_agent

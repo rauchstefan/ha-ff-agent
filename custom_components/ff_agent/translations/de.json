@@ -36,6 +36,14 @@
         "name": "Alarm aktiv"
       }
     },
+    "button": {
+      "accept": {
+        "name": "Zusagen"
+      },
+      "reject": {
+        "name": "Absagen"
+      }
+    },
     "event": {
       "alarm": {
         "name": "Alarm",
@@ -51,6 +59,66 @@
     "sensor": {
       "last_alarm": {
         "name": "Letzter Alarm"
+      },
+      "last_reply": {
+        "name": "Letzte Rückmeldung",
+        "state": {
+          "accepted": "Zugesagt",
+          "rejected": "Abgesagt",
+          "failed": "Fehlgeschlagen"
+        }
+      }
+    }
+  },
+  "exceptions": {
+    "reply_connection_error": {
+      "message": "FF Agent war nicht erreichbar oder hat nicht rechtzeitig geantwortet. Die Rückmeldung wurde vermutlich nicht gesendet. Prüfe die Internetverbindung und versuche es erneut."
+    },
+    "reply_http_error": {
+      "message": "FF Agent hat mit dem HTTP-Status {status} geantwortet. Die Rückmeldung wurde vermutlich nicht erfasst. Prüfe in FF Agent, ob für den aktuellen Einsatz eine Rückmeldung möglich ist."
+    },
+    "invalid_transport": {
+      "message": "Das Verkehrsmittel \"{transport}\" wird nicht unterstützt. Unterstützt wird nur car (Auto)."
+    }
+  },
+  "selector": {
+    "transport": {
+      "options": {
+        "car": "Auto"
+      }
+    }
+  },
+  "services": {
+    "accept": {
+      "name": "Zusagen",
+      "description": "Sagt für eine Person dem aktuellen Einsatz zu. Ohne Verkehrsmittel gilt der Standard des Eintrags; ein Standort wird nur gesendet, wenn du ihn hier angibst oder in den Optionen eine Standort-Entität gewählt hast.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Eintrag",
+          "description": "Der FF-Agent-Eintrag der Person, die zusagt."
+        },
+        "transport": {
+          "name": "Verkehrsmittel",
+          "description": "Wie die Person zum Einsatz kommt. Unterstützt wird nur Auto."
+        },
+        "latitude": {
+          "name": "Breitengrad",
+          "description": "Breitengrad des aktuellen Standorts. Braucht zusätzlich den Längengrad. Beide leer lassen, um keinen Standort zu senden."
+        },
+        "longitude": {
+          "name": "Längengrad",
+          "description": "Längengrad des aktuellen Standorts. Braucht zusätzlich den Breitengrad."
+        }
+      }
+    },
+    "reject": {
+      "name": "Absagen",
+      "description": "Sagt für eine Person dem aktuellen Einsatz ab.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Eintrag",
+          "description": "Der FF-Agent-Eintrag der Person, die absagt."
+        }
       }
     }
   },

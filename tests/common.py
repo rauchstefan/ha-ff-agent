@@ -12,6 +12,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 from homeassistant import components
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
+from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from .const import CLOUDHOOK_URL
 
@@ -63,3 +64,10 @@ def patch_cloud(
             yield mocks
     finally:
         hass.config.components.remove("cloud")
+
+
+async def async_setup_entry(hass: HomeAssistant, entry: MockConfigEntry) -> None:
+    """Add a config entry to Home Assistant and set it up."""
+    entry.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(entry.entry_id)
+    await hass.async_block_till_done()

@@ -8,6 +8,14 @@
         }
       }
     },
+    "button": {
+      "accept": {
+        "default": "mdi:check-circle"
+      },
+      "reject": {
+        "default": "mdi:close-circle"
+      }
+    },
     "event": {
       "alarm": {
         "default": "mdi:fire-truck"
@@ -16,7 +24,18 @@
     "sensor": {
       "last_alarm": {
         "default": "mdi:clock-alert-outline"
+      },
+      "last_reply": {
+        "default": "mdi:message-reply-text"
       }
+    }
+  },
+  "services": {
+    "accept": {
+      "service": "mdi:check-circle"
+    },
+    "reject": {
+      "service": "mdi:close-circle"
     }
   }
 }

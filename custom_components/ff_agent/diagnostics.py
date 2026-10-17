@@ -1,7 +1,8 @@
 """Diagnostics for the FF Agent integration.
 
 Secrets (reply ID, webhook ID, cloudhook URL, token), the title and the location
-entity are redacted. Of the last webhook call only the shape is available.
+entity are redacted. Of the last webhook call only the shape is available, of the last
+reply only the outcome: no address, no coordinates.
 """
 
 from __future__ import annotations
@@ -15,10 +16,12 @@ from .alarm import AlarmManager
 from .const import (
     CONF_REQUIRE_TOKEN,
     DEDUP_SECONDS,
+    REPLY_REPEAT_GUARD_SECONDS,
     TO_REDACT,
     WEBHOOK_ALLOWED_METHODS,
 )
 from .models import FFAgentConfigEntry
+from .reply import ReplyClient
 from .webhook_url import async_get_webhook_url
 
 
@@ -48,6 +51,21 @@ def _alarm(alarm: AlarmManager | None) -> dict[str, Any] | None:
     }
 
 
+def _reply(reply: ReplyClient | None) -> dict[str, Any] | None:
+    """Return the counters and the last result of the replies, never an address."""
+    if reply is None:
+        return None
+    last = reply.last_result
+    return {
+        "attempts_total": reply.attempts_total,
+        "succeeded_total": reply.succeeded_total,
+        "failed_total": reply.failed_total,
+        "skipped_total": reply.skipped_total,
+        "repeat_guard_seconds": REPLY_REPEAT_GUARD_SECONDS,
+        "last_result": last.as_diagnostics() if last else None,
+    }
+
+
 async def async_get_config_entry_diagnostics(
     hass: HomeAssistant, entry: FFAgentConfigEntry
 ) -> dict[str, Any]:
@@ -57,6 +75,7 @@ async def async_get_config_entry_diagnostics(
     # Not loaded (e.g. disabled or failed): there is no runtime data.
     runtime_data = getattr(entry, "runtime_data", None)
     alarm = runtime_data.alarm if runtime_data else None
+    reply = runtime_data.reply if runtime_data else None
 
     return {
         "entry": async_redact_data(entry.as_dict(), TO_REDACT),
@@ -67,4 +86,5 @@ async def async_get_config_entry_diagnostics(
         },
         "stats": _stats(alarm),
         "alarm": _alarm(alarm),
+        "reply": _reply(reply),
     }

@@ -177,8 +177,10 @@ ISSUE_TOKEN_REJECTED: Final = "webhook_token_rejected_{entry_id}"
 DEFAULT_RESET_MINUTES: Final = 30
 MIN_RESET_MINUTES: Final = 1
 MAX_RESET_MINUTES: Final = 1440
-DEFAULT_TRANSPORT: Final = "CAR"
-TRANSPORTS: Final = ("CAR",)  # only verified values, extend after check (A9)
+DEFAULT_TRANSPORT: Final = "car"  # lower case: translation keys (hassfest)
+TRANSPORT_API_VALUES: Final = {"car": "CAR"}  # for FF Agent; extend after A9
+TRANSPORTS: Final = tuple(TRANSPORT_API_VALUES)
+LEGACY_TRANSPORTS: Final = {"CAR": "car"}  # old option value, tolerated
 
 DEDUP_SECONDS: Final = 30
 REPLY_TIMEOUT_SECONDS: Final = 10
@@ -291,7 +293,7 @@ Persönliche Webhooks > Webhook hinzufügen.
         `cloud_not_connected` (Basis) setzen.
      5. Eintrag anlegen: `async_create_entry` mit `title=name` und
         `data={reply_id, reply_host, webhook_id, cloudhook, cloudhook_url|None, header_token}`,
-        dazu `options={reset_minutes: 30, default_transport: "CAR", require_token: False}`,
+        dazu `options={reset_minutes: 30, default_transport: "car", require_token: False}`,
         `description=url_kind` und `description_placeholders={"webhook_url": url}`. Das
         Token erscheint hier noch nicht, um die Ersteinrichtung einfach zu halten; es steht
         im Options Flow.
@@ -596,9 +598,11 @@ vorhanden: Funktion direkt aufrufen):
      `self.last_result: ReplyResult | None`.
    - `async def async_send(self, action, *, transport: str | None, location: tuple[float, float] | None) -> ReplyResult`. Ablauf:
      1. `async with self._lock:`
-     2. Gab es für dieselbe `action` einen Erfolg vor weniger als
-        `REPLY_REPEAT_GUARD_SECONDS`, wird `ReplyResult(skipped=True, success=True)` ohne
-        HTTP-Aufruf zurückgegeben.
+     2. Wird nur dann übersprungen, wenn die letzte erfolgreiche Rückmeldung dieselbe
+        Aktion war und weniger als `REPLY_REPEAT_GUARD_SECONDS` zurückliegt (Zusagen,
+        Absagen, Zusagen sendet also dreimal). Dann wird
+        `ReplyResult(skipped=True, success=True)` ohne HTTP-Aufruf zurückgegeben. Der
+        Client speichert dafür nur den letzten Erfolg (`tuple[ReplyAction, datetime]`).
      3. URL `f"https://{host}" + REPLY_PATH.format(reply_id=..., action=action)`.
         Parameter: bei `accept` `transport` (falls gesetzt), dazu `lat`/`lng` mit
         `f"{value:.6f}"`, falls ein Standort da ist. Bei `reject` keine Parameter.
@@ -658,7 +662,7 @@ vorhanden: Funktion direkt aufrufen):
    - `SupportsResponse.NONE`
 6. **`services.yaml`**: Felder mit Selektoren:
    - `config_entry_id`: `config_entry: {integration: ff_agent}`
-   - `transport`: `select` mit `options: [CAR]` und `translation_key: transport`
+   - `transport`: `select` mit `options: [car]` und `translation_key: transport` (Werte klein, gesendet wird `CAR`)
    - `latitude`/`longitude`: `number` mit `mode: box`, `step: any`, Bereich ±90 bzw. ±180
 7. **`sensor.py`**: `last_reply` mit `SensorDeviceClass.ENUM` und den Optionen
    `["accepted", "rejected", "failed"]`. Reagiert auf `SIGNAL_REPLY`:
@@ -667,7 +671,7 @@ vorhanden: Funktion direkt aufrufen):
    - Keine Attribute, kein Restore.
 8. **Translations:**
    - `services.accept` und `services.reject` mit Name, Beschreibung und Feldern
-   - `selector.transport.options.CAR`: „Auto“ bzw. „Car“
+   - `selector.transport.options.car`: „Auto“ bzw. „Car“
    - `exceptions.reply_connection_error`, `exceptions.reply_http_error` (mit `{status}`)
    - `entity.button.accept|reject`
    - `entity.sensor.last_reply` mit den States
