@@ -22,6 +22,26 @@ Das Journal ist Verlauf, keine Wissensbasis: Dauerhaftes gehört nach `docs/` od
 
 <!-- Neue Einträge direkt unter dieser Zeile einfügen -->
 
+## 2026-10-17 – lokal-2026-10-16-hacs-recherche – Erste Findings aus dem echten Test
+- **Nutzer:**
+  - Installation über HACS auf der eigenen Instanz ist erledigt.
+  - Finding: Der Fundort der Rückmelde-URL ist falsch beschrieben.
+  - „Ich möchte, dass die Implementationen erstmal warten, bis ich fertig bin mit testen.“
+  - Feature-Wünsche: Standort aus Home Assistant für die Zusage, Verkehrsmittel beim
+    Zusagen wählbar.
+- **Delegiert:** entwickler (Sonnet) für den Bugfix. Er war fertig, bevor die Bitte zu
+  warten kam.
+- **Erledigt:**
+  - Recherche 3.7: Fundort „Weblinks für Einsatzmeldung“; die offiziellen Hinweise von
+    FF Agent klären A8 und A9 (`transport` CAR/FEET/BICYCLE, Standard CAR).
+  - PR rauchstefan/ha-ff-agent#4 (Fundort plus Verkehrsmittel), CI grün, **geparkt**,
+    nicht gemergt.
+  - Neues TODO 261017-zusage-standort-transport.
+- **Offen / Übergabe:**
+  - Erst nach dem Signal des Nutzers weiter: tester und reviewer für #4, Merge, dann die
+    Feature-Planung.
+  - Zugriff auf HA per MCP oder SSH bleibt zurückgestellt.
+
 ## 2026-10-17 – lokal-2026-10-16-hacs-recherche – Veröffentlichung und Release v0.1.0
 - **Nutzer-Auftrag:** „Ich schlage vor, wir schalten es öffentlich und machen die komplette
   Installation einmal durch“

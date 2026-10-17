@@ -90,7 +90,9 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
   Klärung der Markenrechte am Namen „FF Agent“ mit dem Hersteller.
 
 ### 261017-fundort-transport – Fundort der Rückmelde-URL korrigieren, Verkehrsmittel erweitern
-- **Status:** in Arbeit (lokal-2026-10-16-hacs-recherche, 2026-10-17)
+- **Status:** geparkt. PR rauchstefan/ha-ff-agent#4 ist offen, die CI grün. tester und
+  reviewer stehen noch aus. Der Nutzer will Implementierungen erst nach Ende seines Tests
+  (2026-10-17), deshalb nicht mergen, bis er das Signal gibt.
 - **Priorität:** hoch (Finding des Nutzers aus dem echten Test)
 - **Rolle(n):** entwickler, tester, reviewer
 - **Beschreibung:**
@@ -99,6 +101,28 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
   - Verkehrsmittel `feet` und `bicycle` ergänzen (FF Agent: `FEET`, `BICYCLE`).
   - Annahmen A8 und A9 in ADR 0002 und architektur.md als geklärt eintragen.
 - **Verweise:** docs/recherche/261016-ffagent-webhook-zusage.md, Abschnitt 3.7
+
+### 261017-zusage-standort-transport – Standort aus HA und Verkehrsmittel beim Zusagen wählen
+- **Status:** offen (Feature-Wunsch des Nutzers; erst nach Ende seines Tests planen)
+- **Priorität:** mittel
+- **Rolle(n):** architekt, entwickler, tester, reviewer
+- **Beschreibung:** Wunsch des Nutzers vom 2026-10-17:
+  1. Die Koordinaten der Zusage-URL sollen auf den **Home-Assistant-Standort** gesetzt
+     werden können.
+     - Heute gibt es nur die Option „Standort-Entität“ (`person`/`device_tracker`).
+     - Neu wäre die Quelle `zone.home` bzw. der in HA konfigurierte Standort, als
+       Auswahl „kein Standort / HA-Standort / Entität“.
+  2. Das **Verkehrsmittel soll beim Zusagen wählbar** sein, nicht nur als Standard in den
+     Optionen. Mögliche Umsetzungen:
+     - eine Select-Entität „Verkehrsmittel“, die der Button „Zusagen“ verwendet
+     - je ein Button pro Verkehrsmittel
+     - Feld der Action (gibt es bereits)
+
+     Der architekt bewertet die Varianten; der Nutzer entscheidet.
+
+  Baut auf PR rauchstefan/ha-ff-agent#4 auf (drei Verkehrsmittel). Datenschutz beachten:
+  Der HA-Standort ist die Wohnadresse und geht nur auf ausdrückliche Wahl an FF Agent.
+- **Definition of Done:** Entscheidung des Nutzers, ADR-Ergänzung, umgesetzt und getestet.
 
 ### 261017-ha-zugriff – Lesezugriff auf die HA-Instanz des Nutzers (MCP/SSH)
 - **Status:** zurückgestellt (Nutzer, 2026-10-17)
