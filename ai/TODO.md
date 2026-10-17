@@ -111,8 +111,12 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
   Aufwand für normale Nutzer, Kosten, Zuverlässigkeit, Latenz und Datenschutz.
 - **Definition of Done:** docs/recherche/261017-erreichbarkeit.md mit Empfehlung.
 
-### 261017-ux-erreichbarkeit – Hinweis „keine externe URL“ verständlich machen
-- **Status:** offen (nach Ende des Tests; Inhalt abhängig von der Recherche)
+### 261017-ux-erreichbarkeit – Alarmquelle wählbar (Webhook/Nabu Casa oder ntfy), verständlicher Hinweis
+- **Status:** in Arbeit (lokal-2026-10-16-hacs-recherche, 2026-10-17). Auftrag des Nutzers:
+  „bitte 1 und 2 umsetzen, und dem Nutzer die Wahl geben“. Gemeint sind (1) Nabu Casa
+  mit Einrichtungslink und verständlichem Text, (2) ntfy.sh als kostenlose Alternative.
+  Der Nutzer hält den Alarmeingang nicht für kritisch. Merge erst nach seinem Okay
+  (der Test läuft noch).
 - **Priorität:** hoch
 - **Rolle(n):** architekt, entwickler, doku
 - **Beschreibung:** Finding des Nutzers vom 2026-10-17: Der Abschlussdialog bei interner
