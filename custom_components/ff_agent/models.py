@@ -2,11 +2,14 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime
-from typing import Any, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 from homeassistant.config_entries import ConfigEntry
+
+if TYPE_CHECKING:
+    from .alarm import AlarmManager
 
 type BodyKind = Literal["empty", "json", "form", "text", "binary"]
 
@@ -46,20 +49,22 @@ class WebhookCall:
         }
 
 
-@dataclass(slots=True)
-class WebhookStats:
-    """Counters of the webhook of one config entry."""
+@dataclass(frozen=True, slots=True)
+class AlarmEvent:
+    """A recognized alarm: a webhook call that was not a duplicate.
 
-    calls_total: int = 0
-    rejected_total: int = 0
-    last_call: WebhookCall | None = None
+    It carries no mission data. A later ``details`` field is the extension point for
+    mission details (see docs/architektur.md).
+    """
+
+    received_at: datetime
 
 
 @dataclass(slots=True)
 class FFAgentData:
     """Runtime data of a config entry."""
 
-    webhook_stats: WebhookStats = field(default_factory=WebhookStats)
+    alarm: AlarmManager
 
 
 type FFAgentConfigEntry = ConfigEntry[FFAgentData]

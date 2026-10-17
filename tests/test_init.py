@@ -128,8 +128,11 @@ async def test_setup_creates_runtime_data(
     await _setup(hass, mock_config_entry)
 
     assert isinstance(mock_config_entry.runtime_data, FFAgentData)
-    stats = mock_config_entry.runtime_data.webhook_stats
-    assert (stats.calls_total, stats.rejected_total, stats.last_call) == (0, 0, None)
+    alarm = mock_config_entry.runtime_data.alarm
+    assert (alarm.calls_total, alarm.rejected_total, alarm.last_call) == (0, 0, None)
+    assert (alarm.alarms_total, alarm.deduplicated_total) == (0, 0)
+    assert not alarm.active
+    assert alarm.last_alarm is None
 
 
 async def test_setup_registers_the_webhook(

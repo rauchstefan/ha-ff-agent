@@ -1,0 +1,22 @@
+{
+  "entity": {
+    "binary_sensor": {
+      "alarm": {
+        "default": "mdi:alarm-light-outline",
+        "state": {
+          "on": "mdi:alarm-light"
+        }
+      }
+    },
+    "event": {
+      "alarm": {
+        "default": "mdi:fire-truck"
+      }
+    },
+    "sensor": {
+      "last_alarm": {
+        "default": "mdi:clock-alert-outline"
+      }
+    }
+  }
+}

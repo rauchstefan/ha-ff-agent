@@ -30,6 +30,30 @@
       "path_only": "**Achtung:** Home Assistant hat weder eine externe noch eine interne URL und keine Nabu-Casa-Verbindung. Die Einrichtung kennt nur den Pfad `{webhook_url}`, FF Agent kann damit nichts anfangen.\n\nRichte zuerst eine externe URL oder Nabu Casa ein. Entferne danach diese Einrichtung und lege sie neu an, damit eine vollständige Adresse erzeugt wird. Erst dann in FF Agent einen Webhook anlegen (Web-UI > Automatisierung > Persönliche Webhooks > Webhook hinzufügen):\n\n- Type: Alarm\n- Webhooktyp: Generischer Webhook\n- Methode: POST\n- URL: die neue Adresse\n- Aktiv: an\n- auch für Testalarme: an (zum Testen; Automationen laufen dann auch bei Testalarmen)\n- auch für Infoalarme: aus\n- Zeitplan aktiviert: aus\n- Basis-Authentifizierung, Inhalt und Query-Parameter: leer"
     }
   },
+  "entity": {
+    "binary_sensor": {
+      "alarm": {
+        "name": "Alarm aktiv"
+      }
+    },
+    "event": {
+      "alarm": {
+        "name": "Alarm",
+        "state_attributes": {
+          "event_type": {
+            "state": {
+              "alarm": "Alarm"
+            }
+          }
+        }
+      }
+    },
+    "sensor": {
+      "last_alarm": {
+        "name": "Letzter Alarm"
+      }
+    }
+  },
   "issues": {
     "webhook_token_rejected": {
       "title": "FF-Agent-Webhook-Aufruf abgelehnt",

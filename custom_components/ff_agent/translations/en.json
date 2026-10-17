@@ -30,6 +30,30 @@
       "path_only": "**Warning:** Home Assistant has neither an external nor an internal URL and no Nabu Casa connection. This entry only knows the path `{webhook_url}`, which is of no use to FF Agent.\n\nSet up an external URL or Nabu Casa first. Then remove this entry and add it again so that a complete address is generated. Only then create a webhook in FF Agent (web UI > Automation > Personal webhooks > Add webhook):\n\n- Type: Alarm\n- Webhook type: Generic webhook\n- Method: POST\n- URL: the new address\n- Active: on\n- Also for test alarms: on (for testing; automations then also run for test alarms)\n- Also for info alarms: off\n- Schedule enabled: off\n- Basic authentication, content and query parameters: empty"
     }
   },
+  "entity": {
+    "binary_sensor": {
+      "alarm": {
+        "name": "Alarm active"
+      }
+    },
+    "event": {
+      "alarm": {
+        "name": "Alarm",
+        "state_attributes": {
+          "event_type": {
+            "state": {
+              "alarm": "Alarm"
+            }
+          }
+        }
+      }
+    },
+    "sensor": {
+      "last_alarm": {
+        "name": "Last alarm"
+      }
+    }
+  },
   "issues": {
     "webhook_token_rejected": {
       "title": "FF Agent webhook call rejected",

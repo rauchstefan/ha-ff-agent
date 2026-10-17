@@ -27,7 +27,24 @@ TOKEN_HEADER: Final = "X-FF-Agent-Token"
 ISSUE_TOKEN_REJECTED: Final = "webhook_token_rejected_{entry_id}"
 
 DEFAULT_RESET_MINUTES: Final = 30
+MIN_RESET_MINUTES: Final = 1
+MAX_RESET_MINUTES: Final = 1440
 DEFAULT_TRANSPORT: Final = "CAR"
+
+# Calls within this time after the last recognized alarm are only counted (A3).
+DEDUP_SECONDS: Final = 30
+
+# Dispatcher signals of the alarm manager, one pair per config entry.
+SIGNAL_ALARM: Final = "ff_agent_alarm_{entry_id}"  # payload AlarmEvent
+SIGNAL_ALARM_STATE: Final = "ff_agent_alarm_state_{entry_id}"
+
+# The event type of the event entity "alarm".
+EVENT_TYPE_ALARM: Final = "alarm"
+
+# Device of a config entry.
+MANUFACTURER: Final = "mackoy consulting"
+MODEL: Final = "FF Agent"
+CONFIGURATION_URL: Final = "https://www.ff-agent.com"
 
 # Analysis of an incoming webhook call: only the shape is kept, never a value.
 # A body longer than MAX_BODY_ANALYSIS_CHARS is cut before it is parsed, so a large

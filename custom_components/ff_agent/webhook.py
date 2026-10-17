@@ -172,13 +172,13 @@ def async_build_handler(entry: FFAgentConfigEntry) -> Handler:
         hass: HomeAssistant, webhook_id: str, request: WebhookRequest
     ) -> web.Response | None:
         """Handle a webhook call: 200 (None), or 401 for a missing or wrong token."""
-        stats = entry.runtime_data.webhook_stats
+        alarm = entry.runtime_data.alarm
         issue_id = ISSUE_TOKEN_REJECTED.format(entry_id=entry.entry_id)
 
         if entry.options.get(CONF_REQUIRE_TOKEN) and not _token_is_valid(
             entry, request
         ):
-            stats.rejected_total += 1
+            alarm.async_handle_rejected()
             _LOGGER.debug("Rejected a webhook call: token missing or wrong")
             ir.async_create_issue(
                 hass,
@@ -201,8 +201,11 @@ def async_build_handler(entry: FFAgentConfigEntry) -> Handler:
             call.method,
             call.body_length,
         )
-        stats.calls_total += 1
-        stats.last_call = call
+        # Read the manager only now: during the await above the entry may have been
+        # reloaded, and the call belongs to the manager that is current at this point.
+        # While the entry is being unloaded there is none, and the call is dropped.
+        if (runtime_data := getattr(entry, "runtime_data", None)) is not None:
+            runtime_data.alarm.async_handle_call(call)
         return None
 
     return async_handle

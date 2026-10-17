@@ -145,3 +145,33 @@ def test_translations_contain_no_urls(language: str) -> None:
     values = _load(INTEGRATION / "translations" / f"{language}.json")
     assert "http://" not in json.dumps(values)
     assert "https://" not in json.dumps(values)
+
+
+def test_icons_cover_the_entities() -> None:
+    """Every entity has an icon translation; the alarm lamp lights up when active."""
+    icons = _load(INTEGRATION / "icons.json")["entity"]
+    assert icons["binary_sensor"]["alarm"] == {
+        "default": "mdi:alarm-light-outline",
+        "state": {"on": "mdi:alarm-light"},
+    }
+    assert icons["event"]["alarm"] == {"default": "mdi:fire-truck"}
+    assert icons["sensor"]["last_alarm"] == {"default": "mdi:clock-alert-outline"}
+
+
+@pytest.mark.parametrize(
+    ("language", "names"),
+    [
+        ("en", ("Alarm active", "Alarm", "Last alarm")),
+        ("de", ("Alarm aktiv", "Alarm", "Letzter Alarm")),
+    ],
+)
+def test_translations_name_the_alarm_entities(
+    language: str, names: tuple[str, str, str]
+) -> None:
+    """The entity names are translated, the event type has a label."""
+    entities = _load(INTEGRATION / "translations" / f"{language}.json")["entity"]
+    assert entities["binary_sensor"]["alarm"]["name"] == names[0]
+    assert entities["event"]["alarm"]["name"] == names[1]
+    assert entities["sensor"]["last_alarm"]["name"] == names[2]
+    event_type = entities["event"]["alarm"]["state_attributes"]["event_type"]
+    assert event_type["state"]["alarm"] == "Alarm"

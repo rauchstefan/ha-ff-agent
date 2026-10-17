@@ -19,6 +19,7 @@ from homeassistant.helpers import issue_registry as ir
 from homeassistant.util.aiohttp import MockRequest
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
+from custom_components.ff_agent.alarm import AlarmManager
 from custom_components.ff_agent.const import (
     DOMAIN,
     ISSUE_TOKEN_REJECTED,
@@ -28,7 +29,7 @@ from custom_components.ff_agent.const import (
     MAX_USER_AGENT_CHARS,
     TOKEN_HEADER,
 )
-from custom_components.ff_agent.models import WebhookCall, WebhookStats
+from custom_components.ff_agent.models import WebhookCall
 from custom_components.ff_agent.webhook import async_capture_call
 
 from .const import HEADER_TOKEN, REPLY_ID, WEBHOOK_ID
@@ -44,11 +45,11 @@ QUERY_VALUE = "query-value-placeholder"
 HEADER_VALUE = "header-value-placeholder"
 
 
-async def _setup(hass: HomeAssistant, entry: MockConfigEntry) -> WebhookStats:
+async def _setup(hass: HomeAssistant, entry: MockConfigEntry) -> AlarmManager:
     entry.add_to_hass(hass)
     assert await hass.config_entries.async_setup(entry.entry_id)
     await hass.async_block_till_done()
-    return entry.runtime_data.webhook_stats
+    return entry.runtime_data.alarm
 
 
 def _issue(hass: HomeAssistant, entry: MockConfigEntry) -> ir.IssueEntry | None:

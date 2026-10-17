@@ -10,8 +10,11 @@ from homeassistant.const import CONF_WEBHOOK_ID, Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import issue_registry as ir
 
+from .alarm import AlarmManager
 from .const import (
     CONF_CLOUDHOOK,
+    CONF_RESET_MINUTES,
+    DEFAULT_RESET_MINUTES,
     DOMAIN,
     ISSUE_TOKEN_REJECTED,
     WEBHOOK_ALLOWED_METHODS,
@@ -19,12 +22,18 @@ from .const import (
 from .models import FFAgentConfigEntry, FFAgentData
 from .webhook import async_build_handler
 
-PLATFORMS: list[Platform] = []
+PLATFORMS: list[Platform] = [Platform.BINARY_SENSOR, Platform.EVENT, Platform.SENSOR]
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: FFAgentConfigEntry) -> bool:
     """Set up FF Agent from a config entry."""
-    entry.runtime_data = FFAgentData()
+    alarm = AlarmManager(
+        hass,
+        entry.entry_id,
+        entry.options.get(CONF_RESET_MINUTES, DEFAULT_RESET_MINUTES),
+    )
+    entry.runtime_data = FFAgentData(alarm=alarm)
+    entry.async_on_unload(alarm.async_shutdown)
 
     # FF Agent calls from the internet, so the webhook must not be local only. GET and
     # POST are exactly the methods a generic webhook in FF Agent offers.

@@ -114,6 +114,15 @@ async def test_diagnostics_show_the_shape_of_the_last_call(
     assert "x-ff-agent-token" in last_call["header_names"]
     assert last_call["received_at"]
 
+    alarm = result["alarm"]
+    assert alarm["active"] is True
+    assert alarm["last_alarm"] == last_call["received_at"]
+    assert alarm["active_until"]
+    assert (alarm["alarms_total"], alarm["deduplicated_total"]) == (1, 0)
+    assert alarm["dedup_seconds"] == 30
+    assert alarm["reset_minutes"] == 30
+    assert BODY_VALUE not in json.dumps(alarm)
+
 
 async def test_diagnostics_without_any_call(
     hass: HomeAssistant,
@@ -134,6 +143,15 @@ async def test_diagnostics_without_any_call(
         "calls_total": 0,
         "rejected_total": 0,
         "last_call": None,
+    }
+    assert result["alarm"] == {
+        "active": False,
+        "last_alarm": None,
+        "active_until": None,
+        "alarms_total": 0,
+        "deduplicated_total": 0,
+        "dedup_seconds": 30,
+        "reset_minutes": 30,
     }
 
 
@@ -159,6 +177,8 @@ async def test_diagnostics_report_the_token_option_and_rejections(
         "rejected_total": 1,
         "last_call": None,
     }
+    assert result["alarm"]["alarms_total"] == 0
+    assert result["alarm"]["active"] is False
 
 
 @pytest.mark.usefixtures("external_url")
@@ -189,5 +209,6 @@ async def test_diagnostics_of_an_unloaded_entry(
     result = await async_get_config_entry_diagnostics(hass, cloudhook_entry)
 
     assert result["stats"] is None
+    assert result["alarm"] is None
     assert result["webhook"]["url_kind"] == "cloud"
     assert result["entry"]["data"]["webhook_id"] == REDACTED

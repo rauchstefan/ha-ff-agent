@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import json
 import logging
 from http import HTTPStatus
@@ -85,7 +86,7 @@ async def test_huge_text_body_is_measured_not_analyzed(
     response = await client.post(PATH, data="x" * size)
 
     assert response.status == HTTPStatus.OK
-    call = mock_config_entry.runtime_data.webhook_stats.last_call
+    call = mock_config_entry.runtime_data.alarm.last_call
     assert call is not None
     assert (call.body_kind, call.body_shape, call.body_length) == ("text", None, size)
     assert not [r for r in caplog.records if r.levelno >= logging.ERROR]
@@ -105,7 +106,7 @@ async def test_huge_json_body_never_raises(
     response = await client.post(PATH, data=body, headers=JSON)
 
     assert response.status == HTTPStatus.OK
-    call = mock_config_entry.runtime_data.webhook_stats.last_call
+    call = mock_config_entry.runtime_data.alarm.last_call
     assert call is not None
     assert call.body_kind == "text"
     assert call.body_length == len(body)
@@ -166,7 +167,7 @@ async def test_upper_case_token_header_name_is_accepted(
     """Header names are case-insensitive, for a real request and a cloudhook call."""
     await _setup(hass, token_entry)
     client = await hass_client_no_auth()
-    stats = token_entry.runtime_data.webhook_stats
+    stats = token_entry.runtime_data.alarm
 
     http = await client.post(PATH, headers={TOKEN_HEADER.upper(): HEADER_TOKEN})
     cloud = await webhook.async_handle_webhook(
@@ -186,7 +187,7 @@ async def test_empty_token_header_is_rejected(
     """An empty token header is as wrong as a missing one."""
     await _setup(hass, token_entry)
     client = await hass_client_no_auth()
-    stats = token_entry.runtime_data.webhook_stats
+    stats = token_entry.runtime_data.alarm
 
     http = await client.post(PATH, headers={TOKEN_HEADER: ""})
     cloud = await webhook.async_handle_webhook(
@@ -227,7 +228,7 @@ async def test_repeated_rejections_keep_a_single_issue(
 
     own = [key for key in registry.issues if key[0] == DOMAIN]
     assert len(own) == 1
-    assert token_entry.runtime_data.webhook_stats.rejected_total == 4
+    assert token_entry.runtime_data.alarm.rejected_total == 4
 
     good = await client.post(PATH, headers={TOKEN_HEADER: HEADER_TOKEN})
     assert good.status == HTTPStatus.OK
@@ -245,7 +246,7 @@ async def test_rejected_call_does_not_read_the_body(
     )
 
     assert response.status == HTTPStatus.UNAUTHORIZED
-    assert token_entry.runtime_data.webhook_stats.last_call is None
+    assert token_entry.runtime_data.alarm.last_call is None
 
 
 # --- Unload and reload ----------------------------------------------------------
@@ -270,10 +271,10 @@ async def test_reload_registers_the_webhook_again(
 
     second = mock_config_entry.runtime_data
     assert second is not first
-    assert second.webhook_stats.calls_total == 0
+    assert second.alarm.calls_total == 0
     assert (await client.post(PATH)).status == HTTPStatus.OK
-    assert second.webhook_stats.calls_total == 1
-    assert first.webhook_stats.calls_total == 1
+    assert second.alarm.calls_total == 1
+    assert first.alarm.calls_total == 1
 
 
 async def test_unload_removes_the_registration(
@@ -339,3 +340,64 @@ async def test_diagnostics_hold_no_secret_even_if_a_call_carries_them(
         "nested": {"b": ["list(2)", f"str({len(WEBHOOK_ID)})"]},
         "list": ["list(1)", f"str({len(token_entry.title)})"],
     }
+
+
+# --- A call that is in flight while the entry reloads ---------------------------
+
+
+class SlowRequest(MockRequest):
+    """A request whose body only arrives when the gate is opened."""
+
+    def __init__(self, gate: asyncio.Event) -> None:
+        super().__init__(b"", "test", method="POST")
+        self._gate = gate
+
+    async def text(self) -> str:
+        """Wait for the gate, then return an empty body."""
+        await self._gate.wait()
+        return ""
+
+
+async def test_call_in_flight_during_a_reload_goes_to_the_new_manager(
+    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+) -> None:
+    """The manager is read after the body: the call lands in the current one."""
+    await _setup(hass, mock_config_entry)
+    old = mock_config_entry.runtime_data.alarm
+    gate = asyncio.Event()
+    task = hass.async_create_task(
+        webhook.async_handle_webhook(hass, WEBHOOK_ID, SlowRequest(gate))
+    )
+    await asyncio.sleep(0)
+
+    assert await hass.config_entries.async_reload(mock_config_entry.entry_id)
+    new = mock_config_entry.runtime_data.alarm
+    gate.set()
+    response = await task
+    await hass.async_block_till_done()
+
+    assert response.status == HTTPStatus.OK
+    assert new is not old
+    assert (old.calls_total, old.active) == (0, False)
+    assert (new.calls_total, new.alarms_total, new.active) == (1, 1, True)
+
+
+async def test_call_in_flight_while_the_entry_unloads_is_dropped(
+    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+) -> None:
+    """Without a manager the call is answered with 200 and has no effect."""
+    await _setup(hass, mock_config_entry)
+    old = mock_config_entry.runtime_data.alarm
+    gate = asyncio.Event()
+    task = hass.async_create_task(
+        webhook.async_handle_webhook(hass, WEBHOOK_ID, SlowRequest(gate))
+    )
+    await asyncio.sleep(0)
+
+    assert await hass.config_entries.async_unload(mock_config_entry.entry_id)
+    gate.set()
+    response = await task
+    await hass.async_block_till_done()
+
+    assert response.status == HTTPStatus.OK
+    assert (old.calls_total, old.active) == (0, False)
