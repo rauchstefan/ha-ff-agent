@@ -84,7 +84,7 @@ Gemeinsame Angaben für alle sechs Schritte:
   Nutzerfreigabe.
 
 ### 261017-mvp-5-options-reconfigure – Options Flow und Reconfigure
-- **Status:** offen
+- **Status:** in Arbeit (lokal-2026-10-16-hacs-recherche, 2026-10-17)
 - **Priorität:** mittel
 - **Zusätzlich (aus PR 1/2):**
   - Texte `internal` und `path_only` vom Rat „Eintrag neu anlegen“ auf Reconfigure umstellen
