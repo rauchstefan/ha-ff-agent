@@ -1,6 +1,6 @@
 # ADR 0002: Integrationsweg über persönlichen Webhook und persönliche Rückmelde-URL
 
-- **Status:** vorgeschlagen (Architekt, 2026-10-17). Gilt unter dem Vorbehalt der Annahmen
+- **Status:** angenommen (Nutzer, 2026-10-17; vorgeschlagen vom Architekten am selben Tag). Gilt unter dem Vorbehalt der Annahmen
   am Ende; sie werden beim ersten echten Test geprüft.
 - **Datum:** 2026-10-17
 - **TODO:** `261016-ffagent-klaerung`

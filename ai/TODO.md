@@ -64,7 +64,7 @@ Gemeinsame Angaben für alle sechs Schritte:
 - **Definition of Done:** wie im Plan beim jeweiligen PR
 
 ### 261017-mvp-1-config-flow – Manifest, Rückmelde-URL-Parser, Webhook-URL, Config Flow
-- **Status:** offen
+- **Status:** in Arbeit (lokal-2026-10-16-hacs-recherche, 2026-10-17)
 - **Priorität:** hoch
 
 ### 261017-mvp-2-webhook – Webhook-Empfang, Zusatz-Token, Diagnostics

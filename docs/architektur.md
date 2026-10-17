@@ -3,7 +3,7 @@
 Gesamtbild der Integration. Gepflegt vom `architekt`. Einzelentscheidungen stehen als ADR
 in `docs/adr/`.
 
-Stand 2026-10-17. Der Integrationsweg ist in ADR 0002 entschieden (Status: vorgeschlagen).
+Stand 2026-10-17. Der Integrationsweg ist in ADR 0002 entschieden (Status: angenommen).
 Die Umsetzung folgt `docs/plaene/261017-mvp-alarm-zusage.md`. Der Code im Repo ist noch
 das Gerüst; die Struktur unten beschreibt das **Zielbild des MVP**.
 
