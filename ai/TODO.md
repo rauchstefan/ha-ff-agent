@@ -102,6 +102,28 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
   - Annahmen A8 und A9 in ADR 0002 und architektur.md als geklärt eintragen.
 - **Verweise:** docs/recherche/261016-ffagent-webhook-zusage.md, Abschnitt 3.7
 
+### 261017-geraeteinfo-hersteller – Kein Herstellername in der Geräte-Info
+- **Status:** offen (nach Ende des Tests des Nutzers)
+- **Priorität:** hoch (Rechtliches, sichtbar in der HA-UI)
+- **Rolle(n):** entwickler, tester, reviewer, doku
+- **Beschreibung:** Vorgabe des Nutzers vom 2026-10-17: „Erwähne nicht mackoy consulting
+  hier, ich besitze nicht die Rechte daran. Es ist eine inoffizielle Integration.“
+  - Heute zeigt die Geräte-Info in HA unter dem Gerätenamen den Hersteller
+    „mackoy consulting“: `const.py` `MANUFACTURER`, genutzt in `entity.py`
+    (`DeviceInfo`); Test `tests/test_entities.py` Zeile 163.
+  - Vorschlag:
+    - `manufacturer` ganz weglassen oder einen neutralen Eintrag wählen, etwa
+      „ha-ff-agent (inoffiziell)“; der Nutzer entscheidet.
+    - `model` „FF Agent“ und `configuration_url` prüfen. Nur der Produktname als
+      Beschreibung, kein Hinweis auf eine offizielle Herkunft.
+  - Auch Plan (docs/plaene/261017-mvp-alarm-zusage.md, Schritt Gerät) und die Doku
+    anpassen. Recherche-Fakten in docs/recherche/ bleiben unverändert.
+  - Grundsatz für alle Texte, die Nutzer sehen (UI, README, Release-Notes): keine Namen
+    des Herstellers bzw. Betreibers; Hinweis „inoffizielles Community-Projekt“.
+- **Definition of Done:** Die Geräte-Info zeigt keinen Herstellernamen mehr, die Tests
+  sind angepasst, und eine Regel im CLAUDE.md-Abschnitt „Fallstricke“ bzw. im Plan legt
+  den Grundsatz fest.
+
 ### 261017-zusage-standort-transport – Standort aus HA und Verkehrsmittel beim Zusagen wählen
 - **Status:** offen (Feature-Wunsch des Nutzers; erst nach Ende seines Tests planen)
 - **Priorität:** mittel
