@@ -56,26 +56,60 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
 - **Definition of Done:** HACS-Job grün, Cron täglich.
 - **Verweise:** PR rauchstefan/ha-ff-agent#1
 
-### 261016-ffagent-klaerung – Ausgehende FF-Agent-Schnittstelle klären
-- **Status:** in Arbeit (lokal-2026-10-16-hacs-recherche, 2026-10-16) – wartet auf Web-UI-Antworten (docs/recherche/261016-ffagent-webhook-zusage.md, Abschnitt 6) und Hersteller
+### MVP Alarm + Zusage (Plan: docs/plaene/261017-mvp-alarm-zusage.md, ADR 0002)
+
+Gemeinsame Angaben für alle sechs Schritte:
+- **Rolle(n):** entwickler → tester → reviewer, je ein PR auf `feat/<id>`
+- **Reihenfolge:** strikt nacheinander
+- **Definition of Done:** wie im Plan beim jeweiligen PR
+
+### 261017-mvp-1-config-flow – Manifest, Rückmelde-URL-Parser, Webhook-URL, Config Flow
+- **Status:** offen
 - **Priorität:** hoch
-- **Rolle(n):** Nutzer, Projektleiter
-- **Beschreibung:** Öffentlich ist keine Schnittstelle dokumentiert, die Alarme an HA
-  liefert. Zu klären:
-  - Rolle und Lizenz des Nutzers
-  - Was die Web-UI zeigt: Webhook, Reiter „Fireboard-API“, Status-Seiten, Gateway PLUS.
-    Screenshots ohne Tokens.
-  - ob die Hersteller-Anfrage gestellt wird (Fragen in der Recherche, Abschnitt 4.2)
-  - MVP-Umfang
 
-  Danach `iot_class` und den Integrationsweg per ADR festlegen (`architekt`).
-- **Definition of Done:** Integrationsweg entschieden, ADR geschrieben.
-- **Verweise:** docs/recherche/261016-ffagent-schnittstellen.md
+### 261017-mvp-2-webhook – Webhook-Empfang, Zusatz-Token, Diagnostics
+- **Status:** offen
+- **Priorität:** hoch
+- **Beschreibung:** Danach ist der erste echte Test möglich (Annahmen A1–A5, A12), nur mit
+  Nutzerfreigabe.
 
-Vorschläge des Projektleiters für den Einstieg (noch nicht beauftragt):
-1. MVP-Umfang mit dem Nutzer festlegen, danach Architektur-ADR (`architekt`).
+### 261017-mvp-3-alarm-entitaeten – Alarm-Logik, Binary-Sensor, Event, Sensor, Gerät
+- **Status:** offen
+- **Priorität:** hoch
+
+### 261017-mvp-4-rueckmeldung – Rückmelde-Client, Buttons, Actions
+- **Status:** offen
+- **Priorität:** hoch
+- **Beschreibung:** Den echten Test (A6–A9) nur während eines Testalarms und nur mit
+  Nutzerfreigabe.
+
+### 261017-mvp-5-options-reconfigure – Options Flow und Reconfigure
+- **Status:** offen
+- **Priorität:** mittel
+
+### 261017-mvp-6-doku-qualitaet – README/Einrichtungsanleitung, Quality Scale, Abdeckung
+- **Status:** offen
+- **Priorität:** mittel
+
+### 261017-token-default – Zusatz-Token standardmäßig an?
+- **Status:** offen (nach erstem echten Test)
+- **Priorität:** niedrig
+- **Beschreibung:** Nach dem Test von A12 entscheiden, ob neue Einträge die Token-Prüfung
+  standardmäßig eingeschaltet bekommen.
+
+### 261017-einsatzdetails – Quelle für Einsatzdetails
+- **Status:** offen (wartet auf Hersteller und Antwort zu A13)
+- **Priorität:** mittel
+- **Beschreibung:** Platzhalter im Webhook, Hersteller-API oder iCal-Feed (Remote
+  Calendar). Siehe ADR 0002, Abschnitt 7.
 
 ## Erledigt
+
+### 261016-ffagent-klaerung – Ausgehende FF-Agent-Schnittstelle klären
+- **Status:** erledigt (2026-10-17, ADR 0002 vorgeschlagen)
+- **Rolle(n):** Nutzer, researcher, architekt
+- **Verweise:** docs/adr/0002-integrationsweg-webhook-und-rueckmelde-url.md,
+  docs/recherche/261016-ffagent-webhook-zusage.md
 
 ### 261016-ffagent-schnittstellen – Recherche: FF-Agent-Schnittstellen
 - **Status:** erledigt (2026-10-16, siehe Commit „docs: add FF Agent interface research“)

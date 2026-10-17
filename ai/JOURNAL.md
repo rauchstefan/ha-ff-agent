@@ -22,6 +22,31 @@ Das Journal ist Verlauf, keine Wissensbasis: Dauerhaftes gehört nach `docs/` od
 
 <!-- Neue Einträge direkt unter dieser Zeile einfügen -->
 
+## 2026-10-17 – lokal-2026-10-16-hacs-recherche – ADR 0002 Integrationsweg
+- **Nutzer-Auftrag:** Screenshots der Rückmelde-URLs und des Dialogs „Webhook hinzufügen“
+  (generischer Webhook).
+- **Delegiert:** architekt (Opus, Standard). Er hat in einer zweiten Runde die
+  Webhook-Dialogfakten eingearbeitet.
+- **Erledigt:**
+  - Rückmelde-URLs geschwärzt dokumentiert (9c4a66e)
+  - ADR 0002 (vorgeschlagen) und Plan docs/plaene/261017-mvp-alarm-zusage.md mit 6 PRs
+  - docs/architektur.md aktualisiert
+  - TODOs 261017-mvp-1 bis -6, token-default und einsatzdetails angelegt
+- **Kernentscheidungen:**
+  - Alarm kommt per persönlichem Webhook an einen HA-Webhook (Cloudhook, falls vorhanden)
+  - Zusage und Absage per GET auf die persönliche Rückmelde-URL; nur UUID und Host werden
+    gespeichert
+  - `cloud_push`, `service`
+  - ein Config-Eintrag pro Person
+  - Zusatz-Token im Header optional
+- **Datenschutz:** Die Screenshots des Nutzers enthielten eine echte Rückmelde-UUID, Koordinaten
+  und einen vom Browser automatisch eingesetzten Benutzernamen. Nichts davon ist im Repo; per
+  grep geprüft.
+- **Offen / Übergabe:**
+  - Die Freigabe des ADR durch den Nutzer und die Fragen in ADR 0002 stehen aus
+    (Annahmen A3–A13).
+  - Echte Tests in der HA-Instanz nur mit Freigabe.
+
 ## 2026-10-16 – lokal-2026-10-16-hacs-recherche – Vertiefung Webhook und Zusage
 - **Nutzer-Auftrag:** Antworten des Nutzers, siehe docs/projekt-brief.md:
   - Admin, aber die Integration ist für Einsatzkräfte gedacht
