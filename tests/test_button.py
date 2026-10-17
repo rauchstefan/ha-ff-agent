@@ -16,7 +16,7 @@ from homeassistant.helpers import entity_registry as er
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.ff_agent import button
-from custom_components.ff_agent.const import DOMAIN
+from custom_components.ff_agent.const import CONF_DEFAULT_TRANSPORT, DOMAIN
 
 from .common import async_setup_entry
 from .const import (
@@ -179,6 +179,35 @@ async def test_pressing_accept_sends_the_acceptance_with_the_default_transport(
     assert _last_reply(hass, mock_config_entry) == "accepted"
     # The state of a button is the time of the press.
     assert _state(hass, button_id).state != "unknown"
+
+
+@pytest.mark.parametrize(
+    ("option", "expected"),
+    [("car", "CAR"), ("feet", "FEET"), ("bicycle", "BICYCLE")],
+)
+async def test_accept_button_sends_the_transport_of_the_option(
+    hass: HomeAssistant,
+    aioclient_mock: AiohttpClientMocker,
+    mock_config_entry: MockConfigEntry,
+    option: str,
+    expected: str,
+) -> None:
+    """The default transport of the options decides the query of the button."""
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        title=mock_config_entry.title,
+        unique_id=mock_config_entry.unique_id,
+        data=dict(mock_config_entry.data),
+        options={**mock_config_entry.options, CONF_DEFAULT_TRANSPORT: option},
+    )
+    aioclient_mock.get(ACCEPT_URL)
+    await async_setup_entry(hass, entry)
+
+    await _press(hass, entry, "accept")
+
+    assert aioclient_mock.call_count == 1
+    url = aioclient_mock.mock_calls[0][1]
+    assert dict(url.query) == {"transport": expected}
 
 
 async def test_pressing_reject_sends_the_rejection(

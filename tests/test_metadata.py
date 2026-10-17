@@ -9,7 +9,7 @@ from pathlib import Path
 import pytest
 from homeassistant.util import yaml as yaml_util
 
-from custom_components.ff_agent.const import DOMAIN, TRANSPORTS
+from custom_components.ff_agent.const import DOMAIN, TRANSPORT_API_VALUES, TRANSPORTS
 
 ROOT = Path(__file__).parent.parent
 INTEGRATION = ROOT / "custom_components" / DOMAIN
@@ -204,7 +204,9 @@ def test_translations_cover_replies_actions_and_exceptions(language: str) -> Non
     assert set(last_reply["state"]) == {"accepted", "rejected", "failed"}
     assert "{status}" in texts["exceptions"]["reply_http_error"]["message"]
     assert "{transport}" in texts["exceptions"]["invalid_transport"]["message"]
-    assert texts["selector"]["transport"]["options"]["car"]
+    assert set(texts["selector"]["transport"]["options"]) == set(TRANSPORTS)
+    for label in texts["selector"]["transport"]["options"].values():
+        assert label
     assert texts["exceptions"]["reply_connection_error"]["message"]
     for service in ("accept", "reject"):
         assert texts["services"][service]["name"]
@@ -245,7 +247,12 @@ def test_services_yaml_matches_the_translations_and_the_schemas() -> None:
     transport = services["accept"]["fields"]["transport"]["selector"]["select"]
     assert transport["options"] == list(TRANSPORTS)
     assert transport["translation_key"] == "transport"
-    assert list(TRANSPORTS) == ["car"]
+    assert list(TRANSPORTS) == ["car", "feet", "bicycle"]
+    assert dict(TRANSPORT_API_VALUES) == {
+        "car": "CAR",
+        "feet": "FEET",
+        "bicycle": "BICYCLE",
+    }
     for key in ("latitude", "longitude"):
         assert services["accept"]["fields"][key]["selector"]["number"]["step"] == "any"
 
@@ -321,3 +328,18 @@ def test_new_webhook_dialog_shows_the_access_once(language: str) -> None:
     text = texts["config"]["abort"]["reconfigure_successful_new_webhook"]
     for placeholder in ("webhook_url", "token_header", "token"):
         assert f"{{{placeholder}}}" in text
+
+
+@pytest.mark.parametrize("language", ["en", "de"])
+def test_reply_url_help_names_the_place_in_the_person_settings(language: str) -> None:
+    """The help of the field points to the personal settings of the person."""
+    texts = _load(INTEGRATION / "translations" / f"{language}.json")
+    step = texts["config"]["step"]["user"]
+    text = step["data_description"]["reply_url"]
+    assert "Weblinks für Einsatzmeldung" in text
+    assert "Übung/Einsatz" in text
+    for outdated in ("Einsatzrückmeldungen", "Mission replies"):
+        assert outdated not in text
+    # hassfest does not allow URLs in translations.
+    assert "http://" not in text
+    assert "https://" not in text

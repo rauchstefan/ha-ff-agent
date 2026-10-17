@@ -32,9 +32,9 @@ MIN_RESET_MINUTES: Final = 1
 MAX_RESET_MINUTES: Final = 1440
 DEFAULT_TRANSPORT: Final = "car"
 # The transports of the actions and the options are lower case, because translation
-# keys must be (hassfest). FF Agent gets the upper case value. Only verified values;
-# CAR is the only one seen so far. Extend after a check (A9).
-TRANSPORT_API_VALUES: Final = {"car": "CAR"}
+# keys must be (hassfest). FF Agent gets the upper case value. The three values are
+# the ones the FF Agent web UI names for the optional parameter (research 3.7, A9).
+TRANSPORT_API_VALUES: Final = {"car": "CAR", "feet": "FEET", "bicycle": "BICYCLE"}
 TRANSPORTS: Final = tuple(TRANSPORT_API_VALUES)
 # Entries from the first version stored the value for FF Agent as default transport.
 LEGACY_TRANSPORTS: Final = {api: key for key, api in TRANSPORT_API_VALUES.items()}
