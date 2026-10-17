@@ -72,7 +72,7 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
 - **Verweise:** README (Einrichtung, Fehlerbehebung), ADR 0002 (Annahmen)
 
 ### 261017-dependabot-hassfest – Dependabot-PR für den hassfest-Pin prüfen
-- **Status:** offen
+- **Status:** erledigt (2026-10-17, per Ersatz-PR rauchstefan/ha-ff-agent#3; #1 geschlossen. Hinweis: Das gh-Token dieses Rechners hat keinen `workflow`-Scope, deshalb lassen sich Dependabot-PRs auf Workflow-Dateien nicht per gh mergen. Ausweg: Ersatz-PR oder Merge im Browser)
 - **Priorität:** niedrig
 - **Rolle(n):** reviewer
 - **Beschreibung:** Dependabot hat PR rauchstefan/ha-ff-agent#1 geöffnet: Bump des Pins von
