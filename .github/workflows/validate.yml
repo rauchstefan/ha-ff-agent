@@ -5,8 +5,8 @@ on:
     branches: [main]
   pull_request:
   schedule:
-    # Weekly while the repository is private; switch to daily once it is public.
-    - cron: "0 3 * * 1"
+    # Daily: catches new HACS and hassfest requirements early.
+    - cron: "0 3 * * *"
   workflow_dispatch:
 
 permissions:
