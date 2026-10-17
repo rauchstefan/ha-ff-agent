@@ -1,6 +1,8 @@
 # ADR 0003: Alarmquelle wählbar – Webhook (Home Assistant Cloud / eigene Adresse) oder ntfy
 
-- **Status:** vorgeschlagen (Architekt, 2026-10-17). Ergänzt ADR 0002, Abschnitte 1, 3, 5 und 8.
+- **Status:** angenommen (Nutzer, 2026-10-17; vorgeschlagen vom Architekten am selben Tag,
+  Einstieg in den Flow nach Entscheidung des Nutzers überarbeitet). Ergänzt ADR 0002,
+  Abschnitte 1, 3, 5 und 8.
 - **Datum:** 2026-10-17
 - **TODO:** `261017-ux-erreichbarkeit`
 - **Umsetzungsplan:** `docs/plaene/261017-alarmquelle-ntfy.md`
@@ -27,6 +29,29 @@ entschieden:
   Thema ist geheim zu halten).
 - Mindestversion bleibt HA 2026.3.0. FF Agent ruft eine beliebige URL per GET oder POST auf,
   Timeout 5 s, eigene Header und Query-Parameter sind möglich [G, ADR 0002].
+
+**Entscheidungen des Nutzers zum Vorschlag (2026-10-17):**
+
+1. **Einstieg:** „Ich würde es dem Nutzer als empfohlen darstellen, Nabu Casa zu verwenden,
+   falls er es bereits hat. Nicht aber erzwingen. Der Nutzer kann sagen, dass er es nicht
+   hat, und dann auf ntfy im nächsten Dialog verwiesen werden. Zeig ihm dann bitte jeweils
+   für Nabu Casa und für ntfy je nach Selektion einen Einrichtungsdialog mit
+   Schritt-für-Schritt-Anweisung.“
+   - Die erste Frage lautet „Nutzt du Home Assistant Cloud (Nabu Casa)?“ mit „Ja
+     (empfohlen)“ und „Nein“. „Nein“ führt über einen kurzen Hinweis auf die kostenlose
+     Alternative ntfy in den ntfy-Pfad.
+   - Ein erkanntes Cloud-Abo darf den Text anpassen, erzwingt aber nichts.
+   - Der Wechsel zur jeweils anderen Option bleibt möglich.
+   - Eine vorhandene externe URL wird im Cloud- bzw. Webhook-Pfad wie bisher erkannt und
+     genutzt.
+2. **Schritt-für-Schritt-Dialoge je Pfad** mit nummerierten Schritten für Laien. Alle
+   Links kommen als `description_placeholders`.
+3. **„Trotzdem fortfahren“ bleibt:** nur Zu- und Absage, kein Alarmeingang, später über
+   Reconfigure nachrüstbar.
+4. **ntfy-Aufruf:** GET auf `/<thema>/trigger`, bestätigt.
+5. Vom Projektleiter vorläufig entschieden:
+   - Wortlaut „kostenpflichtiges Abo, zunächst kostenlos testbar“, ohne Preis und Dauer
+   - kein automatisches Anlegen des ntfy-Abos, höchstens als späteres TODO
 
 ### Geprüfter Stand von HA Core (2026-10-17, Tag `2026.3.0` und Branch `dev`)
 
@@ -150,34 +175,69 @@ Weitere Laufzeitregeln:
 
 - **`user`:** Name und Rückmelde-URL wie bisher. Die Duplikatprüfung (`unique_id`) kommt so
   vor jeder Einrichtung des Alarmwegs. Danach folgt das Menü.
-- **`alarm_source` (Menü):** „Direkt über das Internet (Home Assistant Cloud oder eigene
-  Adresse)“ → `webhook`, „Über den kostenlosen Dienst ntfy“ → `ntfy`. Ein Menü hat keine
-  Vorauswahl. Die Reihenfolge ist Webhook vor ntfy (offene Frage an den Nutzer).
-- **Webhook-Pfad:** `webhook` prüft die Erreichbarkeit ohne Nebenwirkung (Cloud-Abo aktiv?
-  externe URL vorhanden?).
-  - Erreichbar: Cloudhook bzw. externe URL erzeugen, Abschluss `cloud`/`external` wie
-    bisher.
-  - Cloud-Abo aktiv, aber nicht verbunden: Menü `cloud_not_connected` mit „Erneut versuchen“
-    und „Stattdessen ntfy“.
-  - Nicht erreichbar: **keine Sackgasse**, sondern das Menü `webhook_unreachable` mit
-    laienverständlichem Text, My-Link zu Home Assistant Cloud und zu den
-    Netzwerkeinstellungen. Optionen: „Erneut prüfen“, „Stattdessen ntfy nutzen“, „Trotzdem
-    fortfahren“. Beim zweiten erfolglosen Prüfen erscheint `webhook_still_unreachable` mit
-    Prüfhinweisen, damit der Nutzer sieht, dass geprüft wurde.
-  - „Trotzdem fortfahren“ legt den Eintrag wie bisher mit interner Adresse bzw. nur dem Pfad
-    an (Texte `internal`/`path_only`, neu formuliert).
-- **ntfy-Pfad:** Formular `ntfy` mit Thema, Anleitung und optionalem Entitätsfeld. Absenden
-  ist zugleich „Erneut prüfen“: Wird keine Entität gefunden, erscheint ein Fehler und das
-  Formular bleibt mit demselben Thema stehen. Abschluss `ntfy` mit den FF-Agent-Werten:
-  Methode **GET**, URL `https://<server>/<thema>/trigger`, sonst alles leer.
+- **Einstiegsfrage (Menü):** „Nutzt du Home Assistant Cloud (Nabu Casa)?“
+  - Optionen in dieser Reihenfolge: `cloud` mit „Ja (empfohlen)“ und `no_cloud` mit „Nein“.
+    Ein Menü hat keine Vorauswahl [G]. Die Empfehlung steht deshalb im Optionstext, und
+    „Ja“ steht oben.
+  - Zwei Varianten derselben Frage, weil HA die Beschreibung je Step-ID übersetzt:
+    - `alarm_source`: kein Cloud-Abo erkannt
+    - `alarm_source_cloud`: Cloud-Abo erkannt. Der Text sagt dann: „Home Assistant Cloud
+      ist bei dir bereits aktiv. Mit ‚Ja‘ bekommst du sofort die Adresse.“
+
+    Optionen und Reihenfolge sind gleich. Es wird **nicht** automatisch weitergesprungen.
+- **„Nein“ → Menü `no_cloud`:** Kurzer Hinweis, dass ntfy die kostenlose Alternative ist,
+  mit einem Satz zum Datenschutz. Optionen:
+  - `ntfy`: „Weiter mit ntfy (kostenlos)“, an erster Stelle
+  - `cloud`: „Doch Home Assistant Cloud nutzen“
+  - `own_address`: „Ich habe eine eigene Internetadresse (für Fortgeschrittene)“. Damit
+    landen Technikaffine mit externer URL, die ehrlich „Nein“ sagen, nicht zwangsweise bei
+    ntfy.
+- **Cloud-Pfad (`cloud`, ebenso `own_address`):** Prüft die Erreichbarkeit ohne
+  Nebenwirkung.
+  - Cloud-Abo aktiv und verbunden: Cloudhook erzeugen, Abschluss `cloud`.
+  - Kein Cloud-Abo, aber eine externe URL: Abschluss `external`, wie bisher.
+  - Cloud-Abo aktiv, aber nicht verbunden: Menü `cloud_not_connected` mit „Erneut
+    versuchen“ und „Stattdessen ntfy“.
+  - Nicht erreichbar: **Einrichtungsdialog `cloud_setup`** (Menü) mit nummerierten
+    Schritten:
+    1. Home Assistant Cloud über den My-Link öffnen.
+    2. Anmelden oder kostenlosen Test starten.
+    3. Zurückkommen und „Erneut prüfen“ wählen.
+
+    Dazu der Hinweis auf eine eigene Adresse (My-Link Netzwerk). Optionen: „Erneut
+    prüfen“, „Stattdessen ntfy nutzen“ und „Trotzdem fortfahren“. Ab dem zweiten
+    erfolglosen Prüfen erscheint `cloud_setup_retry` mit Prüfhinweisen.
+  - Die Abschlussdialoge `cloud`/`external` sind die Schritt-für-Schritt-Anleitung für
+    FF Agent: Webhook-URL plus alle Feldwerte.
+  - „Trotzdem fortfahren“ (`webhook_anyway`) legt den Eintrag wie bisher mit interner
+    Adresse bzw. nur dem Pfad an. Die Texte `internal`/`path_only` sind neu formuliert: nur
+    Zu- und Absage, Alarmeingang später über „Neu konfigurieren“.
+- **ntfy-Pfad:**
+  - Zuerst der **Einrichtungsdialog `ntfy`** (Menü) mit nummerierten Schritten:
+    1. Integration ntfy über den My-Link hinzufügen.
+    2. Das angezeigte Thema abonnieren, mit Anzeigename.
+    3. In FF Agent die URL `https://<server>/<thema>/trigger` mit Methode GET eintragen.
+    4. „Erledigt“ wählen.
+
+    Optionen: `ntfy_find` („Erledigt, Entität suchen“) und `cloud` („Doch Home Assistant
+    Cloud nutzen“).
+  - `ntfy_find` sucht die Entität über das Thema. Gefunden: Abschluss `ntfy`. Sonst das
+    **Formular `ntfy_select`** mit Fehlerhinweis und optionalem Entitätsfeld. Absenden mit
+    leerem Feld sucht erneut, eine gewählte Entität wird geprüft.
+  - Abschluss `ntfy`: Er wiederholt die FF-Agent-Werte mit der Server-Adresse des
+    tatsächlichen Abos: Methode **GET**, URL `https://<server>/<thema>/trigger`, sonst alles
+    leer.
+  - Server im Einrichtungsdialog: `ntfy.sh`, oder die Adresse des einzigen vorhandenen
+    ntfy-Eintrags.
   - Warum GET auf `/trigger`: Es gibt keinen Body, also kann FF Agent nichts mitschicken, was
-    ntfy speichern würde. ntfy setzt dann die Nachricht `triggered` [G].
+    ntfy speichern würde. ntfy setzt dann die Nachricht `triggered` [G]. Der Nutzer hat das
+    bestätigt.
 - **URLs in Texten** kommen nur über `description_placeholders` (hassfest-Regel).
 - **Reconfigure:** Das Formular bekommt das Feld `alarm_source` (Auswahl, Vorbelegung =
   aktuelle Quelle).
-  - Wechsel zu bzw. Bleiben bei `ntfy` führt in denselben Schritt `ntfy`.
-  - Wechsel zu `webhook`, „Webhook-Zugang neu erzeugen“ oder eine bisher unerreichbare
-    Adresse führen in denselben Webhook-Pfad samt Menüs.
+  - Wechsel zu bzw. Bleiben bei `ntfy` führt in den Einrichtungsdialog `ntfy`.
+  - Wechsel zu `webhook`, „Neue geheime Adresse erzeugen“ oder eine bisher unerreichbare
+    Adresse führen in den Cloud-Pfad samt Menüs (`cloud`).
   - Die Schritte unterscheiden am Ende über `self.source`: neuer Eintrag oder Update mit
     Reload.
 - **Options Flow:** `init` zeigt je nach Quelle das bisherige Webhook-Formular oder den
@@ -268,20 +328,28 @@ Entität ein Repair-Issue statt eines Setup-Fehlers, weil Rückmeldungen weiter 
 |---|---|
 | **Eigener ntfy-Client** (WebSocket/JSON-Stream in unserer Integration) | Verworfen. Er bräuchte Verbindungsmanager, Wiederverbindung, Nachholen über `since`, Auth und Tests. Dazu kämen eine Abhängigkeit (`aiontfy` o. Ä.) und Verantwortung für ein Drittsystem. Vorteile wären ein eigenes `since` (verpasste Alarme nachholen) und ein Abo ohne zweite Integration. Die Core-Integration ist Platin und kann alles andere schon. Neu bewerten, falls verlorene Alarme bei Verbindungsabbrüchen in der Praxis auftreten. |
 | **Nur README-Anleitung mit eigener Automation** (ntfy-Event → Action) | Verworfen. Es gibt keine Action, die einen Alarm einspeist. Wir müssten eine bauen (etwa `ff_agent.trigger_alarm`); dann könnte jede Automation und jedes Skript einen „Alarm aktiv“ erzeugen. Das ist eine neue Angriffs- und Fehlerfläche. Jeder Nutzer müsste den Filter aus 3. selbst richtig bauen, und die naheliegende Variante mit `not_from` verliert Alarme. Es gäbe kein Repair-Issue und keine Diagnose. Wer es trotzdem so will, kann heute schon eine eigene Automation auf die ntfy-Entität legen; dafür braucht es unsere Integration nicht. |
-| **Integration legt das ntfy-Abo selbst an** (Subentry-Flow der ntfy-Integration programmatisch starten oder `async_add_subentry` auf deren Eintrag) | Verworfen für diesen PR. Es schreibt in den Config-Eintrag einer fremden Integration bzw. steuert deren Flow-Schritte (`add_topic`, Feldnamen, Sektion `filter`) von außen. Ist ntfy gar nicht eingerichtet, müsste zusätzlich deren Haupt-Flow ferngesteuert werden. Das widerspricht der Trennung der Integrationen und bricht bei jeder Änderung des ntfy-Flows. Wenn der manuelle Weg sich im Test als zu schwer erweist, als „Komfort“-Option neu bewerten (offene Frage). |
+| **Integration legt das ntfy-Abo selbst an** (Subentry-Flow der ntfy-Integration programmatisch starten oder `async_add_subentry` auf deren Eintrag) | Verworfen für diesen PR. Es schreibt in den Config-Eintrag einer fremden Integration bzw. steuert deren Flow-Schritte (`add_topic`, Feldnamen, Sektion `filter`) von außen. Ist ntfy gar nicht eingerichtet, müsste zusätzlich deren Haupt-Flow ferngesteuert werden. Das widerspricht der Trennung der Integrationen und bricht bei jeder Änderung des ntfy-Flows. Entschieden vom Projektleiter am 2026-10-17. Mögliches späteres TODO `ntfy-komfort`, falls sich der manuelle Weg im Test als zu schwer erweist. |
 | **Thema von der ntfy-Integration erzeugen lassen** („Generate topic name“) und nur die Entität wählen | Teilweise übernommen: Ein vorhandenes Abo ist wählbar. Als Standard nicht, weil das Thema dann ausschließlich aus fremden Interna gelesen werden kann und nur 16 Zeichen hat. Unser Thema ist bekannt, bevor das Abo existiert. |
 | **Webhook auch im ntfy-Modus registriert lassen** (beide Eingänge parallel) | Verworfen. Ein zweiter offener Eingang ohne Nutzen. Im ntfy-Modus ist HA meist gar nicht erreichbar. Ein Cloudhook würde nur Ressourcen bei Nabu Casa halten. |
 | **Filter `not_from`/`not_to: [unavailable, unknown]`** wie bei Automationen | Verworfen. Er verliert den ersten Alarm nach dem Anlegen des Abos und Alarme im 10-s-Fenster nach einem Neuaufbau (siehe 3.). |
 | **Frische über das ntfy-Attribut `time` oder Dedup über `id`** | Verworfen als Hauptregel. Das koppelt an Attribute der Bibliothek, und `time` ist die Server-Uhr. Der State-Zeitstempel kommt von `EventEntity` selbst und ist stabil. |
 | **Event-Entität beliebiger Integrationen als Quelle** (allgemeine „Alarmquelle = Event-Entität“) | Vorerst nicht. Die Filterregel funktioniert für jede `EventEntity`. Die Erkennung über das Thema und die Texte sind aber ntfy-spezifisch. Der Listener wird so gebaut, dass er außer bei der Suche nichts von ntfy weiß. Eine spätere Öffnung ist damit billig. |
 | **Menü vor der Rückmelde-URL** | Verworfen. Die Duplikatprüfung soll vor dem Einrichten des Alarmwegs kommen. Sonst richtet jemand ntfy ein und erfährt erst danach, dass die Person schon eingerichtet ist. |
-| **Preis im Dialog** | Verworfen (Vorgabe des Nutzers; Preise ändern sich). |
+| **Neutrale Wahl „Webhook oder ntfy“ als erste Frage** (erster Vorschlag des Architekten) | Verworfen (Nutzer). Laien wissen oft nicht, was ein Webhook ist. Die Frage „Nutzt du Home Assistant Cloud?“ können sie beantworten. Die Cloud ist der empfohlene Weg, weil sie ohne Drittdienst auskommt und das Zusatz-Token erlaubt. |
+| **Automatisch weiter bei erkanntem Cloud-Abo** (Frage überspringen) | Verworfen (Nutzer: „nicht erzwingen“). Das erkannte Abo ändert nur den Text der Einstiegsfrage. |
+| **Einstieg über drei gleichrangige Optionen** (Cloud, eigene Adresse, ntfy) | Verworfen. Die eigene Adresse ist ein Expertenweg. Sie wird im Cloud-Pfad automatisch erkannt und ist zusätzlich im Menü `no_cloud` als dritte Option erreichbar. |
+| **ntfy-Formular mit Entitätsfeld als erster ntfy-Dialog** (erster Vorschlag) | Verworfen. Ein Formular kann kein „Doch Home Assistant Cloud“ anbieten. Der Einrichtungsdialog ist deshalb ein Menü, das Formular `ntfy_select` erscheint nur, wenn die Suche nichts findet. |
+| **Preis oder Testdauer im Dialog** | Verworfen (Vorgabe des Nutzers bzw. des Projektleiters; Preise und Testbedingungen ändern sich). Wortlaut: „kostenpflichtiges Abo, zunächst kostenlos testbar“. |
 
 ## Konsequenzen
 
 - Nutzer ohne Home Assistant Cloud und ohne eigene Adresse bekommen einen kostenlosen,
-  geführten Weg. Die Sackgasse `internal`/`path_only` wird zu einem Menü mit
-  Ausweg.
+  geführten Weg. Die Sackgasse `internal`/`path_only` wird zum Einrichtungsdialog
+  `cloud_setup` mit Ausweg zu ntfy oder „Trotzdem fortfahren“.
+- Die Einrichtung hat mehr Dialoge als vorher, mindestens Frage, Einrichtungsdialog und
+  Abschluss. Jeder Dialog hat dafür nur eine Aufgabe und nummerierte Schritte.
+- Zwischen Cloud- und ntfy-Pfad lässt sich in beide Richtungen wechseln, ohne den Flow
+  neu zu starten.
 - Ein dritter Dienst (ntfy.sh) kennt im ntfy-Modus die Alarmzeitpunkte. Das hat der Nutzer
   akzeptiert, es steht im Datenschutzhinweis.
 - **Zuverlässigkeit im ntfy-Modus:**
