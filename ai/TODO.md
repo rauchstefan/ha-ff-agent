@@ -54,7 +54,7 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
   ist. Dependabot aktualisiert solche Branch-Pins nicht, also gelegentlich von Hand
   nachziehen. Dasselbe gilt für hassfest@master.
 - **Definition of Done:** HACS-Job grün, Cron täglich.
-- **Verweise:** PR rauchstefan/ha-ff-agent#1
+- **Verweise:** PR rauchstefan/ha-ff-agent-archiv#1
 
 ### 261017-echter-test – Erster echter Test mit FF Agent und HA-Instanz
 - **Status:** in Arbeit (Freigabe des Nutzers 2026-10-17; Anleitung docs/plaene/261017-echter-test-anleitung.md; wartet auf Rückmeldeliste)
@@ -89,27 +89,27 @@ Gemeinsame Angaben für alle sechs Schritte:
 - **Definition of Done:** wie im Plan beim jeweiligen PR
 
 ### 261017-mvp-1-config-flow – Manifest, Rückmelde-URL-Parser, Webhook-URL, Config Flow
-- **Status:** erledigt (2026-10-17, PR rauchstefan/ha-ff-agent#2, 0fb459a)
+- **Status:** erledigt (2026-10-17, PR rauchstefan/ha-ff-agent-archiv#2, 0fb459a)
 - **Priorität:** hoch
 
 ### 261017-mvp-2-webhook – Webhook-Empfang, Zusatz-Token, Diagnostics
-- **Status:** erledigt (2026-10-17, PR rauchstefan/ha-ff-agent#3, bb533a8)
+- **Status:** erledigt (2026-10-17, PR rauchstefan/ha-ff-agent-archiv#3, bb533a8)
 - **Priorität:** hoch
 - **Beschreibung:** Danach ist der erste echte Test möglich (Annahmen A1–A5, A12), nur mit
   Nutzerfreigabe.
 
 ### 261017-mvp-3-alarm-entitaeten – Alarm-Logik, Binary-Sensor, Event, Sensor, Gerät
-- **Status:** erledigt (2026-10-17, PR rauchstefan/ha-ff-agent#4, 22a7c4c)
+- **Status:** erledigt (2026-10-17, PR rauchstefan/ha-ff-agent-archiv#4, 22a7c4c)
 - **Priorität:** hoch
 
 ### 261017-mvp-4-rueckmeldung – Rückmelde-Client, Buttons, Actions
-- **Status:** erledigt (2026-10-17, PR rauchstefan/ha-ff-agent#5, bba8b34)
+- **Status:** erledigt (2026-10-17, PR rauchstefan/ha-ff-agent-archiv#5, bba8b34)
 - **Priorität:** hoch
 - **Beschreibung:** Den echten Test (A6–A9) nur während eines Testalarms und nur mit
   Nutzerfreigabe.
 
 ### 261017-mvp-5-options-reconfigure – Options Flow und Reconfigure
-- **Status:** erledigt (2026-10-17, PR rauchstefan/ha-ff-agent#6)
+- **Status:** erledigt (2026-10-17, PR rauchstefan/ha-ff-agent-archiv#6)
 - **Priorität:** mittel
 - **Zusätzlich (aus PR 1/2):**
   - Texte `internal` und `path_only` vom Rat „Eintrag neu anlegen“ auf Reconfigure umstellen
@@ -118,7 +118,7 @@ Gemeinsame Angaben für alle sechs Schritte:
   - Entscheiden und dokumentieren, ob ein Reload den laufenden Alarm behalten soll (heute: nein)
 
 ### 261017-mvp-6-doku-qualitaet – README/Einrichtungsanleitung, Quality Scale, Abdeckung
-- **Status:** erledigt (2026-10-17, PR rauchstefan/ha-ff-agent#7, fa6a52d)
+- **Status:** erledigt (2026-10-17, PR rauchstefan/ha-ff-agent-archiv#7, fa6a52d)
 - **Priorität:** mittel
 - **Zusätzlich (aus PR 2):** In der Nutzerdoku warnen, dass HA Core die Webhook-ID in Debug-Logs von `homeassistant.components.webhook` und `.http` schreibt; solche Logs nicht teilen.
 - **Zusätzlich (aus PR 3):** Beispiel-Automation nur mit `not_from`/`not_to: [unavailable, unknown]` (siehe docs/architektur.md, HA-Fallstricke). Hinweis, dass Options-Änderungen einen laufenden Alarm zurücksetzen.
@@ -154,7 +154,7 @@ Gemeinsame Angaben für alle sechs Schritte:
 - **Definition of Done:** Verhalten entschieden, umgesetzt und getestet.
 
 ### 261017-reply-test-k5 – Test „Erfolg, Fehler, gleiche Aktion“ ergänzen
-- **Status:** erledigt (2026-10-17, in PR rauchstefan/ha-ff-agent#6)
+- **Status:** erledigt (2026-10-17, in PR rauchstefan/ha-ff-agent-archiv#6)
 - **Priorität:** niedrig
 - **Rolle(n):** tester
 - **Beschreibung:** Zu testender Ablauf: Zusagen klappt, Absagen schlägt fehl, eine erneute
@@ -187,7 +187,7 @@ Gemeinsame Angaben für alle sechs Schritte:
 - **Verweise:** docs/recherche/261016-ffagent-schnittstellen.md
 
 ### 261016-hacs-geruest – HACS-konformes Grundgerüst + CI
-- **Status:** erledigt (2026-10-16, PR rauchstefan/ha-ff-agent#1, 1d9ac86)
+- **Status:** erledigt (2026-10-16, PR rauchstefan/ha-ff-agent-archiv#1, 1d9ac86)
 - **Rolle(n):** entwickler, tester, reviewer
 - **Beschreibung:** custom_components/ff_agent (Manifest, Config-Flow mit
   Bestätigungsschritt, Übersetzungen, Platzhalter-Icons), bereinigte hacs.json,

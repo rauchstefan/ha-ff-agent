@@ -1,7 +1,7 @@
 # Erster echter Test: Anleitung für den Nutzer
 
 TODO-ID: `261017-echter-test` · Freigabe des Nutzers am 2026-10-17 erteilt · Stand: main
-nach PR rauchstefan/ha-ff-agent#7
+nach PR rauchstefan/ha-ff-agent-archiv#7
 
 Ziel: Herausfinden, wie sich FF Agent wirklich verhält. Die Annahmen aus ADR 0002
 (A1–A13) werden geprüft. Was du siehst, trägst du in die **Rückmeldeliste** am Ende ein

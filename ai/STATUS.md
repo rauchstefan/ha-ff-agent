@@ -5,7 +5,7 @@ Session. Von Hand gepflegt.
 
 - **Version:** 0.1.0 im Manifest, kein Release
 - **Integration:** MVP fertig (ADR 0002, Plan docs/plaene/261017-mvp-alarm-zusage.md,
-  PRs rauchstefan/ha-ff-agent#2 bis #7):
+  PRs rauchstefan/ha-ff-agent-archiv#2 bis #7):
   - Config Flow (eine Person je Eintrag), Parser für die Rückmelde-URL, Webhook-URL
     (Cloudhook, extern, intern)
   - Webhook-Empfang (GET/POST) mit optionalem Zusatz-Token und Repair-Issue. Erfasst wird
@@ -26,7 +26,7 @@ Session. Von Hand gepflegt.
   - `tests.yml`: ruff, pytest mit pytest-homeassistant-custom-component, Python 3.14,
     Abdeckungs-Gate 95 %, aktuell 100 %
   - Dependabot
-- **Letzte Änderung:** 2026-10-17 – MVP PR 6 (rauchstefan/ha-ff-agent#7)
+- **Letzte Änderung:** 2026-10-17 – MVP PR 6 (rauchstefan/ha-ff-agent-archiv#7)
 
 ## Was funktioniert
 

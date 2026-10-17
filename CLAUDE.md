@@ -9,7 +9,16 @@ Home-Assistant-Custom-Integration, installierbar über **HACS**, die **FF Agent*
 (Alarmierungs- und Einsatzsoftware für Feuerwehren und Hilfsorganisationen) in Home
 Assistant verfügbar macht. Ziel und offene Fragen: `docs/projekt-brief.md`.
 
-- Repo: `github.com/rauchstefan/ha-ff-agent` (privat), Standard-Branch `main`
+- Repo: `github.com/rauchstefan/ha-ff-agent` (**öffentlich** seit 2026-10-17), Standard-Branch
+  `main`.
+  - Die Entwicklungshistorie bis 2026-10-17 mit den PRs #1–#7 liegt im privaten Archiv
+    `github.com/rauchstefan/ha-ff-agent-archiv`. Verweise wie
+    `rauchstefan/ha-ff-agent-archiv#3` zeigen dorthin.
+  - Der Neustart erfolgte mit umgeschriebener Historie, damit die private E-Mail-Adresse
+    nicht öffentlich wird.
+- **Commit-Adresse:** Commits laufen ausschließlich über
+  `22816901+rauchstefan@users.noreply.github.com` (lokal in `git config user.email`
+  gesetzt). Keine private E-Mail-Adresse in Commits; das gilt auch für Cloud-Sessions.
 - Integrations-Domain: `ff_agent`, Code unter `custom_components/ff_agent/`
 - Sprache: Doku und Kommentare Deutsch, Code-Bezeichner und Commit-Messages Englisch
 

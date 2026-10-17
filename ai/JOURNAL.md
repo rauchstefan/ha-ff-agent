@@ -52,7 +52,7 @@ Das Journal ist Verlauf, keine Wissensbasis: Dauerhaftes gehört nach `docs/` od
   - danach eine neue reviewer-Nachprüfung, weil die erste Instanz ihren Bericht nicht
     zugestellt hat
 - **Erledigt:**
-  - PR rauchstefan/ha-ff-agent#7 per Squash gemergt (fa6a52d). Damit ist das MVP
+  - PR rauchstefan/ha-ff-agent-archiv#7 per Squash gemergt (fa6a52d). Damit ist das MVP
     fertig.
   - reviewer im ersten Durchlauf **nicht freigegeben**: docs/quality-scale.md stammte
     aus dem Gedächtnis und war falsch (`docs-triggers`/`docs-conditions` gehören zu
@@ -81,7 +81,7 @@ Das Journal ist Verlauf, keine Wissensbasis: Dauerhaftes gehört nach `docs/` od
 - **Entscheidung des Projektleiters:** Ein Reload behält einen laufenden Alarm nicht. Der
   Zustand bleibt flüchtig, der Options-Text weist darauf hin.
 - **Erledigt:**
-  - PR rauchstefan/ha-ff-agent#6 per Squash gemergt (348428a), 478 Tests, Abdeckung 100 %
+  - PR rauchstefan/ha-ff-agent-archiv#6 per Squash gemergt (348428a), 478 Tests, Abdeckung 100 %
   - tester: PASS; reviewer: freigegeben, ohne „Sollte“-Punkte
   - Härtung: Reload wird vor dem Löschen des alten Cloudhooks geplant; Repair-Issue fällt
     beim neuen Zugang weg
@@ -108,7 +108,7 @@ Das Journal ist Verlauf, keine Wissensbasis: Dauerhaftes gehört nach `docs/` od
   uncommitteten Änderungen blieben im Arbeitsverzeichnis, und er hat nach dem Reset per
   SendMessage mit Kontext weitergemacht.
 - **Erledigt:**
-  - PR rauchstefan/ha-ff-agent#5 per Squash gemergt (bba8b34), 404 Tests, Abdeckung 100 %.
+  - PR rauchstefan/ha-ff-agent-archiv#5 per Squash gemergt (bba8b34), 404 Tests, Abdeckung 100 %.
   - Der reviewer hatte im ersten Durchlauf **nicht freigegeben**, wegen B1: Der
     Wiederholungsschutz merkte sich den Erfolg je Aktion, deshalb wurde bei „Zusagen →
     Absagen → Zusagen“ die dritte Rückmeldung still verschluckt. Behoben: Es zählt nur
@@ -132,7 +132,7 @@ Das Journal ist Verlauf, keine Wissensbasis: Dauerhaftes gehört nach `docs/` od
   - tester (Sonnet) und reviewer (Opus) parallel
   - Standardmodelle
 - **Erledigt:**
-  - PR rauchstefan/ha-ff-agent#4 per Squash gemergt (22a7c4c), 270 Tests, Abdeckung 100 %
+  - PR rauchstefan/ha-ff-agent-archiv#4 per Squash gemergt (22a7c4c), 270 Tests, Abdeckung 100 %
   - tester: PASS, 9 Szenario-Tests ergänzt; reviewer: freigegeben
   - Nacharbeit:
     - Uhr-Rücksprung zählt als neuer Alarm
@@ -158,7 +158,7 @@ Das Journal ist Verlauf, keine Wissensbasis: Dauerhaftes gehört nach `docs/` od
   - tester (Sonnet) und reviewer (Opus) parallel
   - Standardmodelle
 - **Erledigt:**
-  - PR rauchstefan/ha-ff-agent#3 per Squash gemergt (bb533a8)
+  - PR rauchstefan/ha-ff-agent-archiv#3 per Squash gemergt (bb533a8)
   - tester: PASS, 14 Randfall-Tests ergänzt; reviewer: freigegeben
   - Nacharbeit: persistentes Repair-Issue, Content-Type nur als Medientyp, Diagnostics
     bei nicht geladenem Eintrag
@@ -185,7 +185,7 @@ Das Journal ist Verlauf, keine Wissensbasis: Dauerhaftes gehört nach `docs/` od
   - alle mit Standardmodell
 - **Erledigt:**
   - ADR 0002 auf „angenommen“ gesetzt.
-  - PR rauchstefan/ha-ff-agent#2 per Squash gemergt (0fb459a). tester: PASS (30 Tests
+  - PR rauchstefan/ha-ff-agent-archiv#2 per Squash gemergt (0fb459a). tester: PASS (30 Tests
     ergänzt), reviewer: freigegeben.
   - Nacharbeit nach dem Review:
     - Cloudhook-Fehler abgefangen
@@ -269,7 +269,7 @@ Das Journal ist Verlauf, keine Wissensbasis: Dauerhaftes gehört nach `docs/` od
 - **Nutzer-Auftrag:** „Repo bleibt vorerst privat. Bau zuerst das HACS-Grundgerüst mit CI.“
 - **Delegiert:** entwickler (Sonnet), dann tester (Sonnet) und reviewer (Opus) parallel,
   danach Review-Nacharbeit durch den entwickler. Alle mit Standardmodell.
-- **Erledigt:** PR rauchstefan/ha-ff-agent#1 per Squash gemergt (1d9ac86). tester: PASS,
+- **Erledigt:** PR rauchstefan/ha-ff-agent-archiv#1 per Squash gemergt (1d9ac86). tester: PASS,
   reviewer: freigegeben, CI grün, der HACS-Job wird wegen des privaten Repos
   übersprungen.
 - **Annahmen des Projektleiters:**
