@@ -56,7 +56,32 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
 - **Definition of Done:** HACS-Job grün, Cron täglich.
 - **Verweise:** PR rauchstefan/ha-ff-agent#1
 
-### MVP Alarm + Zusage (Plan: docs/plaene/261017-mvp-alarm-zusage.md, ADR 0002)
+### 261017-echter-test – Erster echter Test mit FF Agent und HA-Instanz
+- **Status:** offen (braucht ausdrückliche Freigabe des Nutzers)
+- **Priorität:** hoch
+- **Rolle(n):** Nutzer, Projektleiter, tester
+- **Beschreibung:**
+  - Integration in die echte HA-Instanz installieren (Repo privat, daher manuell kopieren).
+  - Persönlichen Webhook in FF Agent nach README anlegen und einen Testalarm auslösen.
+  - Während des Testalarms Absagen und Zusagen.
+  - Diagnose auswerten: Annahmen A1–A9, A12, A13 aus ADR 0002, dazu das Redirect-Verhalten
+    (261017-reply-redirects).
+  - Ergebnisse in docs/architektur.md bzw. ADR 0002 eintragen.
+- **Definition of Done:** alle Annahmen bestätigt oder widerlegt und dokumentiert,
+  Folge-TODOs angelegt.
+- **Verweise:** README (Einrichtung, Fehlerbehebung), ADR 0002 (Annahmen)
+
+### 261017-quality-todos – Offene Quality-Scale-Regeln
+- **Status:** offen
+- **Priorität:** niedrig
+- **Rolle(n):** architekt, entwickler
+- **Beschreibung:**
+  - `entity-category`: „Letzte Rückmeldung“ als `diagnostic`?
+  - `strict-typing`: mypy-Gate
+  - `reauthentication-flow`: nach A7
+  - Siehe docs/quality-scale.md.
+
+### MVP Alarm + Zusage (Plan: docs/plaene/261017-mvp-alarm-zusage.md, ADR 0002) – fertig 2026-10-17
 
 Gemeinsame Angaben für alle sechs Schritte:
 - **Rolle(n):** entwickler → tester → reviewer, je ein PR auf `feat/<id>`
@@ -93,7 +118,7 @@ Gemeinsame Angaben für alle sechs Schritte:
   - Entscheiden und dokumentieren, ob ein Reload den laufenden Alarm behalten soll (heute: nein)
 
 ### 261017-mvp-6-doku-qualitaet – README/Einrichtungsanleitung, Quality Scale, Abdeckung
-- **Status:** in Arbeit (lokal-2026-10-16-hacs-recherche, 2026-10-17)
+- **Status:** erledigt (2026-10-17, PR rauchstefan/ha-ff-agent#7, fa6a52d)
 - **Priorität:** mittel
 - **Zusätzlich (aus PR 2):** In der Nutzerdoku warnen, dass HA Core die Webhook-ID in Debug-Logs von `homeassistant.components.webhook` und `.http` schreibt; solche Logs nicht teilen.
 - **Zusätzlich (aus PR 3):** Beispiel-Automation nur mit `not_from`/`not_to: [unavailable, unknown]` (siehe docs/architektur.md, HA-Fallstricke). Hinweis, dass Options-Änderungen einen laufenden Alarm zurücksetzen.

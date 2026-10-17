@@ -22,6 +22,36 @@ Das Journal ist Verlauf, keine Wissensbasis: Dauerhaftes gehört nach `docs/` od
 
 <!-- Neue Einträge direkt unter dieser Zeile einfügen -->
 
+## 2026-10-17 – lokal-2026-10-16-hacs-recherche – MVP PR 6 (Doku und Qualität), MVP fertig
+- **Nutzer-Auftrag:** „Ja, starte mit PR 6 (Doku und Qualitätsabschluss).“
+- **Delegiert:**
+  - entwickler (Sonnet): Datenschutztest über den ganzen Lebenszyklus
+  - doku mit **Sonnet statt Haiku**: Das README enthält sicherheitsrelevante
+    Einrichtungsschritte und musste fachlich exakt sein.
+  - tester (Sonnet) und reviewer (Opus) parallel
+  - danach eine neue reviewer-Nachprüfung, weil die erste Instanz ihren Bericht nicht
+    zugestellt hat
+- **Erledigt:**
+  - PR rauchstefan/ha-ff-agent#7 per Squash gemergt (fa6a52d). Damit ist das MVP
+    fertig.
+  - reviewer im ersten Durchlauf **nicht freigegeben**: docs/quality-scale.md stammte
+    aus dem Gedächtnis und war falsch (`docs-triggers`/`docs-conditions` gehören zu
+    Bronze, `common-modules` hat keine Ausnahme, Gold- und Platin-Regeln fehlten).
+  - Korrigiert nach der offiziellen Liste (54 Regeln). Der Projektleiter hat sie selbst
+    per WebFetch geprüft.
+  - README-Warnungen geschärft (Logs, Header-Reihenfolge). Nachprüfung: freigegeben.
+- **Lernpunkt:** Agenten ohne Webzugriff (doku) dürfen Regellisten oder API-Fakten nicht
+  aus dem Gedächtnis schreiben. Solche Inhalte vorab vom researcher holen lassen oder vom
+  reviewer mit WebFetch prüfen lassen.
+- **Offen / Übergabe:**
+  - 261017-echter-test (Freigabe des Nutzers nötig)
+  - 261016-repo-oeffentlich (Entscheidung des Nutzers)
+  - 261017-reply-redirects
+  - 261017-quality-todos
+  - 261017-token-default
+  - 261017-einsatzdetails
+  - Ein Release (Tag 0.1.0) nur mit Freigabe.
+
 ## 2026-10-17 – lokal-2026-10-16-hacs-recherche – MVP PR 5 (Options Flow und Reconfigure)
 - **Nutzer-Auftrag:** „Ja, starte mit PR 5 (Options Flow und Reconfigure).“
 - **Delegiert:**

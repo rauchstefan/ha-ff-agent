@@ -4,49 +4,53 @@ Was ist der aktuelle Stand der Integration? Diese Datei beantwortet das für jed
 Session. Von Hand gepflegt.
 
 - **Version:** 0.1.0 im Manifest, kein Release
-- **Integration:** MVP in Arbeit (ADR 0002, Plan docs/plaene/261017-mvp-alarm-zusage.md).
-  Erledigt sind PR 1 bis 5 von 6:
+- **Integration:** MVP fertig (ADR 0002, Plan docs/plaene/261017-mvp-alarm-zusage.md,
+  PRs rauchstefan/ha-ff-agent#2 bis #7):
   - Config Flow (eine Person je Eintrag), Parser für die Rückmelde-URL, Webhook-URL
     (Cloudhook, extern, intern)
-  - Webhook-Empfang (GET/POST) mit optionalem Zusatz-Token und Repair-Issue; erfasst wird
-    nur die Form des Aufrufs, Diagnostics sind redigiert
+  - Webhook-Empfang (GET/POST) mit optionalem Zusatz-Token und Repair-Issue. Erfasst wird
+    nur die Form des Aufrufs, die Diagnostics sind redigiert.
   - Alarm-Logik (Dedup 30 s, Rücksetzzeit) mit den Entitäten Event „Alarm“, Binary-Sensor
     „Alarm aktiv“ und Sensor „Letzter Alarm“, alle an einem Gerät je Person
-  - Rückmeldung: Buttons „Zusagen“/„Absagen“, Actions `ff_agent.accept`/`ff_agent.reject`
-    (Verkehrsmittel `car`, optional Standort), Sensor „Letzte Rückmeldung“, Schutz vor
-    Doppelklick
-  - Optionen (Token-Pflicht, Rücksetzzeit, Verkehrsmittel, Standort-Entität, Anzeige von
-    Webhook-URL und Token) und Reconfigure (neue Rückmelde-URL, Webhook-Zugang neu
-    erzeugen)
-
-  Es fehlt noch die Doku (PR 6). Beispiel-Automationen liegen als Entwurf in
-  docs/plaene/261017-beispiel-automationen.md.
-- **CI:** `validate.yml` (hassfest, HACS-Action) und `tests.yml` (ruff, pytest mit
-  pytest-homeassistant-custom-component, Python 3.14, Abdeckung mindestens 95 %),
-  Dependabot
-- **Letzte Änderung:** 2026-10-17 – MVP PR 5 (rauchstefan/ha-ff-agent#6)
+  - Rückmeldung:
+    - Buttons „Zusagen“/„Absagen“
+    - Actions `ff_agent.accept`/`ff_agent.reject` (Verkehrsmittel `car`, optional
+      Standort)
+    - Sensor „Letzte Rückmeldung“
+    - Schutz vor Doppelklick
+  - Optionen und Reconfigure (neue Rückmelde-URL, Webhook-Zugang neu erzeugen)
+  - README mit Einrichtungsanleitung, Datenschutz, Beispielen und Fehlerbehebung;
+    docs/quality-scale.md mit allen 54 Regeln
+- **CI:**
+  - `validate.yml`: hassfest, HACS-Action
+  - `tests.yml`: ruff, pytest mit pytest-homeassistant-custom-component, Python 3.14,
+    Abdeckungs-Gate 95 %, aktuell 100 %
+  - Dependabot
+- **Letzte Änderung:** 2026-10-17 – MVP PR 6 (rauchstefan/ha-ff-agent#7)
 
 ## Was funktioniert
 
-- hassfest, ruff und pytest laufen grün in GitHub Actions, die Abdeckung liegt bei 100 %.
-- Der Config Flow speichert nur die UUID und den Host der Rückmelde-URL und zeigt die
-  Webhook-URL an. Die Cloud-API ist nur gestubbt getestet; ein Vertragstest prüft die
-  Signaturen.
+- Alle Funktionen des MVP sind in der CI getestet: 480 Tests, Abdeckung 100 %, ein
+  Datenschutztest über den ganzen Lebenszyklus.
+- Quality Scale: Bronze erfüllt (Ausnahmen begründet), Silber bis auf
+  `reauthentication-flow`, Gold weitgehend (siehe docs/quality-scale.md).
 
 ## Bekannte Einschränkungen
 
-- Das Repo ist privat, daher funktioniert keine HACS-Installation und der HACS-Job in
-  der CI wird übersprungen.
-- Automationen auf die Event-Entität brauchen die Filter `not_from`/`not_to: unavailable`
-  (siehe docs/architektur.md).
+- **Nicht real getestet:** Die Integration lief noch nie gegen echtes FF Agent oder eine
+  echte HA-Instanz. Die Annahmen A1–A13 aus ADR 0002 sind offen
+  (TODO 261017-echter-test, braucht die Freigabe des Nutzers).
+- Das Repo ist privat. Eine HACS-Installation funktioniert deshalb nicht, und der
+  HACS-Job in der CI wird übersprungen.
+- Automationen auf die Event-Entität brauchen die Filter `not_from`/`not_to`.
 - Speichern der Optionen oder ein Reconfigure lädt die Integration neu und setzt einen
   laufenden Alarm zurück (bewusst so).
-- Ein echter Test (FF Agent → HA) ist möglich, steht aber noch aus und braucht die Freigabe
-  des Nutzers.
 - Die Icons sind Platzhalter, die Rechte am FF-Agent-Logo sind ungeklärt.
 - Lokal gibt es kein Python. Tests laufen nur in GitHub Actions.
 
 ## Zugänge und Testumgebung
 
-- FF-Agent-Testzugang: unbekannt (siehe `docs/projekt-brief.md`, Fragen an den Nutzer)
-- Home-Assistant-Testinstanz: noch nicht festgelegt
+- FF Agent: Der Nutzer ist Admin einer Einheit mit PRO-Lizenz. Persönliche Webhooks und
+  Rückmelde-URLs sind vorhanden.
+- Home-Assistant-Testinstanz: die Instanz des Nutzers. Ein Test nur mit Freigabe im
+  Einzelfall.

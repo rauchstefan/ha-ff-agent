@@ -47,6 +47,19 @@ Ergebnis: <wohin schreiben, was zurückmelden>
   `architekt` dazu oder fragt den Nutzer.
 - Offene Fragen, die nur der Nutzer beantworten kann, sammelt der Projektleiter und
   stellt sie gebündelt.
+- Nach „nicht freigegeben“ prüft der `reviewer` die Nacharbeit gezielt nach. Erst seine
+  neue Freigabe zählt für das Gate.
+- Agenten ohne Webzugriff (`doku`, `tester`) schreiben keine externen Fakten (Regellisten,
+  API-Verhalten, Versionen) aus dem Gedächtnis. Solche Inhalte liefert der `researcher`
+  vorab, oder der `reviewer` prüft sie per WebFetch.
+
+## Gemeinsames Arbeitsverzeichnis
+
+- Subagenten arbeiten im selben Checkout. Ein schreibender Agent checkt seinen
+  Feature-Branch aus und kehrt am Ende auf `main` zurück.
+- Der Projektleiter committet nur, wenn er `git branch --show-current` geprüft hat, und
+  nicht, solange ein schreibender Agent läuft.
+- `doku` hat kein Git. Der Projektleiter checkt den Branch vorher aus und committet danach.
 
 ## Parallelität
 
