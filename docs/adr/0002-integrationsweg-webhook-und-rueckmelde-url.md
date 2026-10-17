@@ -283,7 +283,7 @@ trägt. Testalarm, stiller Einsatz und echter Alarm sehen für HA gleich aus.
 
 - **Geheimnisse:** `reply_id`, `webhook_id`, `cloudhook_url` und `header_token` stehen
   nur in `entry.data`. Werte eingehender Header werden nie gespeichert oder geloggt, nur
-  ihre Namen. In Diagnostics werden sie redigiert, ebenso `unique_id`, `title` und
+  ihre Namen; Ausnahmen sind der Medientyp aus dem Content-Type und der auf 120 Zeichen gekürzte User-Agent (siehe 5). In Diagnostics werden sie redigiert, ebenso `unique_id`, `title` und
   `location_entity`. Sie erscheinen in keinem Log und keinem Entitätsattribut.
 - **Recorder:** Die MVP-Entitäten haben keine Attribute mit Einsatzinhalt. Gespeichert werden
   nur Zeitpunkte und Zustände. Dass die Alarmzeitpunkte selbst personenbezogen sind, steht

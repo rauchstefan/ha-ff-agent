@@ -2,27 +2,34 @@
 
 from __future__ import annotations
 
-from typing import Any
+from unittest.mock import patch
 
 import pytest
+from homeassistant.components import webhook
 from homeassistant.config_entries import ConfigEntryState
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import issue_registry as ir
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.ff_agent.const import (
-    CONF_CLOUDHOOK,
-    CONF_CLOUDHOOK_URL,
     DOMAIN,
+    ISSUE_TOKEN_REJECTED,
+    WEBHOOK_ALLOWED_METHODS,
 )
+from custom_components.ff_agent.models import FFAgentData
 
 from .common import CloudNotAvailable, patch_cloud
-from .const import CLOUDHOOK_URL, WEBHOOK_ID
+from .const import WEBHOOK_ID
 
 
 async def _setup(hass: HomeAssistant, entry: MockConfigEntry) -> None:
     entry.add_to_hass(hass)
     assert await hass.config_entries.async_setup(entry.entry_id)
     await hass.async_block_till_done()
+
+
+async def _dummy_handler(hass: HomeAssistant, webhook_id: str, request: object) -> None:
+    """Do nothing; only used to probe whether a webhook ID is taken."""
 
 
 async def test_setup_and_unload_entry(
@@ -59,20 +66,6 @@ async def test_reload_entry(
     await hass.async_block_till_done()
 
     assert mock_config_entry.state is ConfigEntryState.LOADED
-
-
-@pytest.fixture
-def cloudhook_entry(
-    mock_config_entry: MockConfigEntry, entry_data: dict[str, Any]
-) -> MockConfigEntry:
-    """Return a config entry that uses a cloudhook."""
-    return MockConfigEntry(
-        domain=DOMAIN,
-        title=mock_config_entry.title,
-        unique_id=mock_config_entry.unique_id,
-        data={**entry_data, CONF_CLOUDHOOK: True, CONF_CLOUDHOOK_URL: CLOUDHOOK_URL},
-        options=dict(mock_config_entry.options),
-    )
 
 
 async def test_remove_entry_deletes_cloudhook(
@@ -126,3 +119,71 @@ async def test_remove_entry_ignores_cloudhook_errors(
 
     cloud_mocks["delete"].assert_awaited_once_with(hass, WEBHOOK_ID)
     assert hass.config_entries.async_entries(DOMAIN) == []
+
+
+async def test_setup_creates_runtime_data(
+    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+) -> None:
+    """Setting up an entry stores fresh runtime data with empty counters."""
+    await _setup(hass, mock_config_entry)
+
+    assert isinstance(mock_config_entry.runtime_data, FFAgentData)
+    stats = mock_config_entry.runtime_data.webhook_stats
+    assert (stats.calls_total, stats.rejected_total, stats.last_call) == (0, 0, None)
+
+
+async def test_setup_registers_the_webhook(
+    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+) -> None:
+    """The webhook is open to the internet and accepts exactly GET and POST."""
+    with patch(
+        "homeassistant.components.webhook.async_register", wraps=webhook.async_register
+    ) as register:
+        await _setup(hass, mock_config_entry)
+
+    register.assert_called_once()
+    args, kwargs = register.call_args
+    assert args[:4] == (hass, DOMAIN, mock_config_entry.title, WEBHOOK_ID)
+    assert kwargs == {
+        "local_only": False,
+        "allowed_methods": list(WEBHOOK_ALLOWED_METHODS),
+    }
+    assert WEBHOOK_ALLOWED_METHODS == ("GET", "POST")
+
+
+async def test_unload_unregisters_the_webhook(
+    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+) -> None:
+    """After unloading the webhook ID is free again."""
+    await _setup(hass, mock_config_entry)
+    with pytest.raises(ValueError):
+        webhook.async_register(hass, DOMAIN, "Other", WEBHOOK_ID, _dummy_handler)
+
+    assert await hass.config_entries.async_unload(mock_config_entry.entry_id)
+    await hass.async_block_till_done()
+
+    webhook.async_register(hass, DOMAIN, "Other", WEBHOOK_ID, _dummy_handler)
+    webhook.async_unregister(hass, WEBHOOK_ID)
+
+
+async def test_remove_entry_deletes_the_repair_issue(
+    hass: HomeAssistant, token_entry: MockConfigEntry
+) -> None:
+    """A stale hint about a rejected call does not outlive its entry."""
+    await _setup(hass, token_entry)
+    issue_id = ISSUE_TOKEN_REJECTED.format(entry_id=token_entry.entry_id)
+    ir.async_create_issue(
+        hass,
+        DOMAIN,
+        issue_id,
+        is_fixable=False,
+        severity=ir.IssueSeverity.WARNING,
+        translation_key="webhook_token_rejected",
+        translation_placeholders={"title": token_entry.title},
+    )
+    registry = ir.async_get(hass)
+    assert registry.async_get_issue(DOMAIN, issue_id) is not None
+
+    await hass.config_entries.async_remove(token_entry.entry_id)
+
+    assert registry.async_get_issue(DOMAIN, issue_id) is None

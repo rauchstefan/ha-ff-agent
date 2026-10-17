@@ -29,5 +29,11 @@
       "internal": "**Achtung:** Home Assistant hat keine externe URL und keine Nabu-Casa-Verbindung. FF Agent erreicht die folgende interne Adresse nicht: `{webhook_url}`\n\nRichte zuerst eine externe URL oder Nabu Casa ein. Entferne danach diese Einrichtung und lege sie neu an, damit eine erreichbare Adresse erzeugt wird. Erst dann in FF Agent einen Webhook anlegen (Web-UI > Automatisierung > Persönliche Webhooks > Webhook hinzufügen):\n\n- Type: Alarm\n- Webhooktyp: Generischer Webhook\n- Methode: POST\n- URL: die neue Adresse\n- Aktiv: an\n- auch für Testalarme: an (zum Testen; Automationen laufen dann auch bei Testalarmen)\n- auch für Infoalarme: aus\n- Zeitplan aktiviert: aus\n- Basis-Authentifizierung, Inhalt und Query-Parameter: leer",
       "path_only": "**Achtung:** Home Assistant hat weder eine externe noch eine interne URL und keine Nabu-Casa-Verbindung. Die Einrichtung kennt nur den Pfad `{webhook_url}`, FF Agent kann damit nichts anfangen.\n\nRichte zuerst eine externe URL oder Nabu Casa ein. Entferne danach diese Einrichtung und lege sie neu an, damit eine vollständige Adresse erzeugt wird. Erst dann in FF Agent einen Webhook anlegen (Web-UI > Automatisierung > Persönliche Webhooks > Webhook hinzufügen):\n\n- Type: Alarm\n- Webhooktyp: Generischer Webhook\n- Methode: POST\n- URL: die neue Adresse\n- Aktiv: an\n- auch für Testalarme: an (zum Testen; Automationen laufen dann auch bei Testalarmen)\n- auch für Infoalarme: aus\n- Zeitplan aktiviert: aus\n- Basis-Authentifizierung, Inhalt und Query-Parameter: leer"
     }
+  },
+  "issues": {
+    "webhook_token_rejected": {
+      "title": "FF-Agent-Webhook-Aufruf abgelehnt",
+      "description": "Ein Aufruf des FF-Agent-Webhooks von \"{title}\" wurde abgelehnt, weil der Header X-FF-Agent-Token fehlte oder falsch war. Möglicherweise ging ein Alarm verloren.\n\nPrüfe in FF Agent (Web-UI > Automatisierung > Persönliche Webhooks), ob der Header X-FF-Agent-Token mit dem Token dieser Einrichtung eingetragen ist. Nutzt du Home Assistant Cloud (Nabu Casa) und der Header kommt nicht an, schalte in den Optionen dieser Einrichtung die Pflicht für das Zusatz-Token aus.\n\nDieser Hinweis verschwindet beim nächsten angenommenen Aufruf."
+    }
   }
 }

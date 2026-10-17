@@ -113,6 +113,16 @@ def test_translations_cover_the_config_flow(language: str) -> None:
 
 
 @pytest.mark.parametrize("language", ["en", "de"])
+def test_translations_cover_the_repair_issue(language: str) -> None:
+    """The repair issue for a rejected webhook call has a title and a description."""
+    texts = _load(INTEGRATION / "translations" / f"{language}.json")
+    issue = texts["issues"]["webhook_token_rejected"]
+    assert issue["title"]
+    assert "{title}" in issue["description"]
+    assert "X-FF-Agent-Token" in issue["description"]
+
+
+@pytest.mark.parametrize("language", ["en", "de"])
 @pytest.mark.parametrize("kind", ["cloud", "external", "internal", "path_only"])
 def test_closing_dialogs_show_the_webhook_url(language: str, kind: str) -> None:
     """Every closing dialog contains the webhook URL placeholder."""

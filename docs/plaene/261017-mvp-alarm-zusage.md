@@ -186,6 +186,8 @@ REPLY_REPEAT_GUARD_SECONDS: Final = 10
 MAX_BODY_ANALYSIS_CHARS: Final = 65536
 MAX_SHAPE_DEPTH: Final = 5
 MAX_SHAPE_KEYS: Final = 50
+MAX_NAME_CHARS: Final = 64  # header, query and JSON key names
+MAX_USER_AGENT_CHARS: Final = 120
 
 DEFAULT_REPLY_HOST: Final = "www.ff-agent.com"
 REPLY_PATH: Final = "/app2/missionreplies/{reply_id}/{action}"

@@ -10,13 +10,13 @@ from __future__ import annotations
 from enum import StrEnum
 
 from homeassistant.components import webhook
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_WEBHOOK_ID
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.network import NoURLAvailableError
 
 from .const import CONF_CLOUDHOOK, CONF_CLOUDHOOK_URL
+from .models import FFAgentConfigEntry
 
 
 class UrlKind(StrEnum):
@@ -90,7 +90,7 @@ async def async_create_webhook_url(
 
 @callback
 def async_get_webhook_url(
-    hass: HomeAssistant, entry: ConfigEntry
+    hass: HomeAssistant, entry: FFAgentConfigEntry
 ) -> tuple[str, UrlKind]:
     """Return the webhook URL of an existing entry without creating anything."""
     if entry.data[CONF_CLOUDHOOK] and (url := entry.data.get(CONF_CLOUDHOOK_URL)):

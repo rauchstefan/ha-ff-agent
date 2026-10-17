@@ -28,7 +28,7 @@ from custom_components.ff_agent.const import (
 from custom_components.ff_agent.reply_url import reply_unique_id
 
 from .common import patch_cloud
-from .const import EXTERNAL_URL, HEADER_TOKEN, REPLY_ID, WEBHOOK_ID
+from .const import CLOUDHOOK_URL, EXTERNAL_URL, HEADER_TOKEN, REPLY_ID, WEBHOOK_ID
 
 
 @pytest.fixture(autouse=True)
@@ -87,4 +87,32 @@ def mock_config_entry(
         unique_id=reply_unique_id(REPLY_ID),
         data=entry_data,
         options=entry_options,
+    )
+
+
+@pytest.fixture
+def cloudhook_entry(
+    mock_config_entry: MockConfigEntry, entry_data: dict[str, Any]
+) -> MockConfigEntry:
+    """Return a config entry that uses a cloudhook."""
+    return MockConfigEntry(
+        domain=DOMAIN,
+        title=mock_config_entry.title,
+        unique_id=mock_config_entry.unique_id,
+        data={**entry_data, CONF_CLOUDHOOK: True, CONF_CLOUDHOOK_URL: CLOUDHOOK_URL},
+        options=dict(mock_config_entry.options),
+    )
+
+
+@pytest.fixture
+def token_entry(
+    mock_config_entry: MockConfigEntry, entry_data: dict[str, Any]
+) -> MockConfigEntry:
+    """Return a config entry that requires the additional token."""
+    return MockConfigEntry(
+        domain=DOMAIN,
+        title=mock_config_entry.title,
+        unique_id=mock_config_entry.unique_id,
+        data=entry_data,
+        options={**mock_config_entry.options, CONF_REQUIRE_TOKEN: True},
     )

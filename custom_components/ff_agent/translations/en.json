@@ -29,5 +29,11 @@
       "internal": "**Warning:** Home Assistant has no external URL and no Nabu Casa connection. FF Agent cannot reach this internal address: `{webhook_url}`\n\nSet up an external URL or Nabu Casa first. Then remove this entry and add it again so that a reachable address is generated. Only then create a webhook in FF Agent (web UI > Automation > Personal webhooks > Add webhook):\n\n- Type: Alarm\n- Webhook type: Generic webhook\n- Method: POST\n- URL: the new address\n- Active: on\n- Also for test alarms: on (for testing; automations then also run for test alarms)\n- Also for info alarms: off\n- Schedule enabled: off\n- Basic authentication, content and query parameters: empty",
       "path_only": "**Warning:** Home Assistant has neither an external nor an internal URL and no Nabu Casa connection. This entry only knows the path `{webhook_url}`, which is of no use to FF Agent.\n\nSet up an external URL or Nabu Casa first. Then remove this entry and add it again so that a complete address is generated. Only then create a webhook in FF Agent (web UI > Automation > Personal webhooks > Add webhook):\n\n- Type: Alarm\n- Webhook type: Generic webhook\n- Method: POST\n- URL: the new address\n- Active: on\n- Also for test alarms: on (for testing; automations then also run for test alarms)\n- Also for info alarms: off\n- Schedule enabled: off\n- Basic authentication, content and query parameters: empty"
     }
+  },
+  "issues": {
+    "webhook_token_rejected": {
+      "title": "FF Agent webhook call rejected",
+      "description": "A call to the FF Agent webhook of \"{title}\" was rejected because the header X-FF-Agent-Token was missing or wrong. An alarm may have been lost.\n\nCheck in FF Agent (web UI > Automation > Personal webhooks) that the header X-FF-Agent-Token with the token of this entry is set. If you use Home Assistant Cloud (Nabu Casa) and the header does not arrive, switch off the option to require the additional token in the options of this entry.\n\nThis notice disappears with the next accepted call."
+    }
   }
 }
