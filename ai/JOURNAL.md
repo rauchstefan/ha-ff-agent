@@ -22,6 +22,31 @@ Das Journal ist Verlauf, keine Wissensbasis: Dauerhaftes gehört nach `docs/` od
 
 <!-- Neue Einträge direkt unter dieser Zeile einfügen -->
 
+## 2026-10-17 – lokal-2026-10-16-hacs-recherche – MVP PR 5 (Options Flow und Reconfigure)
+- **Nutzer-Auftrag:** „Ja, starte mit PR 5 (Options Flow und Reconfigure).“
+- **Delegiert:**
+  - entwickler (Sonnet): Umsetzung und Härtung
+  - tester (Sonnet) und reviewer (Opus) parallel
+  - Standardmodelle
+- **Entscheidung des Projektleiters:** Ein Reload behält einen laufenden Alarm nicht. Der
+  Zustand bleibt flüchtig, der Options-Text weist darauf hin.
+- **Erledigt:**
+  - PR rauchstefan/ha-ff-agent#6 per Squash gemergt (348428a), 478 Tests, Abdeckung 100 %
+  - tester: PASS; reviewer: freigegeben, ohne „Sollte“-Punkte
+  - Härtung: Reload wird vor dem Löschen des alten Cloudhooks geplant; Repair-Issue fällt
+    beim neuen Zugang weg
+  - 261017-reply-test-k5 mit erledigt
+  - Beispiel-Automationen gesichert in docs/plaene/261017-beispiel-automationen.md (stand
+    vorher nur im Agentenbericht)
+- **Hinweis:**
+  - Der entwickler hatte ruff einmal lokal über ein npm-Paket von Astral ausgeführt (Skript
+    im Temp-Ordner, nicht im Repo).
+  - Danach die Vorgabe gemacht: keine lokalen npm- oder pip-Ausführungen, ruff läuft in
+    der CI.
+- **Offen / Übergabe:**
+  - nächster Schritt 261017-mvp-6-doku-qualitaet (Agent `doku`)
+  - danach der echte Test und Release-Vorbereitung, beides nur mit Nutzerfreigabe
+
 ## 2026-10-17 – lokal-2026-10-16-hacs-recherche – MVP PR 4 (Zusage/Absage)
 - **Nutzer-Auftrag:** „Ja, starte mit PR 4 (Rückmeldung: Zusage/Absage).“
 - **Delegiert:**

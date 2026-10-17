@@ -5,7 +5,7 @@ Session. Von Hand gepflegt.
 
 - **Version:** 0.1.0 im Manifest, kein Release
 - **Integration:** MVP in Arbeit (ADR 0002, Plan docs/plaene/261017-mvp-alarm-zusage.md).
-  Erledigt sind PR 1 bis 4 von 6:
+  Erledigt sind PR 1 bis 5 von 6:
   - Config Flow (eine Person je Eintrag), Parser für die Rückmelde-URL, Webhook-URL
     (Cloudhook, extern, intern)
   - Webhook-Empfang (GET/POST) mit optionalem Zusatz-Token und Repair-Issue; erfasst wird
@@ -15,12 +15,16 @@ Session. Von Hand gepflegt.
   - Rückmeldung: Buttons „Zusagen“/„Absagen“, Actions `ff_agent.accept`/`ff_agent.reject`
     (Verkehrsmittel `car`, optional Standort), Sensor „Letzte Rückmeldung“, Schutz vor
     Doppelklick
+  - Optionen (Token-Pflicht, Rücksetzzeit, Verkehrsmittel, Standort-Entität, Anzeige von
+    Webhook-URL und Token) und Reconfigure (neue Rückmelde-URL, Webhook-Zugang neu
+    erzeugen)
 
-  Es fehlen noch Options/Reconfigure (PR 5) und Doku (PR 6).
+  Es fehlt noch die Doku (PR 6). Beispiel-Automationen liegen als Entwurf in
+  docs/plaene/261017-beispiel-automationen.md.
 - **CI:** `validate.yml` (hassfest, HACS-Action) und `tests.yml` (ruff, pytest mit
   pytest-homeassistant-custom-component, Python 3.14, Abdeckung mindestens 95 %),
   Dependabot
-- **Letzte Änderung:** 2026-10-17 – MVP PR 4 (rauchstefan/ha-ff-agent#5)
+- **Letzte Änderung:** 2026-10-17 – MVP PR 5 (rauchstefan/ha-ff-agent#6)
 
 ## Was funktioniert
 
@@ -35,8 +39,8 @@ Session. Von Hand gepflegt.
   der CI wird übersprungen.
 - Automationen auf die Event-Entität brauchen die Filter `not_from`/`not_to: unavailable`
   (siehe docs/architektur.md).
-- Das Token ist vor PR 5 (Options Flow) in der UI nicht sichtbar. Die Token-Prüfung lässt
-  sich deshalb noch nicht einschalten.
+- Speichern der Optionen oder ein Reconfigure lädt die Integration neu und setzt einen
+  laufenden Alarm zurück (bewusst so).
 - Ein echter Test (FF Agent → HA) ist möglich, steht aber noch aus und braucht die Freigabe
   des Nutzers.
 - Die Icons sind Platzhalter, die Rechte am FF-Agent-Logo sind ungeklärt.

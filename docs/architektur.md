@@ -147,7 +147,7 @@ gibt es nicht.
   Zwei Tests in `tests/test_entities.py` belegen das (mit Filter löst er nicht aus, ohne
   Filter schon). README und Beispiel-Automation (PR 6) müssen das zeigen.
 - **Reload löscht den laufenden Alarm.** Der `AlarmManager` startet bei jedem Setup leer.
-  Ab PR 5 lädt jede Options-Änderung den Eintrag neu (`OptionsFlowWithReload`), damit
+  Jede Options-Änderung und jedes Reconfigure mit Änderung lädt den Eintrag neu (`OptionsFlowWithReload`), damit
   springt „Alarm aktiv“ auf aus und das Dedup-Fenster ist offen. Das ist bewusst so
   (flüchtiger Zustand) und gehört in die Nutzerdoku.
 - **Dedup und Uhrzeit:** Eine negative Zeitdifferenz (Uhr springt zurück, z. B. durch

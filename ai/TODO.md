@@ -84,7 +84,7 @@ Gemeinsame Angaben für alle sechs Schritte:
   Nutzerfreigabe.
 
 ### 261017-mvp-5-options-reconfigure – Options Flow und Reconfigure
-- **Status:** in Arbeit (lokal-2026-10-16-hacs-recherche, 2026-10-17)
+- **Status:** erledigt (2026-10-17, PR rauchstefan/ha-ff-agent#6)
 - **Priorität:** mittel
 - **Zusätzlich (aus PR 1/2):**
   - Texte `internal` und `path_only` vom Rat „Eintrag neu anlegen“ auf Reconfigure umstellen
@@ -97,6 +97,11 @@ Gemeinsame Angaben für alle sechs Schritte:
 - **Priorität:** mittel
 - **Zusätzlich (aus PR 2):** In der Nutzerdoku warnen, dass HA Core die Webhook-ID in Debug-Logs von `homeassistant.components.webhook` und `.http` schreibt; solche Logs nicht teilen.
 - **Zusätzlich (aus PR 3):** Beispiel-Automation nur mit `not_from`/`not_to: [unavailable, unknown]` (siehe docs/architektur.md, HA-Fallstricke). Hinweis, dass Options-Änderungen einen laufenden Alarm zurücksetzen.
+- **Zusätzlich (aus PR 4/5):**
+  - Companion-App-Beispiel (Benachrichtigung mit Knopf „Zusagen“) aus dem PR-4-Bericht übernehmen
+  - Options- und Reconfigure-Ablauf als Textbausteine statt Screenshots
+  - Hinweis: Debug-Logs von `websocket_api` können Geheimnisse aus Dialogen enthalten; nicht teilen
+  - Hinweis: Eine Antwort 200 von FF Agent heißt nur „gesendet“, nicht sicher „verbucht“ (A7)
 
 ### 261017-python-target – Python-Mindestversion vs. ruff-Ziel prüfen
 - **Status:** erledigt (2026-10-17, ohne Codeänderung: HA 2026.3.0 verlangt Python ≥ 3.14.2, passt zu ruff py314; siehe docs/architektur.md)
@@ -124,7 +129,7 @@ Gemeinsame Angaben für alle sechs Schritte:
 - **Definition of Done:** Verhalten entschieden, umgesetzt und getestet.
 
 ### 261017-reply-test-k5 – Test „Erfolg, Fehler, gleiche Aktion“ ergänzen
-- **Status:** offen
+- **Status:** erledigt (2026-10-17, in PR rauchstefan/ha-ff-agent#6)
 - **Priorität:** niedrig
 - **Rolle(n):** tester
 - **Beschreibung:** Zu testender Ablauf: Zusagen klappt, Absagen schlägt fehl, eine erneute
