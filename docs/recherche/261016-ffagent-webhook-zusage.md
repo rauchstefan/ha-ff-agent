@@ -89,6 +89,40 @@ verworfen (siehe Abschnitt 7).
 - Die WebAPI wird laut Hersteller-Doku für eigene Lösungen oder Drittanbietersoftware angeboten [G, Vorrecherche]. Persönliche Webhooks und Kalender-Feeds sind **für den Nutzer selbst gedachte, vom Hersteller bereitgestellte Funktionen** [A]; deren Nutzung durch HA ist deshalb unkritischer als jede Nutzung nicht dokumentierter App-Endpunkte [A]. Zu- und Absage über nicht dokumentierte Endpunkte mit Nutzer-Passwort wäre ein Risiko (Kontosperre, Vertragsverstoß, Bruch bei Änderung) [A] und sollte vor einem öffentlichen Release vom Hersteller bestätigt werden.
 - Datenschutz: Zugangsdaten zum Nutzerkonto in HA zu speichern wäre sicherheitskritisch (Konto kann Einsatzdaten Dritter sehen) [A]; ein eigener, widerrufbarer Token (wie beim Kalender-Feed „neu generieren“) wäre vorzuziehen.
 
+## 3.6 Nachtrag 2026-10-17: Zusage-/Absage-URLs (Screenshot des Nutzers)
+
+Der Nutzer hat aus der Web-UI die persönlichen Rückmelde-URLs gezeigt. Darstellung hier
+**geschwärzt**: Die Kennung ist ein Geheimnis, die Koordinaten stammen aus dem Beispiel.
+
+```text
+Zusage: https://www.ff-agent.com/app2/missionreplies/<REPLY_ID>/accept?transport=CAR&lat=<LAT>&lng=<LNG>
+Absage: https://www.ff-agent.com/app2/missionreplies/<REPLY_ID>/reject
+```
+
+Was die URLs zeigen [G]:
+- `<REPLY_ID>` ist eine UUID. Sie identifiziert und berechtigt zugleich, funktioniert also
+  wie ein Token in der URL. Ein Passwort oder eine Anmeldung ist nicht nötig.
+- `transport` gibt das Verkehrsmittel an; belegt ist der Wert `CAR`. `lat` und `lng`
+  sind offenbar optional.
+- Neben den URLs zeigt die UI ein Kopier- und ein Öffnen-Symbol.
+
+Was daraus folgt:
+- Ein Aufruf per GET funktioniert vermutlich, weil die URL im Browser geöffnet werden
+  kann. Das ist abgeleitet [A], nicht geprüft.
+- Die URL nennt keine Einsatz-ID. Sie gilt also für den **aktuell aktiven Einsatz**, wie
+  bei der Homey-App [A].
+
+Noch offen [U]:
+- weitere `transport`-Werte (Homey kennt Auto, zu Fuß, Fahrrad; vermutlich `FOOT`/`BIKE`
+  o. ä.)
+- Antwortformat und Statuscodes, Verhalten ohne aktiven Einsatz
+- ob die Kennung neu erzeugt werden kann
+- ob sie dauerhaft gilt oder sich je Einsatz ändert
+
+Folge fürs Design: Option A aus Abschnitt 4 ist damit praktisch belegt. Der Nutzer
+kopiert die Zusage-URL in den Config Flow. HA speichert die Kennung als Geheimnis und
+ruft `accept` bzw. `reject` auf. Ein Login braucht es nicht.
+
 ## 4. Folgerungen für das Design (alle [A], solange Webhook-Details [U])
 
 **Wie richtet der Nutzer den Webhook ein?**
