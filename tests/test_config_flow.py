@@ -567,8 +567,12 @@ async def test_switching_both_ways_in_one_flow(hass: HomeAssistant) -> None:
 async def test_ntfy_find_creates_the_entry(
     hass: HomeAssistant, caplog: pytest.LogCaptureFixture
 ) -> None:
-    """The subscription is found by the topic; no cloudhook is created."""
-    caplog.set_level(logging.DEBUG)
+    """The subscription is found by the topic; no cloudhook is created.
+
+    Home Assistant itself logs entity IDs on INFO level, so the check covers the log
+    of the integration (all levels) and every warning or error.
+    """
+    caplog.set_level(logging.DEBUG, logger="custom_components.ff_agent")
     with patch_cloud(hass) as cloud_mocks:
         result = await _to_menu(hass)
         result = await _choose(hass, result["flow_id"], "no_cloud")
@@ -603,8 +607,14 @@ async def test_ntfy_find_creates_the_entry(
     assert entry.state is ConfigEntryState.LOADED
     assert entry.runtime_data.source is not None
     cloud_mocks["get_or_create"].assert_not_called()
+    checked = [
+        record.getMessage()
+        for record in caplog.records
+        if record.name.startswith("custom_components.ff_agent")
+        or record.levelno >= logging.WARNING
+    ]
     for secret in (topic, NTFY_ENTITY_ID, registry_entry.id, REPLY_ID):
-        assert secret not in caplog.text
+        assert not [message for message in checked if secret in message]
 
 
 async def test_ntfy_find_without_the_ntfy_integration(hass: HomeAssistant) -> None:
