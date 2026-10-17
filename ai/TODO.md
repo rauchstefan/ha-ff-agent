@@ -74,7 +74,7 @@ Gemeinsame Angaben für alle sechs Schritte:
   Nutzerfreigabe.
 
 ### 261017-mvp-3-alarm-entitaeten – Alarm-Logik, Binary-Sensor, Event, Sensor, Gerät
-- **Status:** offen
+- **Status:** in Arbeit (lokal-2026-10-16-hacs-recherche, 2026-10-17)
 - **Priorität:** hoch
 
 ### 261017-mvp-4-rueckmeldung – Rückmelde-Client, Buttons, Actions
