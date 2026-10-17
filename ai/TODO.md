@@ -89,6 +89,21 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
   (Checkliste 5.2). Dazu braucht es ein vollständiges Release, kein Pre-Release, und die
   Klärung der Markenrechte am Namen „FF Agent“ mit dem Hersteller.
 
+### 261017-ha-zugriff – Lesezugriff auf die HA-Instanz des Nutzers (MCP/SSH)
+- **Status:** zurückgestellt (Nutzer, 2026-10-17)
+- **Priorität:** niedrig
+- **Rolle(n):** Nutzer, Projektleiter
+- **Beschreibung:** Der Nutzer hat HA (lokal im Heimnetz, SSH auf Port 22) und den
+  HA-MCP-Server. Beides ist in Claude Code noch nicht angebunden. Bei Bedarf:
+  - MCP: langlebiges Token in HA anlegen, mit
+    `claude mcp add --transport http --scope user homeassistant http://<HA>:8123/api/mcp`
+    plus Authorization-Header vom Nutzer selbst eintragen lassen (Token nie ins Repo oder
+    in den OneDrive-Projektordner). Nur FF-Agent-Entitäten für Assist freigeben.
+  - SSH: nur mit Schlüssel, der auf dem PC hinterlegt ist; Benutzername vom Nutzer.
+  - Zugriff nur lesend (Dateien, Log, Diagnose); jede Änderung braucht die Freigabe im
+    Einzelfall.
+- **Definition of Done:** Zugriff eingerichtet und dokumentiert, oder bewusst verworfen.
+
 ### 261017-quality-todos – Offene Quality-Scale-Regeln
 - **Status:** offen
 - **Priorität:** niedrig
