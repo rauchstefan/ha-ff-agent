@@ -102,6 +102,28 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
   - Annahmen A8 und A9 in ADR 0002 und architektur.md als geklärt eintragen.
 - **Verweise:** docs/recherche/261016-ffagent-webhook-zusage.md, Abschnitt 3.7
 
+### 261017-erreichbarkeit-recherche – Wege, HA für FF Agent erreichbar zu machen
+- **Status:** in Arbeit (researcher, 2026-10-17)
+- **Priorität:** hoch (Hürde für normale Nutzer)
+- **Rolle(n):** researcher, danach architekt
+- **Beschreibung:** Nabu Casa (Link zur Einrichtung), Alternativen wie Tunnel-Add-ons
+  und kostenlose Webhook-Relays, sowie Wege ohne eingehende Verbindung, bewertet nach
+  Aufwand für normale Nutzer, Kosten, Zuverlässigkeit, Latenz und Datenschutz.
+- **Definition of Done:** docs/recherche/261017-erreichbarkeit.md mit Empfehlung.
+
+### 261017-ux-erreichbarkeit – Hinweis „keine externe URL“ verständlich machen
+- **Status:** offen (nach Ende des Tests; Inhalt abhängig von der Recherche)
+- **Priorität:** hoch
+- **Rolle(n):** architekt, entwickler, doku
+- **Beschreibung:** Finding des Nutzers vom 2026-10-17: Der Abschlussdialog bei interner
+  URL bzw. nur Pfad (`internal`/`path_only`) und der Options-Text sind zu technisch.
+  - Ziel: Ein normaler Nutzer versteht, was zu tun ist.
+  - Für Nabu Casa einen direkten Link zur Einrichtungsseite (z. B. My-Home-Assistant-Link,
+    zu prüfen).
+  - Alternativen laut Recherche 261017-erreichbarkeit-recherche kurz nennen.
+  - README entsprechend.
+- **Definition of Done:** neue Texte de/en, README, Tests.
+
 ### 261017-geraeteinfo-hersteller – Kein Herstellername in der Geräte-Info
 - **Status:** offen (nach Ende des Tests des Nutzers)
 - **Priorität:** hoch (Rechtliches, sichtbar in der HA-UI)
