@@ -78,7 +78,7 @@ Gemeinsame Angaben für alle sechs Schritte:
 - **Priorität:** hoch
 
 ### 261017-mvp-4-rueckmeldung – Rückmelde-Client, Buttons, Actions
-- **Status:** offen
+- **Status:** in Arbeit (lokal-2026-10-16-hacs-recherche, 2026-10-17)
 - **Priorität:** hoch
 - **Beschreibung:** Den echten Test (A6–A9) nur während eines Testalarms und nur mit
   Nutzerfreigabe.
