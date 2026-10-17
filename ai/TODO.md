@@ -68,7 +68,7 @@ Gemeinsame Angaben für alle sechs Schritte:
 - **Priorität:** hoch
 
 ### 261017-mvp-2-webhook – Webhook-Empfang, Zusatz-Token, Diagnostics
-- **Status:** offen
+- **Status:** in Arbeit (lokal-2026-10-16-hacs-recherche, 2026-10-17)
 - **Priorität:** hoch
 - **Beschreibung:** Danach ist der erste echte Test möglich (Annahmen A1–A5, A12), nur mit
   Nutzerfreigabe.
