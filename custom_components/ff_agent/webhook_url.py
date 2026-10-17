@@ -14,7 +14,7 @@ from homeassistant.components import webhook
 from homeassistant.const import CONF_WEBHOOK_ID
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers.network import NoURLAvailableError
+from homeassistant.helpers.network import NoURLAvailableError, get_url
 
 from .const import CONF_CLOUDHOOK, CONF_CLOUDHOOK_URL
 from .models import FFAgentConfigEntry
@@ -29,6 +29,36 @@ class UrlKind(StrEnum):
     PATH_ONLY = "path_only"
 
 
+class Reachability(StrEnum):
+    """How Home Assistant can be reached from the internet, as far as it is known."""
+
+    CLOUD = "cloud"  # active cloud subscription (connected or not)
+    EXTERNAL = "external"  # an external URL is configured
+    NONE = "none"
+
+
+@callback
+def async_probe_reachability(hass: HomeAssistant) -> Reachability:
+    """Return how Home Assistant can be reached, without creating anything.
+
+    No cloudhook is created and no URL is returned: the result only decides which
+    dialog the config flow shows.
+    """
+    if "cloud" in hass.config.components:
+        # Lazy import: the cloud integration is only an optional (after) dependency.
+        from homeassistant.components import cloud
+
+        if cloud.async_active_subscription(hass):
+            return Reachability.CLOUD
+    try:
+        # The remote UI of the cloud does not count: without a subscription there is
+        # none, and with one the cloud case above applies.
+        get_url(hass, allow_internal=False, allow_cloud=False, prefer_external=True)
+    except NoURLAvailableError:
+        return Reachability.NONE
+    return Reachability.EXTERNAL
+
+
 class CloudhookUnavailable(HomeAssistantError):
     """No cloudhook can be created: the cloud is not connected or failed.
 
@@ -37,7 +67,7 @@ class CloudhookUnavailable(HomeAssistantError):
 
 
 @callback
-def _async_local_webhook_url(
+def async_local_webhook_url(
     hass: HomeAssistant, webhook_id: str
 ) -> tuple[str, UrlKind]:
     """Return the external, internal or path-only URL of a webhook."""
@@ -85,7 +115,7 @@ async def async_create_webhook_url(
                 raise CloudhookUnavailable from None
             return url, UrlKind.CLOUD, True
 
-    url, kind = _async_local_webhook_url(hass, webhook_id)
+    url, kind = async_local_webhook_url(hass, webhook_id)
     return url, kind, False
 
 
@@ -96,7 +126,7 @@ def async_get_webhook_url(
     """Return the webhook URL of an existing entry without creating anything."""
     if entry.data[CONF_CLOUDHOOK] and (url := entry.data.get(CONF_CLOUDHOOK_URL)):
         return url, UrlKind.CLOUD
-    return _async_local_webhook_url(hass, entry.data[CONF_WEBHOOK_ID])
+    return async_local_webhook_url(hass, entry.data[CONF_WEBHOOK_ID])
 
 
 async def async_delete_cloudhook(hass: HomeAssistant, webhook_id: str) -> None:

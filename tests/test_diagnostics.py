@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from datetime import timedelta
 from http import HTTPStatus
 from typing import TYPE_CHECKING, Any
 
@@ -12,7 +13,9 @@ from homeassistant.components.diagnostics import REDACTED
 from homeassistant.core import HomeAssistant
 from homeassistant.core_config import async_process_ha_core_config
 from homeassistant.exceptions import HomeAssistantError
+from homeassistant.helpers import entity_registry as er
 from homeassistant.setup import async_setup_component
+from homeassistant.util import dt as dt_util
 from homeassistant.util.aiohttp import MockRequest
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 from pytest_homeassistant_custom_component.components.diagnostics import (
@@ -25,6 +28,7 @@ from custom_components.ff_agent.models import ReplyAction
 from custom_components.ff_agent.reply import async_send_reply
 from custom_components.ff_agent.reply_url import reply_unique_id
 
+from .common import fire_ntfy
 from .const import (
     ACCEPT_URL,
     CLOUDHOOK_URL,
@@ -33,12 +37,15 @@ from .const import (
     LATITUDE,
     LOCATION_ENTITY,
     LONGITUDE,
+    NTFY_ENTITY_ID,
+    NTFY_TOPIC,
     REJECT_URL,
     REPLY_ID,
     WEBHOOK_ID,
 )
 
 if TYPE_CHECKING:
+    from freezegun.api import FrozenDateTimeFactory
     from pytest_homeassistant_custom_component.test_util.aiohttp import (
         AiohttpClientMocker,
     )
@@ -335,3 +342,125 @@ async def test_diagnostics_show_a_failed_reply(
     assert last["status"] == status
     assert last["error_type"] == error_type
     assert REPLY_ID not in json.dumps(result)
+
+
+# --- ntfy -----------------------------------------------------------------------
+
+
+async def test_diagnostics_of_the_webhook_mode_have_no_ntfy_block(
+    hass: HomeAssistant,
+    hass_client: ClientSessionGenerator,
+    mock_config_entry: MockConfigEntry,
+) -> None:
+    """The source is named; the ntfy block is empty in webhook mode."""
+    await _setup(hass, mock_config_entry)
+
+    result = await get_diagnostics_for_config_entry(
+        hass, hass_client, mock_config_entry
+    )
+
+    assert result["alarm_source"] == "webhook"
+    assert result["ntfy"] is None
+    assert result["webhook"] is not None
+
+
+async def test_diagnostics_of_the_ntfy_mode(
+    hass: HomeAssistant,
+    hass_client: ClientSessionGenerator,
+    freezer: FrozenDateTimeFactory,
+    ntfy_entry: MockConfigEntry,
+) -> None:
+    """Counters and the shape of the last message; topic and entity are hidden."""
+    freezer.move_to("2026-10-17 12:00:00+00:00")
+    fire_ntfy(hass, dt_util.utcnow() - timedelta(hours=1))
+    await _setup(hass, ntfy_entry)
+    fire_ntfy(
+        hass,
+        dt_util.utcnow() - timedelta(seconds=1),
+        {"message": BODY_VALUE, "title": BODY_VALUE, "tags": [BODY_VALUE]},
+    )
+    await hass.async_block_till_done()
+
+    result = await get_diagnostics_for_config_entry(hass, hass_client, ntfy_entry)
+
+    assert result["alarm_source"] == "ntfy"
+    assert result["webhook"] is None
+    assert result["ntfy"] == {
+        "entity_found": True,
+        "entity_platform_ok": True,
+        "entity_disabled": False,
+        "entity_available": True,
+        "server": "https://ntfy.sh/",
+        "running": True,
+        "events_total": 1,
+        "accepted_total": 1,
+        "ignored_restored_total": 0,
+        "ignored_stale_total": 0,
+        "ignored_duplicate_total": 0,
+        "last_event": {
+            "received_at": "2026-10-17T11:59:59+00:00",
+            "age_seconds": 1.0,
+            "message_length": len(BODY_VALUE),
+            "has_title": True,
+            "tags_count": 1,
+        },
+    }
+    assert result["alarm"]["alarms_total"] == 1
+    data = result["entry"]["data"]
+    assert data["ntfy_topic"] == REDACTED
+    assert data["ntfy_entity_uuid"] == REDACTED
+    assert data["ntfy_server"] == "https://ntfy.sh/"
+    dumped = json.dumps(result)
+    for secret in (
+        NTFY_TOPIC,
+        NTFY_ENTITY_ID,
+        ntfy_entry.data["ntfy_entity_uuid"],
+        BODY_VALUE,
+        REPLY_ID,
+        WEBHOOK_ID,
+        HEADER_TOKEN,
+    ):
+        assert secret not in dumped
+
+
+async def test_diagnostics_of_the_ntfy_mode_without_entity(
+    hass: HomeAssistant,
+    hass_client: ClientSessionGenerator,
+    ntfy_entry: MockConfigEntry,
+) -> None:
+    """A missing entity is reported as such, without counters."""
+    ntfy_entry.add_to_hass(hass)
+    hass.config_entries.async_update_entry(
+        ntfy_entry, data={**ntfy_entry.data, "ntfy_entity_uuid": "missing"}
+    )
+    await _setup(hass, ntfy_entry)
+
+    result = await get_diagnostics_for_config_entry(hass, hass_client, ntfy_entry)
+
+    assert result["ntfy"] == {
+        "entity_found": False,
+        "entity_platform_ok": False,
+        "entity_disabled": None,
+        "entity_available": None,
+        "server": "https://ntfy.sh/",
+    }
+
+
+async def test_diagnostics_of_the_ntfy_mode_with_a_disabled_entity(
+    hass: HomeAssistant,
+    ntfy_entry: MockConfigEntry,
+    ntfy_entity: er.RegistryEntry,
+) -> None:
+    """A disabled, unavailable entity: found, but neither enabled nor available."""
+    er.async_get(hass).async_update_entity(
+        ntfy_entity.entity_id, disabled_by=er.RegistryEntryDisabler.USER
+    )
+    hass.states.async_set(NTFY_ENTITY_ID, "unavailable")
+    await _setup(hass, ntfy_entry)
+
+    result = await async_get_config_entry_diagnostics(hass, ntfy_entry)
+
+    ntfy = result["ntfy"]
+    assert (ntfy["entity_found"], ntfy["entity_platform_ok"]) == (True, True)
+    assert (ntfy["entity_disabled"], ntfy["entity_available"]) == (True, False)
+    assert "running" not in ntfy

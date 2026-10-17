@@ -3,16 +3,36 @@
 from __future__ import annotations
 
 import json
+import re
 import struct
 from pathlib import Path
 
 import pytest
 from homeassistant.util import yaml as yaml_util
 
-from custom_components.ff_agent.const import DOMAIN, TRANSPORT_API_VALUES, TRANSPORTS
+from custom_components.ff_agent.const import (
+    DOMAIN,
+    MENU_ALARM_SOURCE,
+    MENU_CLOUD_NOT_CONNECTED,
+    MENU_CLOUD_SETUP,
+    MENU_NO_CLOUD,
+    MENU_NTFY,
+    TRANSPORT_API_VALUES,
+    TRANSPORTS,
+)
 
 ROOT = Path(__file__).parent.parent
 INTEGRATION = ROOT / "custom_components" / DOMAIN
+# Menus of the config flow: step ID -> options.
+MENUS = {
+    "alarm_source": MENU_ALARM_SOURCE,
+    "alarm_source_cloud": MENU_ALARM_SOURCE,
+    "no_cloud": MENU_NO_CLOUD,
+    "cloud_setup": MENU_CLOUD_SETUP,
+    "cloud_setup_retry": MENU_CLOUD_SETUP,
+    "cloud_not_connected": MENU_CLOUD_NOT_CONNECTED,
+    "ntfy": MENU_NTFY,
+}
 HACS_REQUIRED_MANIFEST_KEYS = {
     "domain",
     "documentation",
@@ -100,17 +120,36 @@ def test_translations_cover_the_config_flow(language: str) -> None:
         "config.step.user.data.reply_url",
         "config.step.user.data_description.reply_url",
         "config.error.invalid_reply_url",
-        "config.error.cloud_not_connected",
-        "config.error.unknown",
+        "config.error.ntfy_not_set_up",
+        "config.error.ntfy_entity_not_found",
+        "config.error.ntfy_entity_invalid",
+        "config.error.ntfy_entity_in_use",
         "config.abort.already_in_progress",
         "config.abort.already_configured",
+        "config.abort.unknown",
+        "config.abort.reconfigure_successful_ntfy",
         "config.create_entry.cloud",
         "config.create_entry.external",
         "config.create_entry.internal",
         "config.create_entry.path_only",
+        "config.create_entry.ntfy",
+        "config.step.ntfy_select.title",
+        "config.step.ntfy_select.description",
+        "config.step.ntfy_select.data.ntfy_entity",
+        "config.step.ntfy_select.data_description.ntfy_entity",
+        "selector.alarm_source.options.webhook",
+        "selector.alarm_source.options.ntfy",
+        "issues.ntfy_entity_missing.title",
+        "issues.ntfy_entity_missing.description",
     }
+    for step, options in MENUS.items():
+        expected |= {f"config.step.{step}.title", f"config.step.{step}.description"}
+        expected |= {f"config.step.{step}.menu_options.{option}" for option in options}
     assert expected <= keys
     assert "config.abort.single_instance_allowed" not in keys
+    # The connection error is a menu now, the unexpected error an abort.
+    assert "config.error.cloud_not_connected" not in keys
+    assert "config.error.unknown" not in keys
 
 
 @pytest.mark.parametrize("language", ["en", "de"])
@@ -267,8 +306,10 @@ def test_translations_cover_the_options_and_the_reconfigure_flow(
         "config.step.reconfigure.title",
         "config.step.reconfigure.description",
         "config.step.reconfigure.data.reply_url",
+        "config.step.reconfigure.data.alarm_source",
         "config.step.reconfigure.data.regenerate_webhook",
         "config.step.reconfigure.data_description.reply_url",
+        "config.step.reconfigure.data_description.alarm_source",
         "config.step.reconfigure.data_description.regenerate_webhook",
         "config.abort.reconfigure_successful",
         "config.abort.reconfigure_successful_new_webhook",
@@ -312,11 +353,12 @@ def test_options_form_shows_the_access_and_warns_about_the_reload(
 @pytest.mark.parametrize("language", ["en", "de"])
 @pytest.mark.parametrize("kind", ["internal", "path_only"])
 def test_unreachable_url_dialogs_point_to_reconfigure(language: str, kind: str) -> None:
-    """The advice is the reconfigure option, no longer "remove and add again"."""
+    """Saved without alarm: the way out is the cloud link and the reconfigure flow."""
     texts = _load(INTEGRATION / "translations" / f"{language}.json")
     text = texts["config"]["create_entry"][kind]
-    label = texts["config"]["step"]["reconfigure"]["data"]["regenerate_webhook"]
-    assert label in text
+    assert "{cloud_url}" in text
+    assert {"en": "Reconfigure", "de": "Neu konfigurieren"}[language] in text
+    assert "ntfy" in text
     for outdated in ("remove this entry", "lege sie neu an", "Entferne danach"):
         assert outdated not in text
 
@@ -343,3 +385,86 @@ def test_reply_url_help_names_the_place_in_the_person_settings(language: str) ->
     # hassfest does not allow URLs in translations.
     assert "http://" not in text
     assert "https://" not in text
+
+
+# --- The alarm source (ADR 0003) -----------------------
+
+
+@pytest.mark.parametrize("language", ["en", "de"])
+def test_menus_have_exactly_their_options(language: str) -> None:
+    """Every menu option of the flow has a label, and no label is left over."""
+    steps = _load(INTEGRATION / "translations" / f"{language}.json")["config"]["step"]
+    for step, options in MENUS.items():
+        assert list(steps[step]["menu_options"]) == options
+
+
+@pytest.mark.parametrize(
+    ("language", "word"), [("en", "(recommended)"), ("de", "(empfohlen)")]
+)
+def test_cloud_is_recommended_in_the_first_question(language: str, word: str) -> None:
+    """Menus have no preselection, so the recommendation is in the label."""
+    texts = _load(INTEGRATION / "translations" / f"{language}.json")
+    steps = texts["config"]["step"]
+    for step in ("alarm_source", "alarm_source_cloud"):
+        assert word in steps[step]["menu_options"]["cloud"]
+        assert word not in steps[step]["menu_options"]["no_cloud"]
+    assert word in texts["selector"]["alarm_source"]["options"]["webhook"]
+
+
+@pytest.mark.parametrize("language", ["en", "de"])
+def test_guides_have_numbered_steps(language: str) -> None:
+    """The guides for the cloud and for ntfy are numbered step by step."""
+    steps = _load(INTEGRATION / "translations" / f"{language}.json")["config"]["step"]
+    for step in ("cloud_setup", "cloud_setup_retry", "cloud_not_connected"):
+        lines = steps[step]["description"].split("\n")
+        assert {"1.", "2.", "3."} <= {line[:2] for line in lines}
+    ntfy = steps["ntfy"]["description"]
+    for number in ("**1.", "**2.", "**3.", "**4."):
+        assert number in ntfy
+
+
+@pytest.mark.parametrize("language", ["en", "de"])
+def test_ntfy_texts_show_the_url_for_ff_agent(language: str) -> None:
+    """The guide, the closing dialogs and the options show the GET URL."""
+    texts = _load(INTEGRATION / "translations" / f"{language}.json")
+    config = texts["config"]
+    for text in (
+        config["step"]["ntfy"]["description"],
+        config["create_entry"]["ntfy"],
+        config["abort"]["reconfigure_successful_ntfy"],
+        texts["options"]["step"]["ntfy"]["description"],
+    ):
+        assert "{ntfy_publish_url}" in text
+        assert "GET" in text
+    guide = config["step"]["ntfy"]["description"]
+    for placeholder in ("ntfy_topic", "ntfy_setup_url", "ntfy_integration_url"):
+        assert f"{{{placeholder}}}" in guide
+    cloud_guide = config["step"]["cloud_setup"]["description"]
+    assert "{cloud_url}" in cloud_guide
+    assert "{network_url}" in cloud_guide
+    assert "{cloud_url}" in texts["options"]["step"]["init"]["description"]
+
+
+@pytest.mark.parametrize("language", ["en", "de"])
+def test_ntfy_issue_names_the_entry(language: str) -> None:
+    """The repair issue names the entry and nothing secret."""
+    texts = _load(INTEGRATION / "translations" / f"{language}.json")
+    issue = texts["issues"]["ntfy_entity_missing"]
+    assert issue["title"]
+    assert set(re.findall(r"\{(\w+)\}", issue["description"])) == {"title"}
+
+
+@pytest.mark.parametrize("language", ["en", "de"])
+def test_texts_name_no_vendor_and_no_price(language: str) -> None:
+    """No company name of FF Agent and no price in the texts."""
+    text = (INTEGRATION / "translations" / f"{language}.json").read_text("utf-8")
+    for forbidden in ("mackoy", "consulting", "€", "eur ", "$"):
+        assert forbidden not in text.lower()
+    assert "Home Assistant Link" in text
+
+
+def test_manifest_does_not_depend_on_ntfy() -> None:
+    """ntfy stays optional: no dependency, no after_dependency (ADR 0003, 1.)."""
+    manifest = _load(INTEGRATION / "manifest.json")
+    assert "ntfy" not in manifest.get("dependencies", [])
+    assert "ntfy" not in manifest.get("after_dependencies", [])

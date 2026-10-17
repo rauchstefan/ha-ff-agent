@@ -32,3 +32,14 @@ LATITUDE: Final = 1.2345
 LONGITUDE: Final = 6.789
 LOCATION_ENTITY: Final = "person.test_person"
 NEW_CLOUDHOOK_URL: Final = "https://hooks.nabu.casa/test-placeholder-new"
+
+# ntfy: an invented topic and the entity of its subscription. Not real identifiers.
+NTFY_TOPIC: Final = "0123456789abcdef0123456789abcdef"
+OTHER_NTFY_TOPIC: Final = "fedcba9876543210fedcba9876543210"
+NTFY_ENTITY_ID: Final = "event.ff_agent_alarm"
+OTHER_NTFY_ENTITY_ID: Final = "event.ff_agent_alarm_other"
+NTFY_SUBENTRY_ID: Final = "ntfy-subentry-placeholder"
+OTHER_NTFY_SUBENTRY_ID: Final = "ntfy-subentry-placeholder-other"
+NTFY_SERVER: Final = "https://ntfy.sh/"
+NTFY_PUBLISH_URL: Final = f"https://ntfy.sh/{NTFY_TOPIC}/trigger"
+OWN_NTFY_SERVER: Final = "https://ntfy.example.com/"

@@ -9,14 +9,19 @@ import pytest
 from homeassistant.const import CONF_WEBHOOK_ID
 from homeassistant.core import HomeAssistant
 from homeassistant.core_config import async_process_ha_core_config
+from homeassistant.helpers import entity_registry as er
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.ff_agent.const import (
+    CONF_ALARM_SOURCE,
     CONF_CLOUDHOOK,
     CONF_CLOUDHOOK_URL,
     CONF_DEFAULT_TRANSPORT,
     CONF_HEADER_TOKEN,
     CONF_LOCATION_ENTITY,
+    CONF_NTFY_ENTITY_UUID,
+    CONF_NTFY_SERVER,
+    CONF_NTFY_TOPIC,
     CONF_REPLY_HOST,
     CONF_REPLY_ID,
     CONF_REQUIRE_TOKEN,
@@ -25,15 +30,19 @@ from custom_components.ff_agent.const import (
     DEFAULT_RESET_MINUTES,
     DEFAULT_TRANSPORT,
     DOMAIN,
+    SOURCE_NTFY,
+    SOURCE_WEBHOOK,
 )
 from custom_components.ff_agent.reply_url import reply_unique_id
 
-from .common import patch_cloud
+from .common import add_ntfy_entity, add_ntfy_entry, patch_cloud
 from .const import (
     CLOUDHOOK_URL,
     EXTERNAL_URL,
     HEADER_TOKEN,
     LOCATION_ENTITY,
+    NTFY_SERVER,
+    NTFY_TOPIC,
     OTHER_REPLY_ID,
     OTHER_WEBHOOK_ID,
     REPLY_ID,
@@ -73,6 +82,10 @@ def entry_data() -> dict[str, Any]:
         CONF_CLOUDHOOK: False,
         CONF_CLOUDHOOK_URL: None,
         CONF_HEADER_TOKEN: HEADER_TOKEN,
+        CONF_ALARM_SOURCE: SOURCE_WEBHOOK,
+        CONF_NTFY_ENTITY_UUID: None,
+        CONF_NTFY_TOPIC: None,
+        CONF_NTFY_SERVER: None,
     }
 
 
@@ -93,6 +106,7 @@ def mock_config_entry(
     """Return a config entry for one placeholder person."""
     return MockConfigEntry(
         domain=DOMAIN,
+        minor_version=2,
         title="FF Agent Test",
         unique_id=reply_unique_id(REPLY_ID),
         data=entry_data,
@@ -107,6 +121,7 @@ def cloudhook_entry(
     """Return a config entry that uses a cloudhook."""
     return MockConfigEntry(
         domain=DOMAIN,
+        minor_version=2,
         title=mock_config_entry.title,
         unique_id=mock_config_entry.unique_id,
         data={**entry_data, CONF_CLOUDHOOK: True, CONF_CLOUDHOOK_URL: CLOUDHOOK_URL},
@@ -121,6 +136,7 @@ def token_entry(
     """Return a config entry that requires the additional token."""
     return MockConfigEntry(
         domain=DOMAIN,
+        minor_version=2,
         title=mock_config_entry.title,
         unique_id=mock_config_entry.unique_id,
         data=entry_data,
@@ -135,6 +151,7 @@ def location_entry(
     """Return a config entry whose acceptance sends the location of an entity."""
     return MockConfigEntry(
         domain=DOMAIN,
+        minor_version=2,
         title=mock_config_entry.title,
         unique_id=mock_config_entry.unique_id,
         data=entry_data,
@@ -149,6 +166,7 @@ def other_entry(
     """Return the config entry of a second person (other reply ID, other webhook)."""
     return MockConfigEntry(
         domain=DOMAIN,
+        minor_version=2,
         title="FF Agent Other",
         unique_id=reply_unique_id(OTHER_REPLY_ID),
         data={
@@ -158,4 +176,41 @@ def other_entry(
             CONF_HEADER_TOKEN: HEADER_TOKEN + "-other",
         },
         options=dict(mock_config_entry.options),
+    )
+
+
+@pytest.fixture
+def ntfy_config_entry(hass: HomeAssistant) -> MockConfigEntry:
+    """Return a config entry of the ntfy integration with one topic (not set up)."""
+    return add_ntfy_entry(hass)
+
+
+@pytest.fixture
+def ntfy_entity(
+    hass: HomeAssistant, ntfy_config_entry: MockConfigEntry
+) -> er.RegistryEntry:
+    """Return the registry entry of the ntfy event entity of the topic."""
+    return add_ntfy_entity(hass, ntfy_config_entry)
+
+
+@pytest.fixture
+def ntfy_entry(
+    entry_data: dict[str, Any],
+    entry_options: dict[str, Any],
+    ntfy_entity: er.RegistryEntry,
+) -> MockConfigEntry:
+    """Return a config entry that receives the alarm through ntfy."""
+    return MockConfigEntry(
+        domain=DOMAIN,
+        minor_version=2,
+        title="FF Agent Test",
+        unique_id=reply_unique_id(REPLY_ID),
+        data={
+            **entry_data,
+            CONF_ALARM_SOURCE: SOURCE_NTFY,
+            CONF_NTFY_ENTITY_UUID: ntfy_entity.id,
+            CONF_NTFY_TOPIC: NTFY_TOPIC,
+            CONF_NTFY_SERVER: NTFY_SERVER,
+        },
+        options=entry_options,
     )

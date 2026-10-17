@@ -24,10 +24,13 @@ from custom_components.ff_agent import webhook as webhook_module
 from custom_components.ff_agent.const import (
     CONF_DEFAULT_TRANSPORT,
     CONF_LOCATION_ENTITY,
+    CONF_NTFY_ENTITY_UUID,
+    CONF_NTFY_TOPIC,
     CONF_REQUIRE_TOKEN,
     CONF_RESET_MINUTES,
     DOMAIN,
     ISSUE_TOKEN_REJECTED,
+    MY_CLOUD_URL,
     TOKEN_HEADER,
 )
 from custom_components.ff_agent.models import ReplyAction
@@ -44,6 +47,8 @@ from .const import (
     LATITUDE,
     LOCATION_ENTITY,
     LONGITUDE,
+    NTFY_ENTITY_ID,
+    NTFY_PUBLISH_URL,
     REPLY_ID,
     WEBHOOK_ID,
 )
@@ -112,6 +117,7 @@ async def test_form_shows_the_external_webhook_url_header_and_token(
         "url_kind": "external",
         "token_header": TOKEN_HEADER,
         "token": HEADER_TOKEN,
+        "cloud_url": MY_CLOUD_URL,
     }
 
 
@@ -585,3 +591,85 @@ async def test_options_flow_of_an_entry_that_is_not_loaded(
 
     assert result["type"] is FlowResultType.CREATE_ENTRY
     assert mock_config_entry.options[CONF_RESET_MINUTES] == 9
+
+
+# --- ntfy mode -----------------------
+
+
+async def _open_ntfy(hass: HomeAssistant, entry: MockConfigEntry) -> FlowResult:
+    result = await hass.config_entries.options.async_init(entry.entry_id)
+    assert result["type"] is FlowResultType.FORM
+    assert result["step_id"] == "ntfy"
+    return result
+
+
+async def test_ntfy_form_has_no_token_switch(
+    hass: HomeAssistant, ntfy_entry: MockConfigEntry
+) -> None:
+    """There is no additional token with ntfy; the form shows entity and URL."""
+    await async_setup_entry(hass, ntfy_entry)
+
+    result = await _open_ntfy(hass, ntfy_entry)
+
+    keys = {str(key) for key in result["data_schema"].schema}
+    assert keys == {CONF_RESET_MINUTES, CONF_DEFAULT_TRANSPORT, CONF_LOCATION_ENTITY}
+    assert result["description_placeholders"] == {
+        "ntfy_entity": NTFY_ENTITY_ID,
+        "ntfy_publish_url": NTFY_PUBLISH_URL,
+    }
+    for language in ("en", "de"):
+        texts = json.loads((TRANSLATIONS / f"{language}.json").read_text("utf-8"))
+        step = texts["options"]["step"]["ntfy"]
+        assert set(step["data"]) == keys
+        assert set(step["data_description"]) == keys
+        for placeholder in ("ntfy_entity", "ntfy_publish_url"):
+            assert f"{{{placeholder}}}" in step["description"]
+
+
+async def test_ntfy_form_keeps_the_token_option(
+    hass: HomeAssistant, ntfy_entry: MockConfigEntry
+) -> None:
+    """A stored token option survives, so it applies again after a switch back."""
+    ntfy_entry.add_to_hass(hass)
+    hass.config_entries.async_update_entry(
+        ntfy_entry, options={**ntfy_entry.options, CONF_REQUIRE_TOKEN: True}
+    )
+    assert await hass.config_entries.async_setup(ntfy_entry.entry_id)
+    await hass.async_block_till_done()
+    old_alarm = ntfy_entry.runtime_data.alarm
+    result = await _open_ntfy(hass, ntfy_entry)
+
+    saved = await _save(hass, result["flow_id"], {CONF_RESET_MINUTES: 9})
+
+    assert saved["type"] is FlowResultType.CREATE_ENTRY
+    assert dict(ntfy_entry.options) == {
+        CONF_RESET_MINUTES: 9,
+        CONF_DEFAULT_TRANSPORT: "car",
+        CONF_REQUIRE_TOKEN: True,
+    }
+    assert ntfy_entry.runtime_data.alarm is not old_alarm
+    assert ntfy_entry.runtime_data.alarm.reset_minutes == 9
+
+
+async def test_ntfy_form_without_entity_and_topic(
+    hass: HomeAssistant, ntfy_entry: MockConfigEntry
+) -> None:
+    """A missing entity or topic is shown as a dash, not as an error."""
+    ntfy_entry.add_to_hass(hass)
+    hass.config_entries.async_update_entry(
+        ntfy_entry,
+        data={**ntfy_entry.data, CONF_NTFY_ENTITY_UUID: None, CONF_NTFY_TOPIC: None},
+    )
+
+    result = await _open_ntfy(hass, ntfy_entry)
+
+    assert result["description_placeholders"] == {
+        "ntfy_entity": "–",
+        "ntfy_publish_url": "–",
+    }
+    saved = await _save(hass, result["flow_id"])
+    assert saved["data"] == {
+        CONF_RESET_MINUTES: 30,
+        CONF_DEFAULT_TRANSPORT: "car",
+        CONF_REQUIRE_TOKEN: False,
+    }
