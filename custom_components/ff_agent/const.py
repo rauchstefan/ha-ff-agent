@@ -17,6 +17,7 @@ CONF_HEADER_TOKEN: Final = "header_token"  # str, secret, always generated
 # CONF_WEBHOOK_ID and CONF_NAME come from homeassistant.const
 
 CONF_REPLY_URL: Final = "reply_url"  # flow field only, never stored
+CONF_REGENERATE_WEBHOOK: Final = "regenerate_webhook"  # flow field only
 
 CONF_RESET_MINUTES: Final = "reset_minutes"
 CONF_DEFAULT_TRANSPORT: Final = "default_transport"

@@ -7,6 +7,7 @@ must never be logged.
 
 from __future__ import annotations
 
+from contextlib import suppress
 from enum import StrEnum
 
 from homeassistant.components import webhook
@@ -96,3 +97,18 @@ def async_get_webhook_url(
     if entry.data[CONF_CLOUDHOOK] and (url := entry.data.get(CONF_CLOUDHOOK_URL)):
         return url, UrlKind.CLOUD
     return _async_local_webhook_url(hass, entry.data[CONF_WEBHOOK_ID])
+
+
+async def async_delete_cloudhook(hass: HomeAssistant, webhook_id: str) -> None:
+    """Delete the cloudhook of a webhook ID, if the cloud is loaded.
+
+    A cloud that is gone or a cloudhook that does not exist anymore is no error: the
+    result is the same, there is no cloudhook left.
+    """
+    if "cloud" not in hass.config.components:
+        return
+    # Lazy import: the cloud integration is only an optional (after) dependency.
+    from homeassistant.components import cloud
+
+    with suppress(cloud.CloudNotAvailable, ValueError):
+        await cloud.async_delete_cloudhook(hass, webhook_id)

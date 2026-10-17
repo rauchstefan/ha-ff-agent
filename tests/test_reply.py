@@ -427,6 +427,34 @@ async def test_only_the_last_success_counts_for_the_guard(
     assert client.skipped_total == 1
 
 
+async def test_success_then_failed_other_reply_then_the_same_reply_is_skipped(
+    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+) -> None:
+    """Accept works, reject fails, a second accept within 10 s is not sent.
+
+    The failed rejection does not replace the last success: FF Agent still holds the
+    acceptance, so pressing "accept" again is a repetition (261017-reply-test-k5).
+    """
+    aioclient_mock.get(ACCEPT_URL)
+    aioclient_mock.get(REJECT_URL, status=500)
+    client = _client(hass)
+
+    accepted = await client.async_send(ReplyAction.ACCEPT)
+    with pytest.raises(ReplyHttpError):
+        await client.async_send(ReplyAction.REJECT)
+    repeated = await client.async_send(ReplyAction.ACCEPT)
+
+    assert (accepted.success, accepted.skipped) == (True, False)
+    assert (repeated.success, repeated.skipped) == (True, True)
+    # Only the acceptance and the failed rejection made a request.
+    assert aioclient_mock.call_count == 2
+    paths = [_request(aioclient_mock, i).path.rsplit("/", 1)[1] for i in range(2)]
+    assert paths == ["accept", "reject"]
+    assert client.attempts_total == 2
+    assert (client.succeeded_total, client.failed_total) == (1, 1)
+    assert client.skipped_total == 1
+
+
 async def test_the_guard_expires_after_eleven_seconds(
     hass: HomeAssistant,
     aioclient_mock: AiohttpClientMocker,

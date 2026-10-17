@@ -226,7 +226,7 @@ def resolve_location(hass: HomeAssistant, entity_id: str) -> Location | None:
     return latitude, longitude
 
 
-def _configured_transport(value: object) -> str:
+def configured_transport(value: object) -> str:
     """Return the transport of the option; unknown values give the default."""
     if isinstance(value, str):
         if value in TRANSPORT_API_VALUES:
@@ -254,7 +254,7 @@ async def async_send_reply(
     if action is ReplyAction.ACCEPT:
         if transport is None:
             configured = entry.options.get(CONF_DEFAULT_TRANSPORT)
-            transport = _configured_transport(configured)
+            transport = configured_transport(configured)
         elif transport not in TRANSPORTS:
             # Only verified values are sent (A9).
             raise ServiceValidationError(

@@ -12,6 +12,18 @@
           "name": "Label for this entry, for example your name.",
           "reply_url": "Open the FF Agent web UI, go to Automation > Mission replies and copy the accept URL here. The URL is a secret: anyone who has it can accept or decline on your behalf. Do not share it."
         }
+      },
+      "reconfigure": {
+        "title": "Reconfigure FF Agent",
+        "description": "Here you can replace the mission reply URL (for example after you regenerated the UUID in FF Agent) or regenerate the webhook access. If you leave both fields unchanged, nothing happens. Nothing is sent to FF Agent.\n\nSaving reloads the integration; an alarm that is active at that moment is reset.",
+        "data": {
+          "reply_url": "New mission reply URL (accept)",
+          "regenerate_webhook": "Regenerate webhook access"
+        },
+        "data_description": {
+          "reply_url": "Only fill this in if the URL has changed. Empty means unchanged. The current URL is not shown because it is a secret.",
+          "regenerate_webhook": "Creates a new webhook address and a new token. The old access stops working, and you have to enter both in FF Agent afterwards. Useful if the address has become known, or if an external URL or Nabu Casa was added after the setup."
+        }
       }
     },
     "error": {
@@ -21,13 +33,35 @@
     },
     "abort": {
       "already_in_progress": "Setup for this mission reply URL is already in progress.",
-      "already_configured": "FF Agent is already set up for this mission reply URL."
+      "already_configured": "FF Agent is already set up for this mission reply URL.",
+      "reconfigure_successful": "The configuration is saved. If something changed, the integration is reloaded.",
+      "reconfigure_successful_new_webhook": "The webhook access is renewed, the old access is no longer valid. Now replace the URL of the webhook in FF Agent (web UI > Automation > Personal webhooks) with this one: `{webhook_url}`\n\nIf you use the additional token, replace the header as well: name `{token_header}`, value `{token}`. While the token is required, Home Assistant rejects alarms until the new header is entered in FF Agent.\n\nThe URL and the token are secrets. Enter them only in FF Agent.\n\nIf the address is only an internal one or just a path, FF Agent cannot reach it. Set up an external URL or Nabu Casa and regenerate the access again.\n\nThe integration is reloaded; an alarm that is active at that moment is reset."
     },
     "create_entry": {
       "cloud": "Setup is complete. Now create a webhook in FF Agent (web UI > Automation > Personal webhooks > Add webhook) with these values:\n\n- Type: Alarm\n- Webhook type: Generic webhook\n- Method: POST\n- URL: `{webhook_url}`\n- Active: on\n- Also for test alarms: on (for testing; automations then also run for test alarms)\n- Also for info alarms: off\n- Schedule enabled: off\n- Basic authentication, content and query parameters: empty\n\nThe URL is a secret. Enter it only in FF Agent.",
       "external": "Setup is complete. Now create a webhook in FF Agent (web UI > Automation > Personal webhooks > Add webhook) with these values:\n\n- Type: Alarm\n- Webhook type: Generic webhook\n- Method: POST\n- URL: `{webhook_url}`\n- Active: on\n- Also for test alarms: on (for testing; automations then also run for test alarms)\n- Also for info alarms: off\n- Schedule enabled: off\n- Basic authentication, content and query parameters: empty\n\nThe URL is a secret. Enter it only in FF Agent.",
-      "internal": "**Warning:** Home Assistant has no external URL and no Nabu Casa connection. FF Agent cannot reach this internal address: `{webhook_url}`\n\nSet up an external URL or Nabu Casa first. Then remove this entry and add it again so that a reachable address is generated. Only then create a webhook in FF Agent (web UI > Automation > Personal webhooks > Add webhook):\n\n- Type: Alarm\n- Webhook type: Generic webhook\n- Method: POST\n- URL: the new address\n- Active: on\n- Also for test alarms: on (for testing; automations then also run for test alarms)\n- Also for info alarms: off\n- Schedule enabled: off\n- Basic authentication, content and query parameters: empty",
-      "path_only": "**Warning:** Home Assistant has neither an external nor an internal URL and no Nabu Casa connection. This entry only knows the path `{webhook_url}`, which is of no use to FF Agent.\n\nSet up an external URL or Nabu Casa first. Then remove this entry and add it again so that a complete address is generated. Only then create a webhook in FF Agent (web UI > Automation > Personal webhooks > Add webhook):\n\n- Type: Alarm\n- Webhook type: Generic webhook\n- Method: POST\n- URL: the new address\n- Active: on\n- Also for test alarms: on (for testing; automations then also run for test alarms)\n- Also for info alarms: off\n- Schedule enabled: off\n- Basic authentication, content and query parameters: empty"
+      "internal": "**Warning:** Home Assistant has no external URL and no Nabu Casa connection. FF Agent cannot reach this internal address: `{webhook_url}`\n\nSet up an external URL or Nabu Casa first. Then open the menu \"Reconfigure\" of this entry and enable \"Regenerate webhook access\" so that a reachable address is created. Only then create a webhook in FF Agent (web UI > Automation > Personal webhooks > Add webhook):\n\n- Type: Alarm\n- Webhook type: Generic webhook\n- Method: POST\n- URL: the new address\n- Active: on\n- Also for test alarms: on (for testing; automations then also run for test alarms)\n- Also for info alarms: off\n- Schedule enabled: off\n- Basic authentication, content and query parameters: empty",
+      "path_only": "**Warning:** Home Assistant has neither an external nor an internal URL and no Nabu Casa connection. This entry only knows the path `{webhook_url}`, which is of no use to FF Agent.\n\nSet up an external URL or Nabu Casa first. Then open the menu \"Reconfigure\" of this entry and enable \"Regenerate webhook access\" so that a complete address is created. Only then create a webhook in FF Agent (web UI > Automation > Personal webhooks > Add webhook):\n\n- Type: Alarm\n- Webhook type: Generic webhook\n- Method: POST\n- URL: the new address\n- Active: on\n- Also for test alarms: on (for testing; automations then also run for test alarms)\n- Also for info alarms: off\n- Schedule enabled: off\n- Basic authentication, content and query parameters: empty"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "FF Agent: Options",
+        "description": "**Webhook access for FF Agent**\n\n- URL: `{webhook_url}`\n- Kind of address: `{url_kind}` (cloud = Nabu Casa, external = external URL, internal = internal only, path_only = path only)\n- Header name: `{token_header}`\n- Token: `{token}`\n\nIn FF Agent (web UI > Automation > Personal webhooks) use these values: Type Alarm, Webhook type Generic webhook, Method POST, the URL from above, Active on, Schedule off, Basic authentication, content and query parameters empty. You only need the header with the token if \"Require additional token\" below is on.\n\nIf the kind is `internal` or `path_only`, FF Agent cannot reach the address. Set up an external URL or Nabu Casa, then enable \"Regenerate webhook access\" in the \"Reconfigure\" menu of this entry.\n\nThe URL and the token are secrets. Do not share them or screenshots of this page.\n\n**Saving reloads the integration; an alarm that is active at that moment is reset.**",
+        "data": {
+          "require_token": "Require additional token",
+          "reset_minutes": "Reset time of \"Alarm active\"",
+          "default_transport": "Default transport",
+          "location_entity": "Location entity"
+        },
+        "data_description": {
+          "require_token": "Only turn this on once the header is entered in FF Agent and a test alarm shows `x-ff-agent-token` under `header_names` in the diagnostics. Recommended if automations control gates or doors. Calls without a valid token are rejected then.",
+          "reset_minutes": "Minutes without a new alarm after which \"Alarm active\" turns off again (1 to 1440).",
+          "default_transport": "Sent with an acceptance if the action does not name a transport.",
+          "location_entity": "Optional: a person or device tracker whose location is sent with an acceptance. Leave empty to send no location."
+        }
+      }
     }
   },
   "entity": {

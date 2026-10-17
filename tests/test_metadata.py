@@ -248,3 +248,76 @@ def test_services_yaml_matches_the_translations_and_the_schemas() -> None:
     assert list(TRANSPORTS) == ["car"]
     for key in ("latitude", "longitude"):
         assert services["accept"]["fields"][key]["selector"]["number"]["step"] == "any"
+
+
+@pytest.mark.parametrize("language", ["en", "de"])
+def test_translations_cover_the_options_and_the_reconfigure_flow(
+    language: str,
+) -> None:
+    """Both flows, their fields, errors and closing dialogs are translated."""
+    keys = _flatten(_load(INTEGRATION / "translations" / f"{language}.json"))
+    expected = {
+        "config.step.reconfigure.title",
+        "config.step.reconfigure.description",
+        "config.step.reconfigure.data.reply_url",
+        "config.step.reconfigure.data.regenerate_webhook",
+        "config.step.reconfigure.data_description.reply_url",
+        "config.step.reconfigure.data_description.regenerate_webhook",
+        "config.abort.reconfigure_successful",
+        "config.abort.reconfigure_successful_new_webhook",
+        "options.step.init.title",
+        "options.step.init.description",
+    }
+    for field in (
+        "require_token",
+        "reset_minutes",
+        "default_transport",
+        "location_entity",
+    ):
+        expected.add(f"options.step.init.data.{field}")
+        expected.add(f"options.step.init.data_description.{field}")
+    assert expected <= keys
+
+
+@pytest.mark.parametrize("language", ["en", "de"])
+def test_options_form_shows_the_access_and_warns_about_the_reload(
+    language: str,
+) -> None:
+    """The description names URL, header and token and the reset of a running alarm."""
+    texts = _load(INTEGRATION / "translations" / f"{language}.json")
+    step = texts["options"]["step"]["init"]
+    for placeholder in ("webhook_url", "url_kind", "token_header", "token"):
+        assert f"{{{placeholder}}}" in step["description"]
+    reload_hint = {
+        "en": "Saving reloads the integration; an alarm that is active at that "
+        "moment is reset.",
+        "de": "Speichern lädt die Integration neu; ein gerade aktiver Alarm wird "
+        "dabei zurückgesetzt.",
+    }[language]
+    assert reload_hint in step["description"]
+    token_hint = step["data_description"]["require_token"]
+    assert "x-ff-agent-token" in token_hint
+    assert "header_names" in token_hint
+    reconfigure = texts["config"]["step"]["reconfigure"]["description"]
+    assert reload_hint in reconfigure
+
+
+@pytest.mark.parametrize("language", ["en", "de"])
+@pytest.mark.parametrize("kind", ["internal", "path_only"])
+def test_unreachable_url_dialogs_point_to_reconfigure(language: str, kind: str) -> None:
+    """The advice is the reconfigure option, no longer "remove and add again"."""
+    texts = _load(INTEGRATION / "translations" / f"{language}.json")
+    text = texts["config"]["create_entry"][kind]
+    label = texts["config"]["step"]["reconfigure"]["data"]["regenerate_webhook"]
+    assert label in text
+    for outdated in ("remove this entry", "lege sie neu an", "Entferne danach"):
+        assert outdated not in text
+
+
+@pytest.mark.parametrize("language", ["en", "de"])
+def test_new_webhook_dialog_shows_the_access_once(language: str) -> None:
+    """The closing dialog after a new access shows URL, header name and token."""
+    texts = _load(INTEGRATION / "translations" / f"{language}.json")
+    text = texts["config"]["abort"]["reconfigure_successful_new_webhook"]
+    for placeholder in ("webhook_url", "token_header", "token"):
+        assert f"{{{placeholder}}}" in text

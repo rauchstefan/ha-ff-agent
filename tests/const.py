@@ -31,3 +31,4 @@ OTHER_WEBHOOK_ID: Final = "test-webhook-id-placeholder-other"
 LATITUDE: Final = 1.2345
 LONGITUDE: Final = 6.789
 LOCATION_ENTITY: Final = "person.test_person"
+NEW_CLOUDHOOK_URL: Final = "https://hooks.nabu.casa/test-placeholder-new"

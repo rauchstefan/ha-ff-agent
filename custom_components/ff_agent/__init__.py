@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from contextlib import suppress
-
 # Aliased: "webhook" would clash with the submodule .webhook of this package.
 from homeassistant.components import webhook as ha_webhook
 from homeassistant.const import CONF_WEBHOOK_ID, Platform
@@ -17,6 +15,7 @@ from .const import (
     CONF_CLOUDHOOK,
     CONF_REPLY_HOST,
     CONF_REPLY_ID,
+    CONF_REQUIRE_TOKEN,
     CONF_RESET_MINUTES,
     DEFAULT_RESET_MINUTES,
     DOMAIN,
@@ -27,6 +26,7 @@ from .models import FFAgentConfigEntry, FFAgentData
 from .reply import ReplyClient
 from .services import async_setup_services
 from .webhook import async_build_handler
+from .webhook_url import async_delete_cloudhook
 
 # The integration is set up through config entries only.
 CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
@@ -58,6 +58,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: FFAgentConfigEntry) -> b
     entry.runtime_data = FFAgentData(alarm=alarm, reply=reply)
     entry.async_on_unload(alarm.async_shutdown)
 
+    # The hint about a rejected call only makes sense while the token is required.
+    # Switching the option off (which reloads the entry) must not leave it behind.
+    if not entry.options.get(CONF_REQUIRE_TOKEN):
+        ir.async_delete_issue(
+            hass, DOMAIN, ISSUE_TOKEN_REJECTED.format(entry_id=entry.entry_id)
+        )
+
     # FF Agent calls from the internet, so the webhook must not be local only. GET and
     # POST are exactly the methods a generic webhook in FF Agent offers.
     webhook_id = entry.data[CONF_WEBHOOK_ID]
@@ -87,9 +94,5 @@ async def async_remove_entry(hass: HomeAssistant, entry: FFAgentConfigEntry) -> 
         hass, DOMAIN, ISSUE_TOKEN_REJECTED.format(entry_id=entry.entry_id)
     )
 
-    if entry.data.get(CONF_CLOUDHOOK) and "cloud" in hass.config.components:
-        # Lazy import: the cloud integration is only an optional (after) dependency.
-        from homeassistant.components import cloud
-
-        with suppress(cloud.CloudNotAvailable, ValueError):
-            await cloud.async_delete_cloudhook(hass, entry.data[CONF_WEBHOOK_ID])
+    if entry.data.get(CONF_CLOUDHOOK):
+        await async_delete_cloudhook(hass, entry.data[CONF_WEBHOOK_ID])

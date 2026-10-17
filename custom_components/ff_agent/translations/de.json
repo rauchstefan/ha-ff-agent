@@ -12,6 +12,18 @@
           "name": "Bezeichnung dieser Einrichtung, zum Beispiel dein Name.",
           "reply_url": "Öffne die FF-Agent-Web-UI, gehe zu Automatisierung > Einsatzrückmeldungen und kopiere die Zusage-URL hierher. Die URL ist ein Geheimnis: Mit ihr kann jemand in deinem Namen zu- oder absagen. Gib sie niemandem weiter."
         }
+      },
+      "reconfigure": {
+        "title": "FF Agent neu konfigurieren",
+        "description": "Hier kannst du die Rückmelde-URL ersetzen (zum Beispiel nach dem Neuerzeugen der UUID in FF Agent) oder den Webhook-Zugang neu erzeugen. Lässt du beide Felder unverändert, passiert nichts. Es wird nichts an FF Agent gesendet.\n\nSpeichern lädt die Integration neu; ein gerade aktiver Alarm wird dabei zurückgesetzt.",
+        "data": {
+          "reply_url": "Neue Rückmelde-URL (Zusage)",
+          "regenerate_webhook": "Webhook-Zugang neu erzeugen"
+        },
+        "data_description": {
+          "reply_url": "Nur ausfüllen, wenn sich die URL geändert hat. Leer bedeutet: unverändert. Die bisherige URL wird nicht angezeigt, denn sie ist ein Geheimnis.",
+          "regenerate_webhook": "Erzeugt eine neue Webhook-Adresse und ein neues Token. Der alte Zugang funktioniert danach nicht mehr, beides musst du anschließend in FF Agent eintragen. Sinnvoll, wenn die Adresse bekannt geworden ist oder wenn erst nach der Einrichtung eine externe URL oder Nabu Casa dazugekommen ist."
+        }
       }
     },
     "error": {
@@ -21,13 +33,35 @@
     },
     "abort": {
       "already_in_progress": "Die Einrichtung für diese Rückmelde-URL läuft bereits.",
-      "already_configured": "Für diese Rückmelde-URL ist FF Agent bereits eingerichtet."
+      "already_configured": "Für diese Rückmelde-URL ist FF Agent bereits eingerichtet.",
+      "reconfigure_successful": "Die Konfiguration ist gespeichert. Falls sich etwas geändert hat, wird die Integration neu geladen.",
+      "reconfigure_successful_new_webhook": "Der Webhook-Zugang ist erneuert, der alte Zugang gilt nicht mehr. Ersetze jetzt in FF Agent (Web-UI > Automatisierung > Persönliche Webhooks) die URL des Webhooks durch diese: `{webhook_url}`\n\nNutzt du das Zusatz-Token, ersetze auch den Header: Name `{token_header}`, Wert `{token}`. Ist die Token-Pflicht eingeschaltet, lehnt Home Assistant Alarme ab, bis der neue Header in FF Agent steht.\n\nDie URL und das Token sind Geheimnisse. Trage sie nur in FF Agent ein.\n\nIst die Adresse nur eine interne oder nur ein Pfad, erreicht FF Agent sie nicht. Richte dann eine externe URL oder Nabu Casa ein und erzeuge den Zugang erneut.\n\nDie Integration wird neu geladen; ein gerade aktiver Alarm wird dabei zurückgesetzt."
     },
     "create_entry": {
       "cloud": "Die Einrichtung ist abgeschlossen. Lege jetzt in FF Agent einen Webhook an (Web-UI > Automatisierung > Persönliche Webhooks > Webhook hinzufügen) mit diesen Werten:\n\n- Type: Alarm\n- Webhooktyp: Generischer Webhook\n- Methode: POST\n- URL: `{webhook_url}`\n- Aktiv: an\n- auch für Testalarme: an (zum Testen; Automationen laufen dann auch bei Testalarmen)\n- auch für Infoalarme: aus\n- Zeitplan aktiviert: aus\n- Basis-Authentifizierung, Inhalt und Query-Parameter: leer\n\nDie URL ist ein Geheimnis. Trage sie nur in FF Agent ein.",
       "external": "Die Einrichtung ist abgeschlossen. Lege jetzt in FF Agent einen Webhook an (Web-UI > Automatisierung > Persönliche Webhooks > Webhook hinzufügen) mit diesen Werten:\n\n- Type: Alarm\n- Webhooktyp: Generischer Webhook\n- Methode: POST\n- URL: `{webhook_url}`\n- Aktiv: an\n- auch für Testalarme: an (zum Testen; Automationen laufen dann auch bei Testalarmen)\n- auch für Infoalarme: aus\n- Zeitplan aktiviert: aus\n- Basis-Authentifizierung, Inhalt und Query-Parameter: leer\n\nDie URL ist ein Geheimnis. Trage sie nur in FF Agent ein.",
-      "internal": "**Achtung:** Home Assistant hat keine externe URL und keine Nabu-Casa-Verbindung. FF Agent erreicht die folgende interne Adresse nicht: `{webhook_url}`\n\nRichte zuerst eine externe URL oder Nabu Casa ein. Entferne danach diese Einrichtung und lege sie neu an, damit eine erreichbare Adresse erzeugt wird. Erst dann in FF Agent einen Webhook anlegen (Web-UI > Automatisierung > Persönliche Webhooks > Webhook hinzufügen):\n\n- Type: Alarm\n- Webhooktyp: Generischer Webhook\n- Methode: POST\n- URL: die neue Adresse\n- Aktiv: an\n- auch für Testalarme: an (zum Testen; Automationen laufen dann auch bei Testalarmen)\n- auch für Infoalarme: aus\n- Zeitplan aktiviert: aus\n- Basis-Authentifizierung, Inhalt und Query-Parameter: leer",
-      "path_only": "**Achtung:** Home Assistant hat weder eine externe noch eine interne URL und keine Nabu-Casa-Verbindung. Die Einrichtung kennt nur den Pfad `{webhook_url}`, FF Agent kann damit nichts anfangen.\n\nRichte zuerst eine externe URL oder Nabu Casa ein. Entferne danach diese Einrichtung und lege sie neu an, damit eine vollständige Adresse erzeugt wird. Erst dann in FF Agent einen Webhook anlegen (Web-UI > Automatisierung > Persönliche Webhooks > Webhook hinzufügen):\n\n- Type: Alarm\n- Webhooktyp: Generischer Webhook\n- Methode: POST\n- URL: die neue Adresse\n- Aktiv: an\n- auch für Testalarme: an (zum Testen; Automationen laufen dann auch bei Testalarmen)\n- auch für Infoalarme: aus\n- Zeitplan aktiviert: aus\n- Basis-Authentifizierung, Inhalt und Query-Parameter: leer"
+      "internal": "**Achtung:** Home Assistant hat keine externe URL und keine Nabu-Casa-Verbindung. FF Agent erreicht die folgende interne Adresse nicht: `{webhook_url}`\n\nRichte zuerst eine externe URL oder Nabu Casa ein. Öffne danach bei dieser Einrichtung das Menü „Neu konfigurieren“ und aktiviere „Webhook-Zugang neu erzeugen“, damit eine erreichbare Adresse entsteht. Erst dann in FF Agent einen Webhook anlegen (Web-UI > Automatisierung > Persönliche Webhooks > Webhook hinzufügen):\n\n- Type: Alarm\n- Webhooktyp: Generischer Webhook\n- Methode: POST\n- URL: die neue Adresse\n- Aktiv: an\n- auch für Testalarme: an (zum Testen; Automationen laufen dann auch bei Testalarmen)\n- auch für Infoalarme: aus\n- Zeitplan aktiviert: aus\n- Basis-Authentifizierung, Inhalt und Query-Parameter: leer",
+      "path_only": "**Achtung:** Home Assistant hat weder eine externe noch eine interne URL und keine Nabu-Casa-Verbindung. Die Einrichtung kennt nur den Pfad `{webhook_url}`, FF Agent kann damit nichts anfangen.\n\nRichte zuerst eine externe URL oder Nabu Casa ein. Öffne danach bei dieser Einrichtung das Menü „Neu konfigurieren“ und aktiviere „Webhook-Zugang neu erzeugen“, damit eine vollständige Adresse entsteht. Erst dann in FF Agent einen Webhook anlegen (Web-UI > Automatisierung > Persönliche Webhooks > Webhook hinzufügen):\n\n- Type: Alarm\n- Webhooktyp: Generischer Webhook\n- Methode: POST\n- URL: die neue Adresse\n- Aktiv: an\n- auch für Testalarme: an (zum Testen; Automationen laufen dann auch bei Testalarmen)\n- auch für Infoalarme: aus\n- Zeitplan aktiviert: aus\n- Basis-Authentifizierung, Inhalt und Query-Parameter: leer"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "FF Agent: Optionen",
+        "description": "**Webhook-Zugang für FF Agent**\n\n- URL: `{webhook_url}`\n- Art der Adresse: `{url_kind}` (cloud = Nabu Casa, external = externe URL, internal = nur intern, path_only = nur Pfad)\n- Header-Name: `{token_header}`\n- Token: `{token}`\n\nIn FF Agent (Web-UI > Automatisierung > Persönliche Webhooks) gelten diese Werte: Type Alarm, Webhooktyp Generischer Webhook, Methode POST, die URL von oben, Aktiv an, Zeitplan aus, Basis-Authentifizierung, Inhalt und Query-Parameter leer. Den Header mit dem Token brauchst du nur, wenn unten „Zusatz-Token verlangen“ eingeschaltet ist.\n\nIst die Art `internal` oder `path_only`, erreicht FF Agent die Adresse nicht. Richte dann eine externe URL oder Nabu Casa ein und aktiviere im Menü „Neu konfigurieren“ dieser Einrichtung „Webhook-Zugang neu erzeugen“.\n\nURL und Token sind Geheimnisse. Gib sie niemandem weiter und teile keine Screenshots dieser Seite.\n\n**Speichern lädt die Integration neu; ein gerade aktiver Alarm wird dabei zurückgesetzt.**",
+        "data": {
+          "require_token": "Zusatz-Token verlangen",
+          "reset_minutes": "Rücksetzzeit „Alarm aktiv“",
+          "default_transport": "Standard-Verkehrsmittel",
+          "location_entity": "Standort-Entität"
+        },
+        "data_description": {
+          "require_token": "Erst einschalten, wenn der Header in FF Agent eingetragen ist und ein Testalarm in der Diagnose `x-ff-agent-token` unter `header_names` zeigt. Empfohlen, wenn Automationen Tore oder Türen steuern. Aufrufe ohne gültiges Token werden dann abgelehnt.",
+          "reset_minutes": "Minuten ohne neuen Alarm, nach denen „Alarm aktiv“ wieder ausgeht (1 bis 1440).",
+          "default_transport": "Wird beim Zusagen mitgesendet, wenn die Action kein Verkehrsmittel angibt.",
+          "location_entity": "Optional: eine Person oder ein Gerät-Tracker, dessen Standort beim Zusagen mitgesendet wird. Leer lassen, um keinen Standort zu senden."
+        }
+      }
     }
   },
   "entity": {

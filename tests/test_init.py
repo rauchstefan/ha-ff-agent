@@ -190,3 +190,39 @@ async def test_remove_entry_deletes_the_repair_issue(
     await hass.config_entries.async_remove(token_entry.entry_id)
 
     assert registry.async_get_issue(DOMAIN, issue_id) is None
+
+
+def _create_issue(hass: HomeAssistant, entry: MockConfigEntry) -> str:
+    issue_id = ISSUE_TOKEN_REJECTED.format(entry_id=entry.entry_id)
+    ir.async_create_issue(
+        hass,
+        DOMAIN,
+        issue_id,
+        is_fixable=False,
+        severity=ir.IssueSeverity.WARNING,
+        translation_key="webhook_token_rejected",
+        translation_placeholders={"title": entry.title},
+    )
+    return issue_id
+
+
+async def test_setup_deletes_the_repair_issue_when_the_token_is_not_required(
+    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+) -> None:
+    """Switching the token requirement off must not leave the hint behind."""
+    issue_id = _create_issue(hass, mock_config_entry)
+
+    await _setup(hass, mock_config_entry)
+
+    assert ir.async_get(hass).async_get_issue(DOMAIN, issue_id) is None
+
+
+async def test_setup_keeps_the_repair_issue_while_the_token_is_required(
+    hass: HomeAssistant, token_entry: MockConfigEntry
+) -> None:
+    """A reload must not hide a rejected call as long as the token is required."""
+    issue_id = _create_issue(hass, token_entry)
+
+    await _setup(hass, token_entry)
+
+    assert ir.async_get(hass).async_get_issue(DOMAIN, issue_id) is not None
