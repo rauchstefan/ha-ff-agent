@@ -1,4 +1,4 @@
-"""Privacy test for the replies (basis; PR 6 extends it to the whole life cycle).
+"""Privacy test for the replies (the whole life cycle: test_privacy_lifecycle.py).
 
 All flows run with DEBUG logging. The reply ID, the webhook ID and the coordinates
 must not show up in the log, in an error message, in a traceback, in the diagnostics
