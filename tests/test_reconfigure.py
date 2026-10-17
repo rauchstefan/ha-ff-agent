@@ -996,20 +996,19 @@ async def test_switching_logs_no_topic(
     result = await _choose(hass, result["flow_id"], "ntfy_find")
 
     assert result["reason"] == "reconfigure_successful_ntfy"
-    ours = "
-".join(
+    ours = " | ".join(
         record.getMessage()
         for record in caplog.records
         if record.name.startswith("custom_components.ff_agent")
     )
+    serious = " | ".join(
+        record.getMessage()
+        for record in caplog.records
+        if record.levelno >= logging.WARNING
+    )
     for secret in (topic, OTHER_NTFY_ENTITY_ID, registry_entry.id):
         assert secret not in ours
-        assert secret not in "
-".join(
-            record.getMessage()
-            for record in caplog.records
-            if record.levelno >= logging.WARNING
-        )
+        assert secret not in serious
 
 
 async def test_webhook_to_ntfy_without_the_ntfy_integration(
