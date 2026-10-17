@@ -103,7 +103,7 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
 - **Verweise:** docs/recherche/261016-ffagent-webhook-zusage.md, Abschnitt 3.7
 
 ### 261017-erreichbarkeit-recherche – Wege, HA für FF Agent erreichbar zu machen
-- **Status:** in Arbeit (researcher, 2026-10-17)
+- **Status:** erledigt (2026-10-17, docs/recherche/261017-erreichbarkeit.md; My-Link und ntfy-Integration vom Projektleiter geprüft)
 - **Priorität:** hoch (Hürde für normale Nutzer)
 - **Rolle(n):** researcher, danach architekt
 - **Beschreibung:** Nabu Casa (Link zur Einrichtung), Alternativen wie Tunnel-Add-ons
