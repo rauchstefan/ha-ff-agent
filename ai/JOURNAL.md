@@ -22,6 +22,30 @@ Das Journal ist Verlauf, keine Wissensbasis: Dauerhaftes gehört nach `docs/` od
 
 <!-- Neue Einträge direkt unter dieser Zeile einfügen -->
 
+## 2026-10-17 – lokal-2026-10-16-hacs-recherche – MVP PR 3 (Alarm-Logik und Entitäten)
+- **Nutzer-Auftrag:** „Starte mit PR 3 (Alarm-Logik und Entitäten). Den echten Test machen
+  wir später.“
+- **Delegiert:**
+  - entwickler (Sonnet): Umsetzung und Nacharbeit
+  - tester (Sonnet) und reviewer (Opus) parallel
+  - Standardmodelle
+- **Erledigt:**
+  - PR rauchstefan/ha-ff-agent#4 per Squash gemergt (22a7c4c), 270 Tests, Abdeckung 100 %
+  - tester: PASS, 9 Szenario-Tests ergänzt; reviewer: freigegeben
+  - Nacharbeit:
+    - Uhr-Rücksprung zählt als neuer Alarm
+    - Manager wird erst nach dem Lesen des Bodys geholt (Reload-Fenster)
+    - Restore ohne Zeitzone wird ignoriert
+    - Pflichtfilter der Beispiel-Automation per Test belegt
+  - docs/architektur.md: Fallstricke zu Event-Automation, Reload und Uhrzeit
+- **Offen / Übergabe:**
+  - nächster Schritt 261017-mvp-4-rueckmeldung
+  - für PR 5: Hinweise zum Options-Schema und zum Reload-Verhalten
+  - für PR 6: Beispiel-Automation mit Filtern
+  - der echte Test steht weiter aus (Nutzer: „später“)
+- **Für die nächste Session:** In HA 2026.10 wirft `device_registry.async_get_device` in den
+  Tests einen Fehler; stattdessen `async_get_device_by_identifier` verwenden.
+
 ## 2026-10-17 – lokal-2026-10-16-hacs-recherche – Python-Ziel und MVP PR 2 (Webhook)
 - **Nutzer-Auftrag:** „Kläre zuerst die Python-Mindestversion (261017-python-target),
   dann PR 2.“

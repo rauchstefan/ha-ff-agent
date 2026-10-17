@@ -87,7 +87,7 @@ Ein `coordinator.py` entfällt, weil es kein Polling gibt.
 
 | Entität | Key | Verhalten | Recorder |
 |---|---|---|---|
-| Binary-Sensor „Alarm aktiv“ | `alarm` | an beim Alarm; aus nach der Rücksetzzeit (Option, Standard 30 min); nach einem Neustart aus | Zustand |
+| Binary-Sensor „Alarm aktiv“ | `alarm` | an beim Alarm; aus nach der Rücksetzzeit (Option, Standard 30 min); nach einem Neustart **oder Reload** aus (der AlarmManager startet leer, auch das Dedup-Fenster) | Zustand |
 | Event „Alarm“ | `alarm` | Event-Typ `alarm` je neuem Alarm; primärer Trigger | Zeitstempel und `event_type` |
 | Sensor „Letzter Alarm“ | `last_alarm` | `TIMESTAMP`, wird nach einem Neustart wiederhergestellt | Zeitstempel |
 | Sensor „Letzte Rückmeldung“ | `last_reply` | `ENUM`: `accepted`, `rejected`, `failed` | Zustand |
@@ -139,6 +139,19 @@ gibt es nicht.
   Core-Integration „Remote Calendar“.
 
 ## HA-Fallstricke (geprüft 2026-10-17, HA 2026.3.0 und dev)
+
+- **Automationen auf die Event-Entität brauchen Filter.** Bei Reload oder Neustart wechselt
+  die Event-Entität zu `unavailable` und stellt danach den alten Zeitstempel wieder her.
+  Ein `state`-Trigger ohne Filter löst dann aus, als gäbe es einen Alarm. Er braucht
+  deshalb immer `not_from: [unavailable, unknown]` und `not_to: [unavailable, unknown]`.
+  Zwei Tests in `tests/test_entities.py` belegen das (mit Filter löst er nicht aus, ohne
+  Filter schon). README und Beispiel-Automation (PR 6) müssen das zeigen.
+- **Reload löscht den laufenden Alarm.** Der `AlarmManager` startet bei jedem Setup leer.
+  Ab PR 5 lädt jede Options-Änderung den Eintrag neu (`OptionsFlowWithReload`), damit
+  springt „Alarm aktiv“ auf aus und das Dedup-Fenster ist offen. Das ist bewusst so
+  (flüchtiger Zustand) und gehört in die Nutzerdoku.
+- **Dedup und Uhrzeit:** Eine negative Zeitdifferenz (Uhr springt zurück, z. B. durch
+  NTP) gilt als neuer Alarm. Der Rücksetz-Timer läuft über die monotone Loop-Uhr.
 
 - **Python-Version:** Laut `requires_python` auf PyPI verlangt HA 2026.1/2026.2
   Python ≥ 3.13.2 und HA ab 2026.3.0 Python ≥ 3.14.2. Unsere Mindestversion

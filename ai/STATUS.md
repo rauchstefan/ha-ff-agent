@@ -5,17 +5,19 @@ Session. Von Hand gepflegt.
 
 - **Version:** 0.1.0 im Manifest, kein Release
 - **Integration:** MVP in Arbeit (ADR 0002, Plan docs/plaene/261017-mvp-alarm-zusage.md).
-  Erledigt sind PR 1 und 2 von 6:
+  Erledigt sind PR 1 bis 3 von 6:
   - Config Flow (eine Person je Eintrag), Parser für die Rückmelde-URL, Webhook-URL
     (Cloudhook, extern, intern)
   - Webhook-Empfang (GET/POST) mit optionalem Zusatz-Token und Repair-Issue; erfasst wird
     nur die Form des Aufrufs, Diagnostics sind redigiert
+  - Alarm-Logik (Dedup 30 s, Rücksetzzeit) mit den Entitäten Event „Alarm“, Binary-Sensor
+    „Alarm aktiv“ und Sensor „Letzter Alarm“, alle an einem Gerät je Person
 
-  Es gibt noch keine Entitäten (PR 3) und keine Rückmeldung (PR 4).
+  Es fehlen noch Rückmeldung (PR 4), Options/Reconfigure (PR 5) und Doku (PR 6).
 - **CI:** `validate.yml` (hassfest, HACS-Action) und `tests.yml` (ruff, pytest mit
   pytest-homeassistant-custom-component, Python 3.14, Abdeckung mindestens 95 %),
   Dependabot
-- **Letzte Änderung:** 2026-10-17 – MVP PR 2 (rauchstefan/ha-ff-agent#3)
+- **Letzte Änderung:** 2026-10-17 – MVP PR 3 (rauchstefan/ha-ff-agent#4)
 
 ## Was funktioniert
 
@@ -28,8 +30,8 @@ Session. Von Hand gepflegt.
 
 - Das Repo ist privat, daher funktioniert keine HACS-Installation und der HACS-Job in
   der CI wird übersprungen.
-- Ein Webhook-Aufruf wird nur gezählt und in der Diagnose als Form sichtbar. Alarm-Entitäten
-  folgen mit PR 3.
+- Automationen auf die Event-Entität brauchen die Filter `not_from`/`not_to: unavailable`
+  (siehe docs/architektur.md).
 - Das Token ist vor PR 5 (Options Flow) in der UI nicht sichtbar. Die Token-Prüfung lässt
   sich deshalb noch nicht einschalten.
 - Ein echter Test (FF Agent → HA) ist möglich, steht aber noch aus und braucht die Freigabe
