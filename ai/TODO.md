@@ -57,7 +57,7 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
 - **Verweise:** PR rauchstefan/ha-ff-agent#1
 
 ### 261017-echter-test – Erster echter Test mit FF Agent und HA-Instanz
-- **Status:** offen (braucht ausdrückliche Freigabe des Nutzers)
+- **Status:** in Arbeit (Freigabe des Nutzers 2026-10-17; Anleitung docs/plaene/261017-echter-test-anleitung.md; wartet auf Rückmeldeliste)
 - **Priorität:** hoch
 - **Rolle(n):** Nutzer, Projektleiter, tester
 - **Beschreibung:**

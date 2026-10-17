@@ -22,6 +22,26 @@ Das Journal ist Verlauf, keine Wissensbasis: Dauerhaftes gehört nach `docs/` od
 
 <!-- Neue Einträge direkt unter dieser Zeile einfügen -->
 
+## 2026-10-17 – lokal-2026-10-16-hacs-recherche – Freigabe echter Test, Anleitung
+- **Nutzer-Auftrag:** „Ich gebe den echten Test frei. Gib mir die
+  Schritt-für-Schritt-Anleitung für Installation, Webhook und Testalarm.“
+- **Delegiert:** nichts. Die Anleitung hat der Projektleiter aus README, Übersetzungen
+  und diagnostics.py zusammengestellt.
+- **Erledigt:** docs/plaene/261017-echter-test-anleitung.md mit folgenden Teilen:
+  - Vorbereitung (Backup, Version, Erreichbarkeit, Empfänger des Testalarms)
+  - manuelle Installation
+  - Feldwerte für FF Agent, inklusive Dummy-Header zur Messung von A12
+  - Messungen A–C
+  - Aufräumen
+  - Rückmeldeliste mit Diagnose-Schlüsseln je Annahme
+- **Offen / Übergabe:**
+  - 261017-echter-test wartet auf die Rückmeldeliste des Nutzers.
+  - Danach Annahmen in ADR 0002 und architektur.md eintragen und Folge-TODOs anlegen
+    (Redirects, Token-Standard, Einsatzdetails).
+- **Für die nächste Session:** Claude führt den Test nicht selbst aus und hat keinen
+  Zugriff auf FF Agent oder die HA-Instanz. Ausgewertet werden nur die Angaben des
+  Nutzers bzw. redigierte Diagnose-Dateien.
+
 ## 2026-10-17 – lokal-2026-10-16-hacs-recherche – MVP PR 6 (Doku und Qualität), MVP fertig
 - **Nutzer-Auftrag:** „Ja, starte mit PR 6 (Doku und Qualitätsabschluss).“
 - **Delegiert:**
