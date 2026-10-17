@@ -32,7 +32,7 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
 ## Offen
 
 ### 261016-repo-oeffentlich – Entscheidung: Repo öffentlich machen
-- **Status:** offen (wartet auf Nutzer)
+- **Status:** erledigt (2026-10-17: neues öffentliches Repo mit bereinigter Historie, altes als privates Archiv ha-ff-agent-archiv; Beschreibung, Topics, Issues gesetzt)
 - **Priorität:** hoch
 - **Rolle(n):** Nutzer, Projektleiter
 - **Beschreibung:** HACS funktioniert nur mit öffentlichen GitHub-Repos, auch als Custom
@@ -44,7 +44,7 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
 - **Verweise:** docs/recherche/261016-hacs-anforderungen.md, Abschnitt 3.6
 
 ### 261016-hacs-oeffentlich-pruefen – HACS-Job nach Veröffentlichung prüfen
-- **Status:** offen (wartet auf 261016-repo-oeffentlich)
+- **Status:** erledigt (2026-10-17: HACS-Validierung 9/9 Checks ohne ignore, Cron täglich per PR rauchstefan/ha-ff-agent#2)
 - **Priorität:** mittel
 - **Rolle(n):** tester, entwickler
 - **Beschreibung:** Solange das Repo privat ist, überspringt validate.yml den HACS-Job.
@@ -70,6 +70,24 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
 - **Definition of Done:** alle Annahmen bestätigt oder widerlegt und dokumentiert,
   Folge-TODOs angelegt.
 - **Verweise:** README (Einrichtung, Fehlerbehebung), ADR 0002 (Annahmen)
+
+### 261017-dependabot-hassfest – Dependabot-PR für den hassfest-Pin prüfen
+- **Status:** offen
+- **Priorität:** niedrig
+- **Rolle(n):** reviewer
+- **Beschreibung:** Dependabot hat PR rauchstefan/ha-ff-agent#1 geöffnet: Bump des Pins von
+  `home-assistant/actions/hassfest`. Prüfen, ob die CI grün ist, dann mergen.
+  Grundsätzlich: Dependabot-PRs nur bei grüner CI mergen. Ändert sich mit einem Update von
+  pytest-homeassistant-custom-component die Python-Version, `PYTHON_VERSION` in tests.yml
+  anpassen.
+
+### 261017-hacs-default – Aufnahme in den HACS-Default-Store
+- **Status:** offen (nach bestandenem echten Test und stabilem Release)
+- **Priorität:** niedrig
+- **Rolle(n):** Nutzer, Projektleiter
+- **Beschreibung:** PR an `hacs/default` gemäß docs/recherche/261016-hacs-anforderungen.md
+  (Checkliste 5.2). Dazu braucht es ein vollständiges Release, kein Pre-Release, und die
+  Klärung der Markenrechte am Namen „FF Agent“ mit dem Hersteller.
 
 ### 261017-quality-todos – Offene Quality-Scale-Regeln
 - **Status:** offen

@@ -22,6 +22,48 @@ Das Journal ist Verlauf, keine Wissensbasis: Dauerhaftes gehört nach `docs/` od
 
 <!-- Neue Einträge direkt unter dieser Zeile einfügen -->
 
+## 2026-10-17 – lokal-2026-10-16-hacs-recherche – Veröffentlichung und Release v0.1.0
+- **Nutzer-Auftrag:** „Ich schlage vor, wir schalten es öffentlich und machen die komplette
+  Installation einmal durch“
+- **Nutzerentscheidungen (per Rückfrage):**
+  - Historie umschreiben
+  - Repo öffentlich machen
+  - v0.1.0 als Pre-Release
+  - Nachdem klar war, dass geschlossene PRs die private Mailadresse weiter zeigen
+    (`.patch`), entschied der Nutzer: **neues sauberes Repo**, altes Repo wird Archiv.
+- **Prüfung vor der Veröffentlichung (Projektleiter):** komplette Git-Historie gescannt.
+  - Keine echten UUIDs, Tokens, Koordinaten oder Benutzernamen.
+  - Funde: die private Hotmail-Adresse als Commit-Autor in 84 Commits; in einer
+    Recherche-Datei die E-Mail-Adresse und eine Kontozuordnung eines Dritten
+    (Homey-Entwickler).
+- **Erledigt:**
+  - Sicherung (Git-Bundle im Scratchpad)
+  - `main` per `git filter-branch` umgeschrieben (Autor/Committer auf noreply,
+    Drittdaten aus allen Versionen entfernt) und geprüft: 35 Commits, 0 Treffer,
+    Dateistand identisch
+  - altes Repo umbenannt in `ha-ff-agent-archiv` (privat); neues Repo `ha-ff-agent`
+    angelegt, zuerst privat gepusht und geprüft, dann öffentlich mit Beschreibung,
+    Topics und Issues
+  - lokale `git config user.email` auf noreply gesetzt; Regel in CLAUDE.md
+  - PR-Verweise in ai/ und docs/ auf `ha-ff-agent-archiv#N` umgestellt
+  - HACS-Validierung erstmals gelaufen: alle 9 Checks bestanden, kein `ignore`
+  - Cron täglich (PR rauchstefan/ha-ff-agent#2, nur CI-Zeile, ohne tester/reviewer)
+  - CHANGELOG.md, Release **v0.1.0 als Pre-Release** auf grünem Commit
+  - README und Testanleitung auf HACS-Installation umgestellt
+- **Abweichung vom Standard-Release-Ablauf:** Kein eigener tester- oder reviewer-Lauf für
+  das Release. Alle enthaltenen Änderungen hatten das Gate je PR bereits durchlaufen, die
+  CI auf dem Release-Commit war grün, das Release ist als Vorabversion markiert, und der
+  Nutzer hat es ausdrücklich freigegeben.
+- **Offen / Übergabe:**
+  - 261017-echter-test: Der Nutzer installiert über HACS und testet nach
+    docs/plaene/261017-echter-test-anleitung.md.
+  - 261017-dependabot-hassfest (PR rauchstefan/ha-ff-agent#1)
+  - 261017-hacs-default
+- **Für die nächste Session:**
+  - Die Git-Sicherung liegt nur im temporären Scratchpad. Die dauerhafte Sicherung der
+    alten Historie ist das Archiv-Repo.
+  - Lokale `refs/original/` von filter-branch sind entfernt. Der Remote `archiv` zeigt auf das private Archiv-Repo; nie mit `--all` oder `--mirror` nach `origin` pushen.
+
 ## 2026-10-17 – lokal-2026-10-16-hacs-recherche – Freigabe echter Test, Anleitung
 - **Nutzer-Auftrag:** „Ich gebe den echten Test frei. Gib mir die
   Schritt-für-Schritt-Anleitung für Installation, Webhook und Testalarm.“

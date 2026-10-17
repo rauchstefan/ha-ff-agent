@@ -1,7 +1,7 @@
 # Erster echter Test: Anleitung für den Nutzer
 
-TODO-ID: `261017-echter-test` · Freigabe des Nutzers am 2026-10-17 erteilt · Stand: main
-nach PR rauchstefan/ha-ff-agent-archiv#7
+TODO-ID: `261017-echter-test` · Freigabe des Nutzers am 2026-10-17 erteilt · Stand:
+Release v0.1.0 (Vorabversion), Installation über HACS
 
 Ziel: Herausfinden, wie sich FF Agent wirklich verhält. Die Annahmen aus ADR 0002
 (A1–A13) werden geprüft. Was du siehst, trägst du in die **Rückmeldeliste** am Ende ein
@@ -29,17 +29,28 @@ und gibst sie dem Projektleiter.
    hängen, die Tore, Türen oder Sirenen steuert. Ein Licht oder eine Benachrichtigung
    reicht.
 
-## 1. Installation (manuell, weil das Repo privat ist)
+## 1. Installation über HACS (Repo ist seit 2026-10-17 öffentlich)
 
-1. Auf GitHub `rauchstefan/ha-ff-agent` öffnen (du bist angemeldet), Branch `main`,
-   *Code → Download ZIP*.
-2. Im ZIP den Ordner `custom_components/ff_agent` suchen.
-3. Ihn in deine Instanz kopieren nach `/config/custom_components/ff_agent`, z. B. per
-   Samba-Freigabe, „Studio Code Server“ oder SSH. Danach muss es
-   `/config/custom_components/ff_agent/manifest.json` geben.
-4. Home Assistant **neu starten** (Einstellungen → System → Neu starten).
-5. Im Log steht danach eine Warnung, dass eine Custom-Integration geladen wurde, die
+Voraussetzung: HACS ist in deiner Instanz installiert.
+
+1. In Home Assistant: **HACS** öffnen, oben rechts **⋮ → Benutzerdefinierte
+   Repositories**.
+2. Repository `https://github.com/rauchstefan/ha-ff-agent`, Typ **Integration**,
+   hinzufügen.
+3. In HACS nach **FF Agent** suchen und öffnen.
+4. Es gibt nur die Vorabversion **v0.1.0**. Damit HACS sie anbietet, beim Repository die
+   Anzeige von Beta- bzw. Vorabversionen aktivieren (Menü ⋮ des Repositorys oder dessen
+   Einstellungen). Ohne diese Einstellung bietet HACS den Stand von `main` mit einem
+   Commit-Kürzel als Version an. Das ginge auch, aber für den Test wollen wir v0.1.0.
+   - Wie der Schalter in deiner HACS-Version heißt und wo er liegt, bitte notieren
+     (Rückmeldeliste, Punkt 12). Damit verbessern wir das README.
+5. **Herunterladen**, Version **v0.1.0** wählen.
+6. Home Assistant **neu starten** (Einstellungen → System → Neu starten).
+7. Im Log steht danach eine Warnung, dass eine Custom-Integration geladen wurde, die
    nicht von Home Assistant getestet ist. Das ist normal.
+
+Ohne HACS: `custom_components/ff_agent` aus dem Release-ZIP von v0.1.0 nach
+`/config/custom_components/ff_agent` kopieren und neu starten.
 
 ## 2. Einrichtung in Home Assistant
 
@@ -144,6 +155,7 @@ unter den genannten Schlüsseln.
 | 9 | Gibt es im Webhook-Dialog „Testen“, ein Protokoll, eine Platzhalter-Hilfe? | Schritt 3 | A13 |
 | 10 | Optional: Infoalarm / stiller Einsatz ausgelöst? | Schritt 6 | A5 |
 | 11 | Alles, was überrascht hat (Fehlermeldungen in HA, Repair-Hinweise, Verzögerungen) | | |
+| 12 | HACS: Ließ sich das Repository hinzufügen? Wie heißt der Schalter für Vorabversionen, wo liegt er, und welche Version zeigt HACS nach der Installation? | Schritt 1 | HACS-Doku |
 
 Alternativ zu den Einzelwerten kannst du die beiden Diagnose-Dateien weitergeben, nachdem
 du kurz hineingesehen hast. Sie enthalten keine URLs, Tokens oder Einsatzinhalte.

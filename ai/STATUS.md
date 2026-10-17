@@ -3,7 +3,10 @@
 Was ist der aktuelle Stand der Integration? Diese Datei beantwortet das für jede neue
 Session. Von Hand gepflegt.
 
-- **Version:** 0.1.0 im Manifest, kein Release
+- **Version:** 0.1.0, GitHub-Release `v0.1.0` als **Vorabversion** (2026-10-17)
+- **Repo:** öffentlich seit 2026-10-17, über HACS als Custom Repository installierbar. Die
+  HACS-Validierung besteht alle 9 Checks ohne `ignore`. Die alte Historie mit den PRs
+  liegt im privaten Archiv `rauchstefan/ha-ff-agent-archiv`.
 - **Integration:** MVP fertig (ADR 0002, Plan docs/plaene/261017-mvp-alarm-zusage.md,
   PRs rauchstefan/ha-ff-agent-archiv#2 bis #7):
   - Config Flow (eine Person je Eintrag), Parser für die Rückmelde-URL, Webhook-URL
@@ -40,8 +43,8 @@ Session. Von Hand gepflegt.
 - **Nicht real getestet:** Die Integration lief noch nie gegen echtes FF Agent oder eine
   echte HA-Instanz. Die Annahmen A1–A13 aus ADR 0002 sind offen
   (TODO 261017-echter-test, braucht die Freigabe des Nutzers).
-- Das Repo ist privat. Eine HACS-Installation funktioniert deshalb nicht, und der
-  HACS-Job in der CI wird übersprungen.
+- Solange es nur die Vorabversion gibt, müssen Nutzer in HACS Beta-/Vorabversionen
+  aktivieren.
 - Automationen auf die Event-Entität brauchen die Filter `not_from`/`not_to`.
 - Speichern der Optionen oder ein Reconfigure lädt die Integration neu und setzt einen
   laufenden Alarm zurück (bewusst so).

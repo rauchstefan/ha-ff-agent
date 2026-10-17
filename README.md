@@ -5,8 +5,9 @@ Custom-Integration für [Home Assistant](https://www.home-assistant.io/), instal
 Feuerwehren und Hilfsorganisationen) in Home Assistant verfügbar macht.
 
 > **Inoffizielles Community-Projekt, nicht mit dem Hersteller von FF Agent verbunden.**
-> Das Repository ist noch privat. Die Installation über HACS funktioniert erst nach der
-> Veröffentlichung.
+>
+> **Vorabversion 0.1.0:** noch nicht gegen ein echtes FF Agent getestet. In HACS bei
+> „FF Agent“ die Anzeige von Beta-/Vorabversionen aktivieren, um sie zu installieren.
 
 ## Was die Integration tut und was nicht
 
@@ -51,12 +52,14 @@ von FF Agent, es gibt kein Abfragen.
 
 <!-- docs-installation-instructions -->
 
-**Über HACS (Custom Repository), sobald das Repository öffentlich ist:**
+**Über HACS (Custom Repository):**
 
 1. In HACS oben rechts das Menü (⋮) öffnen, *Benutzerdefinierte Repositories* wählen, die
    URL `https://github.com/rauchstefan/ha-ff-agent` eintragen und als Typ „Integration“
    hinzufügen.
-2. „FF Agent“ installieren und Home Assistant neu starten.
+2. „FF Agent“ öffnen. Solange es nur die Vorabversion 0.1.0 gibt: im Menü (⋮) bzw. in den
+   Einstellungen des Repositorys Beta-/Vorabversionen aktivieren. Dann herunterladen und Home
+   Assistant neu starten.
 3. Unter *Einstellungen → Geräte & Dienste → Integration hinzufügen* „FF Agent“ wählen.
 
 **Manuell:**
@@ -451,8 +454,8 @@ MIT, siehe [LICENSE](LICENSE).
 ## English summary
 
 Unofficial Home Assistant custom integration (HACS) for **FF Agent**, an alerting app for
-fire brigades and emergency services. It is not affiliated with the vendor. The repository
-is still private, so HACS installation works only after publication.
+fire brigades and emergency services. It is not affiliated with the vendor. Version 0.1.0
+is a pre-release that has not yet been tested against a real FF Agent account.
 
 - **What it does:** FF Agent calls a personal webhook in Home Assistant on every alarm. The
   integration exposes an `Alarm` event entity (use it as automation trigger), an "Alarm
