@@ -2,12 +2,32 @@
   "config": {
     "step": {
       "user": {
-        "title": "FF Agent",
-        "description": "Die Integration FF Agent einrichten. Zugangsdaten werden in einer späteren Version abgefragt."
+        "title": "FF Agent einrichten",
+        "description": "Eine Einrichtung gehört zu genau einer Person. Es wird nichts an FF Agent gesendet.",
+        "data": {
+          "name": "Name",
+          "reply_url": "Rückmelde-URL (Zusage)"
+        },
+        "data_description": {
+          "name": "Bezeichnung dieser Einrichtung, zum Beispiel dein Name.",
+          "reply_url": "Öffne die FF-Agent-Web-UI, gehe zu Automatisierung > Einsatzrückmeldungen und kopiere die Zusage-URL hierher. Die URL ist ein Geheimnis: Mit ihr kann jemand in deinem Namen zu- oder absagen. Gib sie niemandem weiter."
+        }
       }
     },
+    "error": {
+      "invalid_reply_url": "Das ist keine gültige Rückmelde-URL. Sie enthält /app2/missionreplies/ und endet auf /accept oder /reject.",
+      "cloud_not_connected": "Home Assistant Cloud (Nabu Casa) ist eingerichtet, aber gerade nicht verbunden. Prüfe die Verbindung und versuche es erneut.",
+      "unknown": "Beim Erzeugen der Webhook-URL ist ein unerwarteter Fehler aufgetreten. Details stehen im Home-Assistant-Log, enthalten aber keine Adressen. Bitte versuche es erneut."
+    },
     "abort": {
-      "single_instance_allowed": "FF Agent ist bereits eingerichtet. Es ist nur eine Instanz erlaubt."
+      "already_in_progress": "Die Einrichtung für diese Rückmelde-URL läuft bereits.",
+      "already_configured": "Für diese Rückmelde-URL ist FF Agent bereits eingerichtet."
+    },
+    "create_entry": {
+      "cloud": "Die Einrichtung ist abgeschlossen. Lege jetzt in FF Agent einen Webhook an (Web-UI > Automatisierung > Persönliche Webhooks > Webhook hinzufügen) mit diesen Werten:\n\n- Type: Alarm\n- Webhooktyp: Generischer Webhook\n- Methode: POST\n- URL: `{webhook_url}`\n- Aktiv: an\n- auch für Testalarme: an (zum Testen; Automationen laufen dann auch bei Testalarmen)\n- auch für Infoalarme: aus\n- Zeitplan aktiviert: aus\n- Basis-Authentifizierung, Inhalt und Query-Parameter: leer\n\nDie URL ist ein Geheimnis. Trage sie nur in FF Agent ein.",
+      "external": "Die Einrichtung ist abgeschlossen. Lege jetzt in FF Agent einen Webhook an (Web-UI > Automatisierung > Persönliche Webhooks > Webhook hinzufügen) mit diesen Werten:\n\n- Type: Alarm\n- Webhooktyp: Generischer Webhook\n- Methode: POST\n- URL: `{webhook_url}`\n- Aktiv: an\n- auch für Testalarme: an (zum Testen; Automationen laufen dann auch bei Testalarmen)\n- auch für Infoalarme: aus\n- Zeitplan aktiviert: aus\n- Basis-Authentifizierung, Inhalt und Query-Parameter: leer\n\nDie URL ist ein Geheimnis. Trage sie nur in FF Agent ein.",
+      "internal": "**Achtung:** Home Assistant hat keine externe URL und keine Nabu-Casa-Verbindung. FF Agent erreicht die folgende interne Adresse nicht: `{webhook_url}`\n\nRichte zuerst eine externe URL oder Nabu Casa ein. Entferne danach diese Einrichtung und lege sie neu an, damit eine erreichbare Adresse erzeugt wird. Erst dann in FF Agent einen Webhook anlegen (Web-UI > Automatisierung > Persönliche Webhooks > Webhook hinzufügen):\n\n- Type: Alarm\n- Webhooktyp: Generischer Webhook\n- Methode: POST\n- URL: die neue Adresse\n- Aktiv: an\n- auch für Testalarme: an (zum Testen; Automationen laufen dann auch bei Testalarmen)\n- auch für Infoalarme: aus\n- Zeitplan aktiviert: aus\n- Basis-Authentifizierung, Inhalt und Query-Parameter: leer",
+      "path_only": "**Achtung:** Home Assistant hat weder eine externe noch eine interne URL und keine Nabu-Casa-Verbindung. Die Einrichtung kennt nur den Pfad `{webhook_url}`, FF Agent kann damit nichts anfangen.\n\nRichte zuerst eine externe URL oder Nabu Casa ein. Entferne danach diese Einrichtung und lege sie neu an, damit eine vollständige Adresse erzeugt wird. Erst dann in FF Agent einen Webhook anlegen (Web-UI > Automatisierung > Persönliche Webhooks > Webhook hinzufügen):\n\n- Type: Alarm\n- Webhooktyp: Generischer Webhook\n- Methode: POST\n- URL: die neue Adresse\n- Aktiv: an\n- auch für Testalarme: an (zum Testen; Automationen laufen dann auch bei Testalarmen)\n- auch für Infoalarme: aus\n- Zeitplan aktiviert: aus\n- Basis-Authentifizierung, Inhalt und Query-Parameter: leer"
     }
   }
 }

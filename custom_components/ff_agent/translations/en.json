@@ -2,12 +2,32 @@
   "config": {
     "step": {
       "user": {
-        "title": "FF Agent",
-        "description": "Set up the FF Agent integration. Credentials will be requested in a later version."
+        "title": "Set up FF Agent",
+        "description": "One entry belongs to exactly one person. Nothing is sent to FF Agent.",
+        "data": {
+          "name": "Name",
+          "reply_url": "Mission reply URL (accept)"
+        },
+        "data_description": {
+          "name": "Label for this entry, for example your name.",
+          "reply_url": "Open the FF Agent web UI, go to Automation > Mission replies and copy the accept URL here. The URL is a secret: anyone who has it can accept or decline on your behalf. Do not share it."
+        }
       }
     },
+    "error": {
+      "invalid_reply_url": "This is not a valid mission reply URL. It contains /app2/missionreplies/ and ends with /accept or /reject.",
+      "cloud_not_connected": "Home Assistant Cloud (Nabu Casa) is set up but currently not connected. Check the connection and try again.",
+      "unknown": "An unexpected error occurred while creating the webhook URL. Details are in the Home Assistant log but contain no addresses. Please try again."
+    },
     "abort": {
-      "single_instance_allowed": "FF Agent is already set up. Only a single instance is allowed."
+      "already_in_progress": "Setup for this mission reply URL is already in progress.",
+      "already_configured": "FF Agent is already set up for this mission reply URL."
+    },
+    "create_entry": {
+      "cloud": "Setup is complete. Now create a webhook in FF Agent (web UI > Automation > Personal webhooks > Add webhook) with these values:\n\n- Type: Alarm\n- Webhook type: Generic webhook\n- Method: POST\n- URL: `{webhook_url}`\n- Active: on\n- Also for test alarms: on (for testing; automations then also run for test alarms)\n- Also for info alarms: off\n- Schedule enabled: off\n- Basic authentication, content and query parameters: empty\n\nThe URL is a secret. Enter it only in FF Agent.",
+      "external": "Setup is complete. Now create a webhook in FF Agent (web UI > Automation > Personal webhooks > Add webhook) with these values:\n\n- Type: Alarm\n- Webhook type: Generic webhook\n- Method: POST\n- URL: `{webhook_url}`\n- Active: on\n- Also for test alarms: on (for testing; automations then also run for test alarms)\n- Also for info alarms: off\n- Schedule enabled: off\n- Basic authentication, content and query parameters: empty\n\nThe URL is a secret. Enter it only in FF Agent.",
+      "internal": "**Warning:** Home Assistant has no external URL and no Nabu Casa connection. FF Agent cannot reach this internal address: `{webhook_url}`\n\nSet up an external URL or Nabu Casa first. Then remove this entry and add it again so that a reachable address is generated. Only then create a webhook in FF Agent (web UI > Automation > Personal webhooks > Add webhook):\n\n- Type: Alarm\n- Webhook type: Generic webhook\n- Method: POST\n- URL: the new address\n- Active: on\n- Also for test alarms: on (for testing; automations then also run for test alarms)\n- Also for info alarms: off\n- Schedule enabled: off\n- Basic authentication, content and query parameters: empty",
+      "path_only": "**Warning:** Home Assistant has neither an external nor an internal URL and no Nabu Casa connection. This entry only knows the path `{webhook_url}`, which is of no use to FF Agent.\n\nSet up an external URL or Nabu Casa first. Then remove this entry and add it again so that a complete address is generated. Only then create a webhook in FF Agent (web UI > Automation > Personal webhooks > Add webhook):\n\n- Type: Alarm\n- Webhook type: Generic webhook\n- Method: POST\n- URL: the new address\n- Active: on\n- Also for test alarms: on (for testing; automations then also run for test alarms)\n- Also for info alarms: off\n- Schedule enabled: off\n- Basic authentication, content and query parameters: empty"
     }
   }
 }

@@ -59,6 +59,21 @@ def test_manifest_has_hacs_required_keys() -> None:
     assert {"iot_class", "config_flow", "integration_type"} <= manifest.keys()
 
 
+def test_manifest_describes_a_push_service() -> None:
+    """FF Agent pushes alarms to a webhook; there is one entry per person."""
+    manifest = _load(INTEGRATION / "manifest.json")
+    assert manifest["iot_class"] == "cloud_push"
+    assert manifest["integration_type"] == "service"
+    assert "webhook" in manifest["dependencies"]
+    assert manifest["after_dependencies"] == ["cloud"]
+    assert "single_config_entry" not in manifest
+
+
+def test_manifest_version_is_unchanged() -> None:
+    """The version only changes together with a release."""
+    assert _load(INTEGRATION / "manifest.json")["version"] == "0.1.0"
+
+
 def test_manifest_key_order() -> None:
     """Hassfest order: domain, name, then the remaining keys alphabetically."""
     keys = list(_load(INTEGRATION / "manifest.json"))
@@ -73,6 +88,38 @@ def test_translations_en_de_have_same_keys() -> None:
     assert en == de
 
 
+@pytest.mark.parametrize("language", ["en", "de"])
+def test_translations_cover_the_config_flow(language: str) -> None:
+    """The user step, its errors and all four closing dialogs are translated."""
+    keys = _flatten(_load(INTEGRATION / "translations" / f"{language}.json"))
+    expected = {
+        "config.step.user.title",
+        "config.step.user.description",
+        "config.step.user.data.name",
+        "config.step.user.data.reply_url",
+        "config.step.user.data_description.reply_url",
+        "config.error.invalid_reply_url",
+        "config.error.cloud_not_connected",
+        "config.error.unknown",
+        "config.abort.already_in_progress",
+        "config.abort.already_configured",
+        "config.create_entry.cloud",
+        "config.create_entry.external",
+        "config.create_entry.internal",
+        "config.create_entry.path_only",
+    }
+    assert expected <= keys
+    assert "config.abort.single_instance_allowed" not in keys
+
+
+@pytest.mark.parametrize("language", ["en", "de"])
+@pytest.mark.parametrize("kind", ["cloud", "external", "internal", "path_only"])
+def test_closing_dialogs_show_the_webhook_url(language: str, kind: str) -> None:
+    """Every closing dialog contains the webhook URL placeholder."""
+    texts = _load(INTEGRATION / "translations" / f"{language}.json")
+    assert "{webhook_url}" in texts["config"]["create_entry"][kind]
+
+
 @pytest.mark.parametrize(
     ("name", "size"),
     [("icon.png", (256, 256)), ("icon@2x.png", (512, 512))],
@@ -80,3 +127,11 @@ def test_translations_en_de_have_same_keys() -> None:
 def test_brand_icon_dimensions(name: str, size: tuple[int, int]) -> None:
     """Brand icons have the sizes required for local brand images."""
     assert _png_size(INTEGRATION / "brand" / name) == size
+
+
+@pytest.mark.parametrize("language", ["en", "de"])
+def test_translations_contain_no_urls(language: str) -> None:
+    """hassfest rejects URLs in translations, so they must live in placeholders."""
+    values = _load(INTEGRATION / "translations" / f"{language}.json")
+    assert "http://" not in json.dumps(values)
+    assert "https://" not in json.dumps(values)

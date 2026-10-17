@@ -158,18 +158,18 @@ NAME: Final = "FF Agent"
 
 CONF_REPLY_ID: Final = "reply_id"
 CONF_REPLY_HOST: Final = "reply_host"
-CONF_CLOUDHOOK: Final = "cloudhook"            # bool
-CONF_CLOUDHOOK_URL: Final = "cloudhook_url"    # str | None, secret
-CONF_HEADER_TOKEN: Final = "header_token"      # str, secret, always generated
+CONF_CLOUDHOOK: Final = "cloudhook"  # bool
+CONF_CLOUDHOOK_URL: Final = "cloudhook_url"  # str | None, secret
+CONF_HEADER_TOKEN: Final = "header_token"  # str, secret, always generated
 # CONF_WEBHOOK_ID and CONF_NAME come from homeassistant.const
 
-CONF_REPLY_URL: Final = "reply_url"            # flow field only, never stored
+CONF_REPLY_URL: Final = "reply_url"  # flow field only, never stored
 CONF_REGENERATE_WEBHOOK: Final = "regenerate_webhook"
 
 CONF_RESET_MINUTES: Final = "reset_minutes"
 CONF_DEFAULT_TRANSPORT: Final = "default_transport"
 CONF_LOCATION_ENTITY: Final = "location_entity"
-CONF_REQUIRE_TOKEN: Final = "require_token"    # bool, default False (ADR 0002, 5.)
+CONF_REQUIRE_TOKEN: Final = "require_token"  # bool, default False (ADR 0002, 5.)
 
 TOKEN_HEADER: Final = "X-FF-Agent-Token"
 ISSUE_TOKEN_REJECTED: Final = "webhook_token_rejected_{entry_id}"
@@ -178,7 +178,7 @@ DEFAULT_RESET_MINUTES: Final = 30
 MIN_RESET_MINUTES: Final = 1
 MAX_RESET_MINUTES: Final = 1440
 DEFAULT_TRANSPORT: Final = "CAR"
-TRANSPORTS: Final = ("CAR",)   # only verified values, extend after check (A9)
+TRANSPORTS: Final = ("CAR",)  # only verified values, extend after check (A9)
 
 DEDUP_SECONDS: Final = 30
 REPLY_TIMEOUT_SECONDS: Final = 10
@@ -189,15 +189,21 @@ MAX_SHAPE_KEYS: Final = 50
 
 DEFAULT_REPLY_HOST: Final = "www.ff-agent.com"
 REPLY_PATH: Final = "/app2/missionreplies/{reply_id}/{action}"
-WEBHOOK_ALLOWED_METHODS: Final = ("GET", "POST")   # exactly what FF Agent offers [G]
+WEBHOOK_ALLOWED_METHODS: Final = ("GET", "POST")  # exactly what FF Agent offers [G]
 
-SIGNAL_ALARM: Final = "ff_agent_alarm_{entry_id}"      # payload AlarmEvent
+SIGNAL_ALARM: Final = "ff_agent_alarm_{entry_id}"  # payload AlarmEvent
 SIGNAL_ALARM_STATE: Final = "ff_agent_alarm_state_{entry_id}"
-SIGNAL_REPLY: Final = "ff_agent_reply_{entry_id}"      # payload ReplyResult
+SIGNAL_REPLY: Final = "ff_agent_reply_{entry_id}"  # payload ReplyResult
 
 TO_REDACT: Final = {
-    CONF_REPLY_ID, "webhook_id", CONF_CLOUDHOOK_URL, "webhook_url",
-    CONF_HEADER_TOKEN, "unique_id", "title", CONF_LOCATION_ENTITY,
+    CONF_REPLY_ID,
+    "webhook_id",
+    CONF_CLOUDHOOK_URL,
+    "webhook_url",
+    CONF_HEADER_TOKEN,
+    "unique_id",
+    "title",
+    CONF_LOCATION_ENTITY,
 }
 ```
 
@@ -597,9 +603,12 @@ vorhanden: Funktion direkt aufrufen):
      4. Aufruf:
         ```python
         session = async_get_clientsession(self._hass)
-        async with session.get(url, params=params,
-                               timeout=aiohttp.ClientTimeout(total=REPLY_TIMEOUT_SECONDS),
-                               allow_redirects=True) as resp:
+        async with session.get(
+            url,
+            params=params,
+            timeout=aiohttp.ClientTimeout(total=REPLY_TIMEOUT_SECONDS),
+            allow_redirects=True,
+        ) as resp:
             status = resp.status
             content_type = resp.content_type
         ```
@@ -631,12 +640,14 @@ vorhanden: Funktion direkt aufrufen):
 5. **`services.py`**: `@callback def async_setup_services(hass)`. Aufgerufen wird sie aus
    `async_setup` in `__init__.py`; dort steht auch das `CONFIG_SCHEMA`. Schemata:
    ```python
-   ACCEPT_SCHEMA = vol.Schema({
-       vol.Required(ATTR_CONFIG_ENTRY_ID): cv.string,
-       vol.Optional("transport"): vol.In(TRANSPORTS),
-       vol.Inclusive("latitude", "location"): cv.latitude,
-       vol.Inclusive("longitude", "location"): cv.longitude,
-   })
+   ACCEPT_SCHEMA = vol.Schema(
+       {
+           vol.Required(ATTR_CONFIG_ENTRY_ID): cv.string,
+           vol.Optional("transport"): vol.In(TRANSPORTS),
+           vol.Inclusive("latitude", "location"): cv.latitude,
+           vol.Inclusive("longitude", "location"): cv.longitude,
+       }
+   )
    REJECT_SCHEMA = vol.Schema({vol.Required(ATTR_CONFIG_ENTRY_ID): cv.string})
    ```
    - Den Eintrag mit `service.async_get_config_entry(call.hass, DOMAIN, call.data[ATTR_CONFIG_ENTRY_ID])`

@@ -20,3 +20,5 @@ known-first-party = ["custom_components"]
 asyncio_mode = "auto"
 testpaths = ["tests"]
 pythonpath = ["."]
+# pytest-cov comes with pytest-homeassistant-custom-component.
+addopts = "--cov=custom_components.ff_agent --cov-report=term-missing --cov-fail-under=95"
