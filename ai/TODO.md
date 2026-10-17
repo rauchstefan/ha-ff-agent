@@ -89,6 +89,17 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
   (Checkliste 5.2). Dazu braucht es ein vollständiges Release, kein Pre-Release, und die
   Klärung der Markenrechte am Namen „FF Agent“ mit dem Hersteller.
 
+### 261017-fundort-transport – Fundort der Rückmelde-URL korrigieren, Verkehrsmittel erweitern
+- **Status:** in Arbeit (lokal-2026-10-16-hacs-recherche, 2026-10-17)
+- **Priorität:** hoch (Finding des Nutzers aus dem echten Test)
+- **Rolle(n):** entwickler, tester, reviewer
+- **Beschreibung:**
+  - Fundort der Rückmelde-URL in Config Flow (de/en), README, Testanleitung und Plan
+    korrigieren.
+  - Verkehrsmittel `feet` und `bicycle` ergänzen (FF Agent: `FEET`, `BICYCLE`).
+  - Annahmen A8 und A9 in ADR 0002 und architektur.md als geklärt eintragen.
+- **Verweise:** docs/recherche/261016-ffagent-webhook-zusage.md, Abschnitt 3.7
+
 ### 261017-ha-zugriff – Lesezugriff auf die HA-Instanz des Nutzers (MCP/SSH)
 - **Status:** zurückgestellt (Nutzer, 2026-10-17)
 - **Priorität:** niedrig

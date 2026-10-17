@@ -123,6 +123,32 @@ Folge fürs Design: Option A aus Abschnitt 4 ist damit praktisch belegt. Der Nut
 kopiert die Zusage-URL in den Config Flow. HA speichert die Kennung als Geheimnis und
 ruft `accept` bzw. `reject` auf. Ein Login braucht es nicht.
 
+## 3.7 Nachtrag 2026-10-17: Fundort und offizielle Hinweise zu den Rückmelde-URLs
+
+Quelle ist ein Screenshot des Nutzers aus der FF-Agent-Web-UI. Kennung, Name und
+Koordinaten sind hier nicht wiedergegeben. Alle Aussagen in diesem Abschnitt sind [G].
+
+- **Fundort:** *Personen → (eigener Name) → Bereich „Übung/Einsatz“ → „Weblinks für
+  Einsatzmeldung“*. Die Seite heißt „URLs für Einsatzmeldung“ und gehört zu den
+  persönlichen Einstellungen der Person. Die frühere Annahme *Automatisierung →
+  Einsatzrückmeldungen* war **falsch**.
+- **Offizielle Hinweise auf der Seite:**
+  - Die URLs sind für eigene Rückmeldefunktionen bzw. -geräte gedacht.
+  - Sie gelten jeweils nur für diese Person. Zu- bzw. Absage gelten für den jeweils
+    aktiven Einsatz.
+  - Wie in der App ist eine Zu- oder Absage nur möglich, wenn die Person für den aktiven
+    Einsatz alarmiert wurde.
+  - Optionale Parameter bei der Zusage:
+    - `transport`: `CAR` (Standard), `FEET` oder `BICYCLE`
+    - `lat`, `lng`: GPS-Koordinaten des eigenen Standorts, z. B. bei fest installierten
+      Geräten
+- **Folgen für die Annahmen in ADR 0002:**
+  - **A8 bestätigt:** Die UUID gilt je Person und bezieht sich auf den aktiven Einsatz.
+  - **A9 geklärt:** Es gibt drei Verkehrsmittel. `transport` ist optional, der Standard ist
+    `CAR`.
+  - Neu: Ohne Alarmierung der Person ist keine Rückmeldung möglich. Wie FF Agent dann
+    antwortet (Status), bleibt offen (A7).
+
 ## 4. Folgerungen für das Design (alle [A], solange Webhook-Details [U])
 
 **Wie richtet der Nutzer den Webhook ein?**
