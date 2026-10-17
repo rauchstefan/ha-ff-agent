@@ -4,22 +4,28 @@ Was ist der aktuelle Stand der Integration? Diese Datei beantwortet das für jed
 Session. Von Hand gepflegt.
 
 - **Version:** 0.1.0 im Manifest, kein Release
-- **Integration:** HACS-konformes Grundgerüst ohne FF-Agent-Logik (Config-Flow nur mit
-  Bestätigungsschritt, keine Entitäten)
+- **Integration:** MVP in Arbeit (ADR 0002, Plan docs/plaene/261017-mvp-alarm-zusage.md).
+  Erledigt ist PR 1 von 6: Config Flow (eine Person je Eintrag), Parser für die
+  Rückmelde-URL, Webhook-URL (Cloudhook, extern, intern). Es gibt noch keine Entitäten und
+  noch keinen Webhook-Empfang.
 - **CI:** `validate.yml` (hassfest, HACS-Action) und `tests.yml` (ruff, pytest mit
-  pytest-homeassistant-custom-component, Python 3.14), Dependabot
-- **Letzte Änderung:** 2026-10-16 – Grundgerüst + CI (PR rauchstefan/ha-ff-agent#1)
+  pytest-homeassistant-custom-component, Python 3.14, Abdeckung mindestens 95 %),
+  Dependabot
+- **Letzte Änderung:** 2026-10-17 – MVP PR 1 (rauchstefan/ha-ff-agent#2)
 
 ## Was funktioniert
 
-- hassfest, ruff und pytest laufen grün in GitHub Actions.
-- Die Integration lässt sich in den Tests einrichten, entladen und neu laden.
+- hassfest, ruff und pytest laufen grün in GitHub Actions, die Abdeckung liegt bei 100 %.
+- Der Config Flow speichert nur die UUID und den Host der Rückmelde-URL und zeigt die
+  Webhook-URL an. Die Cloud-API ist nur gestubbt getestet; ein Vertragstest prüft die
+  Signaturen.
 
 ## Bekannte Einschränkungen
 
 - Das Repo ist privat, daher funktioniert keine HACS-Installation und der HACS-Job in
   der CI wird übersprungen.
-- `iot_class: cloud_polling` ist vorläufig, bis die FF-Agent-Schnittstelle bekannt ist.
+- Der Webhook wird noch nicht registriert (kommt in PR 2). Bis dahin hat die Integration
+  keine Funktion.
 - Die Icons sind Platzhalter, die Rechte am FF-Agent-Logo sind ungeklärt.
 - Lokal gibt es kein Python. Tests laufen nur in GitHub Actions.
 

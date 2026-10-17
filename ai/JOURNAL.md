@@ -22,6 +22,31 @@ Das Journal ist Verlauf, keine Wissensbasis: Dauerhaftes gehört nach `docs/` od
 
 <!-- Neue Einträge direkt unter dieser Zeile einfügen -->
 
+## 2026-10-17 – lokal-2026-10-16-hacs-recherche – MVP PR 1 (Config Flow)
+- **Nutzer-Auftrag:** „ADR 0002 ist freigegeben. Starte mit PR 1 (Config Flow).“
+- **Delegiert:**
+  - entwickler (Sonnet): Umsetzung und Nacharbeit
+  - tester (Sonnet) und reviewer (Opus) parallel
+  - alle mit Standardmodell
+- **Erledigt:**
+  - ADR 0002 auf „angenommen“ gesetzt.
+  - PR rauchstefan/ha-ff-agent#2 per Squash gemergt (0fb459a). tester: PASS (30 Tests
+    ergänzt), reviewer: freigegeben.
+  - Nacharbeit nach dem Review:
+    - Cloudhook-Fehler abgefangen
+    - Übersetzung `already_in_progress`
+    - Host-Härtung (ASCII, LDH)
+    - Fallback bei leerem Namen
+    - Vertragstest gegen die echte Cloud-API (per `ast`)
+    - Coverage-Gate 95 % (gemessen 100 %)
+- **Offen / Übergabe:**
+  - nächster Schritt 261017-mvp-2-webhook
+  - neu: 261017-python-target (ruff `py314` gegenüber HA-Mindestversion 2026.3)
+- **Für die nächste Session:**
+  - `homeassistant.components.cloud` lässt sich in der CI nicht importieren (turbojpeg).
+    Tests nutzen deshalb `tests/common.py::patch_cloud`.
+  - ruff formatiert auch Python-Blöcke in Markdown-Dateien.
+
 ## 2026-10-17 – lokal-2026-10-16-hacs-recherche – ADR 0002 Integrationsweg
 - **Nutzer-Auftrag:** Screenshots der Rückmelde-URLs und des Dialogs „Webhook hinzufügen“
   (generischer Webhook).

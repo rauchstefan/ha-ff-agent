@@ -64,7 +64,7 @@ Gemeinsame Angaben für alle sechs Schritte:
 - **Definition of Done:** wie im Plan beim jeweiligen PR
 
 ### 261017-mvp-1-config-flow – Manifest, Rückmelde-URL-Parser, Webhook-URL, Config Flow
-- **Status:** in Arbeit (lokal-2026-10-16-hacs-recherche, 2026-10-17)
+- **Status:** erledigt (2026-10-17, PR rauchstefan/ha-ff-agent#2, 0fb459a)
 - **Priorität:** hoch
 
 ### 261017-mvp-2-webhook – Webhook-Empfang, Zusatz-Token, Diagnostics
@@ -90,6 +90,19 @@ Gemeinsame Angaben für alle sechs Schritte:
 ### 261017-mvp-6-doku-qualitaet – README/Einrichtungsanleitung, Quality Scale, Abdeckung
 - **Status:** offen
 - **Priorität:** mittel
+
+### 261017-python-target – Python-Mindestversion vs. ruff-Ziel prüfen
+- **Status:** offen
+- **Priorität:** mittel
+- **Rolle(n):** entwickler
+- **Beschreibung:**
+  - Problem: In `pyproject.toml` ist ruff auf `py314` eingestellt und formatiert z. B.
+    `except A, B:` (Syntax ab Python 3.14). `hacs.json` erlaubt aber HA ab 2026.3.0.
+  - Zu prüfen: welche Python-Version HA 2026.3 voraussetzt.
+  - Ist sie kleiner als 3.14, entweder ruff `target-version` darauf senken oder die
+    HA-Mindestversion anheben.
+  - Bis dahin weichen PRs mit einer Tupel-Variable aus (Hinweis aus PR 2).
+- **Definition of Done:** ruff-Ziel und HA-Mindestversion passen zusammen.
 
 ### 261017-token-default – Zusatz-Token standardmäßig an?
 - **Status:** offen (nach erstem echten Test)
