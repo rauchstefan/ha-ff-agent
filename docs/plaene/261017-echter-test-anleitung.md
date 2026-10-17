@@ -54,8 +54,9 @@ Ohne HACS: `custom_components/ff_agent` aus dem Release-ZIP von v0.1.0 nach
 
 ## 2. Einrichtung in Home Assistant
 
-1. In der FF-Agent-Web-UI: *Automatisierung → Einsatzrückmeldungen*, die **Zusage-URL**
-   kopieren.
+1. In der FF-Agent-Web-UI: *Personen → (dein Name) → Bereich „Übung/Einsatz“ →
+   „Weblinks für Einsatzmeldung“* (Seite „URLs für Einsatzmeldung“), die **Zusage-URL**
+   kopieren. Die URLs gelten nur für diese Person und den jeweils aktiven Einsatz.
 2. In Home Assistant: *Einstellungen → Geräte & Dienste → Integration hinzufügen →
    „FF Agent“*.
 3. „Name“: z. B. dein Vorname. Bei „Rückmelde-URL (Zusage)“ die kopierte URL einfügen.
@@ -113,7 +114,9 @@ Punkt 9).
 
 ## 5. Messung B: Zusage und Absage (nur solange der Testalarm aktiv ist)
 
-1. In FF Agent prüfen, dass der Testalarm noch **aktiv** ist.
+1. In FF Agent prüfen, dass der Testalarm noch **aktiv** ist und dass **du selbst** dafür
+   alarmiert wurdest. Zu- und Absage gehen nur für den aktiven Einsatz und nur, wenn die
+   Person alarmiert wurde.
 2. In Home Assistant den Button **„Absagen“** einmal drücken.
    - „Letzte Rückmeldung“ zeigt „Abgesagt“ oder „Fehlgeschlagen“.
    - In FF Agent (App oder Web-UI) prüfen, ob deine Absage beim Testalarm erscheint.

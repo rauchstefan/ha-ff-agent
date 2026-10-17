@@ -84,7 +84,7 @@ Hinweise für die Doku:
 - Für die Absage denselben zweiten Block mit `FF_AGENT_REJECT` und `ff_agent.reject`
   anlegen.
 - Optionale Felder bei `ff_agent.accept`:
-  - `transport: car` (einziger belegter Wert)
+  - `transport`: `car`, `feet` oder `bicycle`
   - `latitude` und `longitude`, nur beide zusammen
 - Ist in FF Agent „auch für Testalarme“ an, lösen Testalarme die Automation ebenfalls aus.
 - Der Standort wird nur gesendet, wenn er angegeben ist oder in den Optionen eine

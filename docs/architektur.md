@@ -103,7 +103,7 @@ gibt es nicht.
 - **`data`** (alles Geheimnisse außer `reply_host` und `cloudhook`): `reply_id`,
   `reply_host`, `webhook_id`, `cloudhook`, `cloudhook_url`, `header_token`
 - **`options`:** `require_token` (Standard aus), `reset_minutes`, `default_transport`
-  (gespeichert als `car`, an FF Agent als `CAR` gesendet; belegt ist nur dieser Wert), `location_entity` (optional, `person` oder `device_tracker`)
+  (`car`, `feet` oder `bicycle`; an FF Agent gehen `CAR`, `FEET`, `BICYCLE`), `location_entity` (optional, `person` oder `device_tracker`)
 - **Flows:**
   - `user` mit Name und Rückmelde-URL; ohne Online-Test, weil jeder Test eine echte
     Rückmeldung wäre
@@ -153,7 +153,7 @@ gibt es nicht.
 - **Dedup und Uhrzeit:** Eine negative Zeitdifferenz (Uhr springt zurück, z. B. durch
   NTP) gilt als neuer Alarm. Der Rücksetz-Timer läuft über die monotone Loop-Uhr.
 
-- **Validierung: voluptuous und probatio.** Seit HA 2026.9 ist `probatio` die Validierungsbibliothek, `voluptuous` wird nicht mehr installiert. `homeassistant/__init__.py` setzt beim Start per `probatio.compat.install_as_voluptuous()` einen Alias in `sys.modules`. Deshalb funktioniert `import voluptuous as vol` für Custom-Integrationen weiter, offiziell unterstützt und ohne Abkündigung (contributors.home-assistant.io/blog/2026/09/30/probatio-validation-engine/). Vor 2026.9 ist es das echte voluptuous. Wir nutzen einheitlich `import voluptuous as vol`. Optionsschlüssel von Selektoren (Übersetzung) müssen `[a-z0-9-_]` sein, deshalb heißt das Verkehrsmittel intern `car`.
+- **Validierung: voluptuous und probatio.** Seit HA 2026.9 ist `probatio` die Validierungsbibliothek, `voluptuous` wird nicht mehr installiert. `homeassistant/__init__.py` setzt beim Start per `probatio.compat.install_as_voluptuous()` einen Alias in `sys.modules`. Deshalb funktioniert `import voluptuous as vol` für Custom-Integrationen weiter, offiziell unterstützt und ohne Abkündigung (contributors.home-assistant.io/blog/2026/09/30/probatio-validation-engine/). Vor 2026.9 ist es das echte voluptuous. Wir nutzen einheitlich `import voluptuous as vol`. Optionsschlüssel von Selektoren (Übersetzung) müssen `[a-z0-9-_]` sein, deshalb heißen die Verkehrsmittel intern `car`, `feet` und `bicycle`.
 - **Python-Version:** Laut `requires_python` auf PyPI verlangt HA 2026.1/2026.2
   Python ≥ 3.13.2 und HA ab 2026.3.0 Python ≥ 3.14.2. Unsere Mindestversion
   (`hacs.json`: 2026.3.0) passt deshalb zu ruff `target-version = "py314"`. Syntax ab
@@ -207,8 +207,12 @@ Details und Quellen: `docs/recherche/261016-ffagent-schnittstellen.md` und
   - Offen: Body bei POST, Platzhalter mit Einsatzdaten, Retry. Ohne eigene Einträge
     spricht alles (auch die Homey-App) für einen Aufruf ohne Nutzdaten.
 - **Persönliche Rückmelde-URLs:** `.../app2/missionreplies/<UUID>/accept?transport=CAR&lat=&lng=`
-  und `.../reject`. Die UUID wirkt als Geheimnis; belegt ist nur `CAR`.
+  und `.../reject`. Die UUID wirkt als Geheimnis. `transport` ist optional: `CAR`
+  (Standard), `FEET` oder `BICYCLE`. Die URLs gelten je Person für den jeweils aktiven
+  Einsatz, und nur, wenn die Person dafür alarmiert wurde. Fundort in der Web-UI:
+  *Personen → eigener Name → Bereich „Übung/Einsatz“ → „Weblinks für Einsatzmeldung“*
+  (nicht unter „Automatisierung“).
 - **Einsatzdetails:** Es gibt keine dokumentierte Nutzer-API. Der persönliche iCal-Feed
   (Stand 2019) enthält nur Einsätze, an denen die Person teilgenommen hat.
-- **Offene Annahmen:** A2 bis A13 in ADR 0002 (A1 ist erledigt). Die Ergebnisse des ersten echten Tests
-  werden hier nachgetragen.
+- **Offene Annahmen:** A2 bis A13 in ADR 0002, außer A8 und A9 (zusammen mit A1 geklärt). Die Ergebnisse des
+  ersten echten Tests werden hier nachgetragen.
