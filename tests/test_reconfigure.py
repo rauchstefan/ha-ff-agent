@@ -983,8 +983,11 @@ async def test_switching_logs_no_topic(
     mock_config_entry: MockConfigEntry,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
-    """The topic and the entity ID of ntfy never reach the log."""
-    caplog.set_level(logging.DEBUG)
+    """The topic and the entity ID of ntfy never reach the log of the integration.
+
+    Home Assistant itself logs entity IDs (entity registry, platforms) on INFO level.
+    """
+    caplog.set_level(logging.DEBUG, logger="custom_components.ff_agent")
     await async_setup_entry(hass, mock_config_entry)
     result = await _start(hass, mock_config_entry)
     result = await _submit(hass, result["flow_id"], {CONF_ALARM_SOURCE: "ntfy"})
@@ -993,5 +996,36 @@ async def test_switching_logs_no_topic(
     result = await _choose(hass, result["flow_id"], "ntfy_find")
 
     assert result["reason"] == "reconfigure_successful_ntfy"
+    ours = "
+".join(
+        record.getMessage()
+        for record in caplog.records
+        if record.name.startswith("custom_components.ff_agent")
+    )
     for secret in (topic, OTHER_NTFY_ENTITY_ID, registry_entry.id):
-        assert secret not in caplog.text
+        assert secret not in ours
+        assert secret not in "
+".join(
+            record.getMessage()
+            for record in caplog.records
+            if record.levelno >= logging.WARNING
+        )
+
+
+async def test_webhook_to_ntfy_without_the_ntfy_integration(
+    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+) -> None:
+    """Without ntfy the form asks to set it up and suggests no entity."""
+    await async_setup_entry(hass, mock_config_entry)
+    data = dict(mock_config_entry.data)
+    result = await _start(hass, mock_config_entry)
+    result = await _submit(hass, result["flow_id"], {CONF_ALARM_SOURCE: "ntfy"})
+
+    result = await _choose(hass, result["flow_id"], "ntfy_find")
+
+    assert result["type"] is FlowResultType.FORM
+    assert result["step_id"] == "ntfy_select"
+    assert result["errors"] == {"base": "ntfy_not_set_up"}
+    key = next(key for key in result["data_schema"].schema if key == "ntfy_entity")
+    assert key.description is None
+    assert dict(mock_config_entry.data) == data

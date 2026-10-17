@@ -269,22 +269,30 @@ class FFAgentConfigFlow(ConfigFlow, domain=DOMAIN):
         A detected subscription only changes the text (a second step ID), never the
         choice: nothing happens until the user picks an option.
         """
-        step_id = "alarm_source"
         if async_probe_reachability(self.hass) is Reachability.CLOUD:
-            step_id = "alarm_source_cloud"
-        return self.async_show_menu(
-            step_id=step_id,
-            menu_options=MENU_ALARM_SOURCE,
-            description_placeholders=_link_placeholders(),
-        )
+            return await self.async_step_alarm_source_cloud()
+        return self._async_show_menu("alarm_source", MENU_ALARM_SOURCE)
+
+    async def async_step_alarm_source_cloud(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Ask the same question with the text for a detected subscription."""
+        return self._async_show_menu("alarm_source_cloud", MENU_ALARM_SOURCE)
 
     async def async_step_no_cloud(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
         """Point to ntfy as the free alternative; cloud and own address stay open."""
+        return self._async_show_menu("no_cloud", MENU_NO_CLOUD)
+
+    @callback
+    def _async_show_menu(
+        self, step_id: str, menu_options: list[str]
+    ) -> ConfigFlowResult:
+        """Show a menu whose text may use the My Home Assistant links."""
         return self.async_show_menu(
-            step_id="no_cloud",
-            menu_options=MENU_NO_CLOUD,
+            step_id=step_id,
+            menu_options=menu_options,
             description_placeholders=_link_placeholders(),
         )
 
@@ -302,24 +310,17 @@ class FFAgentConfigFlow(ConfigFlow, domain=DOMAIN):
         """Create the webhook URL if Home Assistant is reachable, else guide."""
         if async_probe_reachability(self.hass) is Reachability.NONE:
             self._cloud_attempts += 1
-            # The second unsuccessful check shows what to look at.
-            step_id = "cloud_setup_retry" if self._cloud_attempts > 1 else "cloud_setup"
-            return self.async_show_menu(
-                step_id=step_id,
-                menu_options=MENU_CLOUD_SETUP,
-                description_placeholders=_link_placeholders(),
-            )
+            if self._cloud_attempts > 1:
+                # The second unsuccessful check shows what to look at.
+                return await self.async_step_cloud_setup_retry()
+            return await self.async_step_cloud_setup()
 
         try:
             url, kind, cloudhook = await async_create_webhook_url(
                 self.hass, self._webhook_id
             )
         except CloudhookUnavailable:
-            return self.async_show_menu(
-                step_id="cloud_not_connected",
-                menu_options=MENU_CLOUD_NOT_CONNECTED,
-                description_placeholders=_link_placeholders(),
-            )
+            return await self.async_step_cloud_not_connected()
         except Exception as err:
             # Only the type is logged: the message may contain the URL.
             _LOGGER.error(
@@ -328,6 +329,24 @@ class FFAgentConfigFlow(ConfigFlow, domain=DOMAIN):
             )
             return self.async_abort(reason="unknown")
         return await self._async_finish_webhook(url, kind, cloudhook)
+
+    async def async_step_cloud_setup(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Guide through setting up Home Assistant Cloud, without a dead end."""
+        return self._async_show_menu("cloud_setup", MENU_CLOUD_SETUP)
+
+    async def async_step_cloud_setup_retry(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Still not reachable: show what to check."""
+        return self._async_show_menu("cloud_setup_retry", MENU_CLOUD_SETUP)
+
+    async def async_step_cloud_not_connected(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """The subscription is active, but the cloud is not connected."""
+        return self._async_show_menu("cloud_not_connected", MENU_CLOUD_NOT_CONNECTED)
 
     async def async_step_webhook_anyway(
         self, user_input: dict[str, Any] | None = None
@@ -398,9 +417,6 @@ class FFAgentConfigFlow(ConfigFlow, domain=DOMAIN):
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
         """Show the guide for ntfy with the topic and the URL for FF Agent."""
-        if self._ntfy_topic is None:
-            stored = self._stored_ntfy_topic()
-            self._ntfy_topic = stored or async_generate_topic()
         return self.async_show_menu(
             step_id="ntfy",
             menu_options=MENU_NTFY,
@@ -522,9 +538,12 @@ class FFAgentConfigFlow(ConfigFlow, domain=DOMAIN):
 
     @property
     def _topic(self) -> str:
-        """Return the topic of the flow; it is created when the guide is shown."""
+        """Return the topic of the flow, created once when the guide is first shown.
+
+        The reconfigure flow keeps the stored topic unless a new one is wanted.
+        """
         if self._ntfy_topic is None:
-            self._ntfy_topic = async_generate_topic()
+            self._ntfy_topic = self._stored_ntfy_topic() or async_generate_topic()
         return self._ntfy_topic
 
     @callback

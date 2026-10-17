@@ -139,9 +139,7 @@ def _timestamp(state: State) -> datetime | None:
     return timestamp
 
 
-def _event_shape(
-    state: State, received_at: datetime, age: timedelta
-) -> NtfyEventShape:
+def _event_shape(state: State, received_at: datetime, age: timedelta) -> NtfyEventShape:
     """Return the shape of an ntfy message: lengths and counts, never a value."""
     message = state.attributes.get("message")
     title = state.attributes.get("title")

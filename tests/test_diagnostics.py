@@ -366,7 +366,6 @@ async def test_diagnostics_of_the_webhook_mode_have_no_ntfy_block(
 
 async def test_diagnostics_of_the_ntfy_mode(
     hass: HomeAssistant,
-    hass_client: ClientSessionGenerator,
     freezer: FrozenDateTimeFactory,
     ntfy_entry: MockConfigEntry,
 ) -> None:
@@ -381,7 +380,9 @@ async def test_diagnostics_of_the_ntfy_mode(
     )
     await hass.async_block_till_done()
 
-    result = await get_diagnostics_for_config_entry(hass, hass_client, ntfy_entry)
+    # Called directly: the frozen time would make the access token of the HTTP
+    # client invalid.
+    result = await async_get_config_entry_diagnostics(hass, ntfy_entry)
 
     assert result["alarm_source"] == "ntfy"
     assert result["webhook"] is None
