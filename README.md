@@ -727,7 +727,6 @@ freiwillig.
 
 ## Weiterführende Links
 
-- [FF Agent](https://www.ff-agent.com) (Produkt-Website)
 - [Home Assistant](https://www.home-assistant.io/)
 - [HACS-Dokumentation zu Custom Repositories](https://hacs.xyz/docs/faq/custom_repositories/)
 - [CHANGELOG.md](CHANGELOG.md)
@@ -1386,7 +1385,6 @@ support the project further, you can buy me a coffee. Both are entirely optional
 
 ## Further resources
 
-- [FF Agent](https://www.ff-agent.com) (product website)
 - [Home Assistant](https://www.home-assistant.io/)
 - [HACS documentation on custom repositories](https://hacs.xyz/docs/faq/custom_repositories/)
 - [CHANGELOG.md](CHANGELOG.md)

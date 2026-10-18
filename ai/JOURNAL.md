@@ -37,7 +37,10 @@ Das Journal ist Verlauf, keine Wissensbasis: Dauerhaftes gehört nach `docs/` od
   `[!NOTE]`/`[!IMPORTANT]`/`[!WARNING]`-Boxen, Haftungsausschluss, vier neue Abschnitte je
   Sprache, Referenzdefinitionen am Ende), neue CONTRIBUTING.md. Grep auf Herstellernamen: 0.
 - **Offen / Übergabe:** PR mergen, sobald CI grün ist. Badges nach dem Merge auf GitHub
-  ansehen. Produkt-Website-Link `https://www.ff-agent.com` vom Nutzer bestätigen lassen.
+  ansehen.
+- **Nutzerentscheidung:** Kein Link zur FF-Agent-Website im README. Die Website-Zeile
+  unter „Weiterführende Links“ wurde entfernt. Die technischen Beispiel-URLs zur Zusage in
+  der Einrichtung bleiben stehen.
 - **Für die nächste Session:** Die Badge-URLs stehen gesammelt am Ende von README.md. Das
   Tests-Badge hängt am Dateinamen `tests.yml`; wird der Workflow umbenannt, die URL mitziehen.
 
