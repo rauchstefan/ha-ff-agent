@@ -73,6 +73,28 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
 - **Verweise:** Nutzerpunkt 1 im Chat vom 2026-10-18; `translations/*.json` (`config.step.reconfigure`,
   `selector.alarm_source`)
 
+### 261018-ntfy-abschluss-redundant – Abschlussdialog ntfy wiederholt die Webhook-Werte
+- **Status:** offen (wartet auf Go des Nutzers)
+- **Priorität:** niedrig
+- **Rolle(n):** entwickler, tester, reviewer
+- **Beschreibung:** Rückmeldung des Nutzers zur Einrichtung über ntfy. Der Dialog `ntfy`
+  (Schritt 3) nennt alle Werte für den Webhook in FF Agent. Nach „Erledigt, Entität
+  suchen“ zeigt der Abschlusstext (`config.create_entry.ntfy`) dieselbe Liste noch einmal
+  zur Prüfung. Das wirkt redundant.
+  - Vorschlag: Der Abschluss bestätigt nur kurz, dass die Einrichtung fertig ist, und
+    empfiehlt einen Testalarm. Den Hinweis „Gut zu wissen“ (ntfy sieht Alarmzeitpunkte,
+    keine Nachlieferung) behalten oder in den Schritt `ntfy` verschieben.
+  - Die volle Liste nur zeigen, wenn sich die Adresse von der in Schritt 3 gezeigten
+    unterscheidet. Das ist der Fall, wenn im Schritt `ntfy_select` eine andere Entität
+    bzw. ein anderes Thema gewählt wurde. Die Variante `ntfy_topic_unknown` bleibt
+    ausführlich, denn dort wurde keine Adresse gezeigt.
+  - Gleiches für die Neukonfiguration prüfen (`abort.reconfigure_successful_ntfy`).
+- **Definition of Done:** Nach dem Standardweg (Thema aus Schritt 3 gefunden) wiederholt
+  der Abschluss die Webhook-Werte nicht. Bei abweichendem oder unbekanntem Thema erhält
+  der Nutzer weiter alle nötigen Werte. de und en angepasst, Tests für beide Fälle.
+- **Verweise:** Chat vom 2026-10-18 (Screenshot nicht im Repo, enthält ein geheimes
+  Thema); `config_flow.py` (`async_step_ntfy_select`), `translations/*.json`
+
 ### 261018-recherche-namen – Namen Dritter in öffentlichen Recherche-Dateien
 - **Status:** offen (Entscheidung des Nutzers)
 - **Priorität:** mittel
