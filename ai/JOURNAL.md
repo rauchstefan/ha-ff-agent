@@ -22,6 +22,34 @@ Das Journal ist Verlauf, keine Wissensbasis: Dauerhaftes gehört nach `docs/` od
 
 <!-- Neue Einträge direkt unter dieser Zeile einfügen -->
 
+## 2026-10-18 – claude/readme-update-ha-anker-solix-2ea3b2 – HACS-Update-Dialog: Hash statt Version, Logo fehlt
+- **Nutzer-Auftrag:** Im HACS-Update-Dialog fehlt das Logo, und die Version erscheint als
+  Hash (7192103 → 36c857e) statt 0.4.0. Entscheidung des Nutzers: „mach zuerst 0.4.0
+  regulär“. Danach, wenn alles abgeschlossen ist, 1.0.0 releasen und in den HACS-Store.
+- **Ursachen (Recherche, im HACS-Code selbst nachgeprüft):**
+  - Gibt es nur Pre-Releases, zeigt HACS den letzten Commit des Default-Branch.
+  - Das Bild der Update-Entität kommt fest von `brands.home-assistant.io/_/ff_agent/icon.png`.
+    Den lokalen `brand/`-Ordner liest HACS dafür nicht.
+- **Delegiert:**
+  - researcher (Sonnet): Recherche `docs/recherche/261018-hacs-update-dialog.md`.
+  - entwickler (Sonnet): `hacs.json` `hide_default_branch` und Test.
+  - doku (Haiku): README und CHANGELOG.
+  - reviewer (Opus): freigegeben.
+  - Die Review-Hinweise habe ich selbst umgesetzt. Erstens wertet HACS 2.x
+    `hide_default_branch` nicht aus; geholfen hat das reguläre Release. Zweitens heißt die
+    deutsche Bezeichnung „Erneut herunterladen“. Außerdem: Badge ohne `include_prereleases`.
+- **Erledigt:**
+  - v0.4.0 auf GitHub zum regulären Release (Latest) hochgestuft, Freigabe durch den Nutzer.
+  - Release-Notes aktualisiert.
+  - rauchstefan/ha-ff-agent#14 gemergt (4dd4153).
+- **Offen / Übergabe:**
+  - 261018-hacs-icon: Der Nutzer fragte, ob der Ordnername `ff_agent` stimmt. Antwort: ja, er
+    muss der Domain entsprechen. Ob ein PR an home-assistant/brands gestellt wird, ist noch
+    nicht entschieden.
+  - 261018-release-1-0 ist neu.
+- **Für die nächste Session:** Für Releases künftig reguläre Releases nutzen. Bei
+  Pre-Releases zeigt HACS ohne Beta-Schalter Commit-Hashes.
+
 ## 2026-10-18 – claude/readme-update-ha-anker-solix-2ea3b2 – Pre-Release v0.4.0
 - **Nutzer-Auftrag:** „update nochmal auf eine neue Vorabversion und gib diese frei“. Das
   ist die ausdrückliche Freigabe für Tag und GitHub-Release.

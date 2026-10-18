@@ -3,7 +3,7 @@
 Was ist der aktuelle Stand der Integration? Diese Datei beantwortet das für jede neue
 Session. Von Hand gepflegt.
 
-- **Version:** 0.4.0. GitHub-Release `v0.4.0` als **Vorabversion** (2026-10-18, Tag auf
+- **Version:** 0.4.0. GitHub-Release `v0.4.0` als **reguläres Release** (Latest; 2026-10-18, Tag auf
   e05621a, rauchstefan/ha-ff-agent#13). Davor `v0.3.0` (619a53e), `v0.2.0` (dabe583) und
   `v0.1.0`, alle Vorabversionen.
 - **Neu in v0.4.0:** Standortquelle wählbar (keine, HA-Zuhause, Koordinaten, Entität;
