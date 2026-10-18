@@ -203,7 +203,7 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
   `docs/recherche/261016-ffagent-schnittstellen.md`, `docs/plaene/261017-alarmquelle-ntfy.md`
   und dieser Datei entfernt. `tests/test_metadata.py` hält die verbotenen Wörter nicht mehr
   im Klartext. Die Git-Historie enthält die Angaben weiter; sie zu entfernen hieße, die
-  Historie umzuschreiben (nur mit Freigabe des Nutzers).
+  Historie umzuschreiben. Entscheidung des Nutzers am 2026-10-18: Die Historie bleibt so.
 
 ### 261017-hacs-default – Aufnahme in den HACS-Default-Store
 - **Status:** erledigt (2026-10-18, aufgegangen in 261018-release-1-0; PR hacs/default#12188)
