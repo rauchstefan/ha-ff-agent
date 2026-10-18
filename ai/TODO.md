@@ -40,20 +40,28 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
   Zusage und Absage sind gegen ein echtes FF Agent getestet. Für hacs/default prüfen:
   Anforderungen (Brands-Eintrag bzw. lokaler brand-Ordner, Releases, Topics,
   Beschreibung), siehe docs/recherche/261016-hacs-anforderungen.md.
+  **Achtung:** HACS zieht ab HA 2026.11 als „Marketplace“ in Home Assistant
+  (hacs/integration#5590). Vor dem Store-Eintrag recherchieren, ob die Aufnahme dann
+  noch über hacs/default läuft oder einen neuen Weg hat (researcher).
 - **Definition of Done:** Release v1.0.0 (Freigabe des Nutzers), PR an hacs/default
   gestellt (Freigabe des Nutzers, da öffentlicher Beitrag unter seinem Konto).
 - **Verweise:** docs/recherche/261018-hacs-update-dialog.md
 
 ### 261018-hacs-icon – Logo im HACS-Update-Dialog fehlt
-- **Status:** offen (Entscheidung des Nutzers: PR an home-assistant/brands?)
+- **Status:** offen (wartet auf HA 2026.11; danach beim Nutzer prüfen)
 - **Priorität:** niedrig
-- **Rolle(n):** projektleiter
+- **Rolle(n):** projektleiter, Nutzer
 - **Beschreibung:** Die HACS-Update-Entität lädt ihr Bild fest von
   `https://brands.home-assistant.io/_/ff_agent/icon.png`, nicht aus dem lokalen
-  `brand/`-Ordner. Abhilfe nur über einen Eintrag `custom_integrations/ff_agent/` im Repo
-  home-assistant/brands (Ordnername = Integrations-Domain, nicht Repo-Name). Der Ordner
-  gilt dort als „Legacy“.
-- **Definition of Done:** Entscheidung getroffen; ggf. PR gestellt.
+  `brand/`-Ordner.
+  - Ein PR an home-assistant/brands ist **nicht möglich**: Laut PR-Vorlage werden keine
+    neuen Custom-Integrationen mehr angenommen (Stand 2026-10-18). Der Nutzer wollte den PR;
+    er wurde deshalb nicht gestellt.
+  - Lösung von außen: HACS zieht als Integration „Marketplace“ in Home Assistant
+    (hacs/integration#5590). Laut den HACS-Betreuern ist das Bild dort behoben, ab
+    HA 2026.11 (hacs/integration#5402, #5179, #5524). Unser `brand/`-Ordner reicht dafür.
+- **Definition of Done:** Nach dem Update auf HA 2026.11 zeigt der Update-Dialog das
+  Symbol. Sonst ein Issue bei home-assistant/core mit Label `integration: marketplace`.
 - **Verweise:** docs/recherche/261018-hacs-update-dialog.md
 
 ### 261018-test-zusage-absage – Zusage und Absage gegen echtes FF Agent prüfen

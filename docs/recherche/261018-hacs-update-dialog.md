@@ -126,3 +126,19 @@ Problem 2: Lokaler `brand/`-Ordner beibehalten (korrekt). Für das HACS-Entity-B
 `home-assistant/brands` unter `custom_integrations/ff_agent/` (`icon.png` 256, `icon@2x.png` 512) stellen,
 nachdem im Repo (README/Template/Issues) geprüft wurde, dass er noch angenommen wird. Alternativ als rein
 kosmetisch akzeptieren und im Backlog vermerken. Kein funktionaler Schaden.
+
+## Nachtrag 2026-10-18: Brands-PR und Marketplace
+
+- Ein PR an `home-assistant/brands` ist nicht möglich. Die PR-Vorlage des Repos sagt,
+  dass neue Custom-Integrationen nicht mehr angenommen werden. Verwiesen wird auf die
+  Ankündigung zur Brands-Proxy-API
+  (https://developers.home-assistant.io/blog/2026/02/24/brands-proxy-api).
+- HACS zieht als Integration „Marketplace“ in Home Assistant (hacs/integration#5590).
+- Die HACS-Betreuer haben das Problem „icon not available“ trotz lokalem `brand/`-Ordner
+  geschlossen, mit dem Hinweis, es sei im Marketplace ab HA 2026.11 behoben. Fundstellen:
+  hacs/integration#5402, hacs/integration#5179 und der geschlossene PR
+  hacs/integration#5524 („Use the brands proxy for update entity pictures“).
+- Für die Anzeige vor der Installation nennt das README des brands-Repos den Pfad
+  `https://brands.home-assistant.io/marketplace/[domain]/icon.png`. Er wird aus dem
+  `brand/`-Ordner der Custom-Integration bedient.
+- Folge: Am Repo ist nichts zu tun. Nach HA 2026.11 prüfen.
