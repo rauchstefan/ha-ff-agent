@@ -22,6 +22,45 @@ Das Journal ist Verlauf, keine Wissensbasis: Dauerhaftes gehört nach `docs/` od
 
 <!-- Neue Einträge direkt unter dieser Zeile einfügen -->
 
+## 2026-10-18 – lokal-2026-10-16-hacs-recherche – Wählbare Alarmquelle (ADR 0003), Gate für #4 und #6
+- **Nutzer-Aufträge:**
+  - „bitte 1 und 2 umsetzen, und dem Nutzer die Wahl geben“ (Nabu Casa und ntfy).
+  - Flow: Nabu Casa als empfohlen darstellen, nicht erzwingen; bei „Nein“ zu ntfy; je Weg
+    ein Einrichtungsdialog Schritt für Schritt.
+  - „Trotzdem fortfahren“ behalten, ntfy per GET `/trigger`.
+  - Merge erst, wenn sein Test fertig ist.
+- **Delegiert:**
+  - architekt (Opus): ADR 0003 und Plan, zwei Runden
+  - entwickler mit **Opus statt Sonnet**: viele Flow-Verzweigungen, Migration und der
+    heikle Laufzeitfilter für eine fremde Entität
+  - tester (Sonnet) und reviewer (Opus) für #4 und #6
+  - zwei Runden Nacharbeit, Nachprüfung durch den reviewer
+  - Beide Prüfer liefen nach einem API-Limit per SendMessage weiter.
+- **Erledigt:**
+  - ADR 0003 angenommen, Plan docs/plaene/261017-alarmquelle-ntfy.md.
+  - PR rauchstefan/ha-ff-agent#5: `docs/` von ruff ausgenommen, weil Python-Beispiele in
+    Plänen main zweimal rot gemacht hatten.
+  - PR rauchstefan/ha-ff-agent#6 (Base #4), Stand f3fa723:
+    - Einstiegsfrage Cloud ja/nein, geführte Dialoge, ntfy über die Core-Integration
+    - Migration 1.1 → 1.2
+    - Selbstheilung bei neuem ntfy-Abo
+    - `reconfigure_successful_local`
+    - 642 Tests, Abdeckung 100 %
+  - #4 und #6: tester PASS, reviewer freigegeben. **Nicht gemergt**, wartet auf das Okay
+    des Nutzers.
+  - Neue TODOs: 261018-ntfy-feinschliff, 261018-configflow-aufteilen.
+- **Hinweise:**
+  - Der tester hat HA-Wheels von PyPI per curl geladen und nur die
+    `translations/de.json` der ntfy-Integration gelesen, nichts ausgeführt. Damit hat er
+    die deutschen Labels geprüft; Ergebnis: „Dienst-URL“ statt „Dienstadresse“.
+  - Der entwickler hat für #6 einmal node lokal zur Prüfung der Übersetzungen genutzt;
+    in der Nacharbeit nicht mehr.
+- **Offen / Übergabe:**
+  - Merge-Reihenfolge nach dem Okay: #4 → main, Base von #6 auf main umstellen, #6 mergen
+    (Squash).
+  - Danach ist ein Release-Kandidat möglich (v0.2.0), nur mit Freigabe des Nutzers.
+  - Der echte Test des Nutzers läuft noch.
+
 ## 2026-10-17 – lokal-2026-10-16-hacs-recherche – Erste Findings aus dem echten Test
 - **Nutzer:**
   - Installation über HACS auf der eigenen Instanz ist erledigt.
