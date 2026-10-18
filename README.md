@@ -11,9 +11,10 @@ mission software for fire brigades and emergency services) available in Home Ass
 > **Inoffizielles Community-Projekt, nicht mit dem Hersteller von FF Agent verbunden.**
 > **Unofficial community project, not affiliated with the vendor of FF Agent.**
 >
-> **Vorabversion 0.3.0 / Pre-release 0.3.0:** noch nicht gegen ein echtes FF Agent
-> getestet. In HACS bei „FF Agent“ die Anzeige von Beta-/Vorabversionen aktivieren, um sie
-> zu installieren. / Not yet tested against a real FF Agent. In HACS, enable showing
+> **Vorabversion 0.3.0 / Pre-release 0.3.0:** Test- und Echtalarm aus FF Agent
+> kommen an; Zusage und Absage sind noch nicht gegen ein echtes FF Agent getestet. In HACS bei „FF Agent“ die Anzeige von Beta-/Vorabversionen aktivieren, um sie
+> zu installieren. / Test and real alarms from FF Agent arrive; accepting and declining
+> have not yet been tested against a real FF Agent. In HACS, enable showing
 > beta/pre-releases for "FF Agent" to install it.
 
 **Sprache / Language:** [Deutsch](#deutsch) · [English](#english)

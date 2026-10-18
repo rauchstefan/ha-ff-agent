@@ -31,6 +31,24 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
 
 ## Offen
 
+### 261018-test-zusage-absage – Zusage und Absage gegen echtes FF Agent prüfen
+- **Status:** offen (Test durch den Nutzer)
+- **Priorität:** hoch
+- **Rolle(n):** Nutzer, Projektleiter, doku
+- **Beschreibung:** Test- und Echtalarm sind laut Nutzer am 2026-10-18 angekommen
+  (v0.3.0). Zusage und Absage über Button bzw. Action sind noch nicht gegen ein echtes
+  FF Agent geprüft (Annahme A7 im README: Verhalten bei inaktivem Einsatz,
+  Statuscodes). Zu prüfen sind:
+  - Zusage mit Verkehrsmittel und ggf. Standort
+  - Absage
+  - Rückmeldung ohne aktiven Einsatz
+  - Sensor „Letzte Rückmeldung“
+  - Ankunft in FF Agent
+- **Definition of Done:** Ergebnis des Nutzers dokumentiert; Hinweise „noch nicht
+  getestet“ in README (Kopf, Einschränkungen) und CHANGELOG angepasst; Abweichungen als
+  Bug-TODO.
+- **Verweise:** Chat vom 2026-10-18; README „Bekannte Einschränkungen“
+
 ### 261018-recherche-namen – Namen Dritter in öffentlichen Recherche-Dateien
 - **Status:** offen (Entscheidung des Nutzers)
 - **Priorität:** mittel

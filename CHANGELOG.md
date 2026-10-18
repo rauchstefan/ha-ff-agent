@@ -5,7 +5,7 @@ Alle nennenswerten Änderungen an dieser Integration. Format angelehnt an
 
 ## [0.3.0] – 2026-10-18 (Vorabversion)
 
-Dritte Vorabversion. Ein Testalarm aus FF Agent ist beim Entwickler erfolgreich angekommen; andere Teile, etwa Zusagen und Absagen, sind noch nicht gegen ein echtes FF Agent geprüft.
+Dritte Vorabversion. Ein Testalarm und ein echter Alarm aus FF Agent sind beim Entwickler erfolgreich angekommen; Zusagen und Absagen sind noch nicht gegen ein echtes FF Agent geprüft.
 
 **Update:** Nach dem Update Home Assistant neu starten **und die Seite im Browser hart neu
 laden** (Strg+F5, am Mac Cmd+Umschalt+R). In der Companion-App die App neu starten bzw.
@@ -44,7 +44,7 @@ unter Umständen keinen oder alten Text.
 
 ### English
 
-Third pre-release. A test alarm from FF Agent has arrived successfully on the developer's system; other parts, such as accepting and declining, have not yet been checked against a real FF Agent.
+Third pre-release. A test alarm and a real alarm from FF Agent have arrived successfully on the developer's system; accepting and declining have not yet been checked against a real FF Agent.
 
 **Update:** After updating, restart Home Assistant **and hard-reload the page in the
 browser** (Ctrl+F5, on a Mac Cmd+Shift+R). In the companion app, restart the app or clear
