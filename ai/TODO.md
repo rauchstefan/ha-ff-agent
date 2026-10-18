@@ -31,139 +31,6 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
 
 ## Offen
 
-<!-- Themensammlung des Nutzers nach Test von v0.2.0 (2026-10-18). Abarbeitung erst nach
-     seinem Go. Screenshots liegen nur im Chat, nicht im Repo. -->
-
-### 261018-leere-dialogtexte – Hinweis auf Browser-Cache nach Update (leere Menütexte in v0.2.0)
-- **Status:** in Arbeit (lokal-2026-10-18-v0-2-feedback, 2026-10-18); Ursache geklärt, kein Code-Fehler
-- **Priorität:** niedrig
-- **Rolle(n):** doku
-- **Beschreibung:** Rückmeldung des Nutzers nach Installation von v0.2.0 über HACS
-  (Nutzerpunkte 2–4): Die Menüs der Einrichtung und der Neukonfiguration zeigten nur
-  den Titel „FF Agent“ und Pfeile ohne Texte. Die Neukonfiguration zeigte noch Texte aus
-  v0.1.0 („Webhook-Zugang neu erzeugen“), die Auswahl-Optionen dagegen schon neue.
-  - Ursache: **Browser-Cache.** Home Assistant war neu gestartet, ohne Wirkung. Erst ein
-    harter Reload (Strg+F5) brachte die neuen Texte (Gegenprobe des Nutzers am
-    2026-10-18, Menü „Nutzt du Home Assistant Cloud?“ vollständig).
-  - Der Tag v0.2.0 enthält die richtigen Übersetzungen; am Code ist nichts zu ändern.
-  - Offen bleibt nur ein Hinweis für Nutzer: Nach einem Update Home Assistant neu
-    starten und den Browser hart neu laden (Strg+F5, in der App ggf. Cache leeren),
-    falls Dialoge leer oder veraltet aussehen.
-- **Definition of Done:** README (Abschnitt Installation/Update oder Fehlersuche) und
-  CHANGELOG des nächsten Release nennen Neustart plus harten Browser-Reload nach einem
-  Update. Kein Herstellername.
-- **Verweise:** Nutzerpunkte 2–4 im Chat vom 2026-10-18
-
-### 261018-reconfig-alarmquelle-text – Feld „Alarmquelle“ in der Neukonfiguration als Frage mit Hinweis
-- **Status:** in Arbeit (lokal-2026-10-18-v0-2-feedback, 2026-10-18)
-- **Priorität:** mittel
-- **Rolle(n):** entwickler, tester, reviewer
-- **Beschreibung:** Nutzerpunkt 1. In der Neukonfiguration steht über der Auswahl der
-  Alarmquelle „alarm_source“; das lag am Browser-Cache (261018-leere-dialogtexte). Der
-  aktuelle Text „Weg für den Alarm“ ist ebenfalls nur ein generisches Label. Gewünscht
-  ist statt eines generischen Labels eine **Frage**, wie die Integration die Alarme
-  erhält, etwa „Wie bekommt Home Assistant den Alarm?“. Bei der Option Home Assistant
-  Cloud soll direkt stehen, was sie voraussetzt: ein Abo (Home Assistant Cloud) **oder**
-  eine aus dem Internet erreichbare Adresse (IP/Domain) des eigenen Home Assistant.
-  Die ntfy-Option bleibt als kostenlose Alternative erkennbar.
-- **Definition of Done:** Label des Felds `alarm_source` im Schritt `reconfigure` ist
-  eine Frage (de und en). Optionstext oder Feldbeschreibung nennt die Voraussetzung
-  (Abo oder erreichbare Adresse). Kein Herstellername. Texte im Screenshot bzw. in
-  der Gegenprobe des Nutzers bestätigt.
-- **Verweise:** Nutzerpunkt 1 im Chat vom 2026-10-18; `translations/*.json` (`config.step.reconfigure`,
-  `selector.alarm_source`)
-
-### 261018-ntfy-abschluss-redundant – Abschlussdialog ntfy wiederholt die Webhook-Werte
-- **Status:** in Arbeit (lokal-2026-10-18-v0-2-feedback, 2026-10-18)
-- **Priorität:** niedrig
-- **Rolle(n):** entwickler, tester, reviewer
-- **Beschreibung:** Rückmeldung des Nutzers zur Einrichtung über ntfy. Der Dialog `ntfy`
-  (Schritt 3) nennt alle Werte für den Webhook in FF Agent. Nach „Erledigt, Entität
-  suchen“ zeigt der Abschlusstext (`config.create_entry.ntfy`) dieselbe Liste noch einmal
-  zur Prüfung. Das wirkt redundant.
-  - Vorschlag: Der Abschluss bestätigt nur kurz, dass die Einrichtung fertig ist, und
-    empfiehlt einen Testalarm. Den Hinweis „Gut zu wissen“ (ntfy sieht Alarmzeitpunkte,
-    keine Nachlieferung) behalten oder in den Schritt `ntfy` verschieben.
-  - Die volle Liste nur zeigen, wenn sich die Adresse von der in Schritt 3 gezeigten
-    unterscheidet. Das ist der Fall, wenn im Schritt `ntfy_select` eine andere Entität
-    bzw. ein anderes Thema gewählt wurde. Die Variante `ntfy_topic_unknown` bleibt
-    ausführlich, denn dort wurde keine Adresse gezeigt.
-  - Gleiches für die Neukonfiguration prüfen (`abort.reconfigure_successful_ntfy`).
-- **Definition of Done:** Nach dem Standardweg (Thema aus Schritt 3 gefunden) wiederholt
-  der Abschluss die Webhook-Werte nicht. Bei abweichendem oder unbekanntem Thema erhält
-  der Nutzer weiter alle nötigen Werte. de und en angepasst, Tests für beide Fälle.
-- **Verweise:** Chat vom 2026-10-18 (Screenshot nicht im Repo, enthält ein geheimes
-  Thema); `config_flow.py` (`async_step_ntfy_select`), `translations/*.json`
-
-### 261018-geraet-ohne-link – Kein Link zu FF Agent in der Dienst-Info
-- **Status:** in Arbeit (lokal-2026-10-18-v0-2-feedback, 2026-10-18)
-- **Priorität:** niedrig
-- **Rolle(n):** entwickler, tester, reviewer
-- **Beschreibung:** Wunsch des Nutzers: Die Karte „Dienst-Informationen“ des Geräts zeigt
-  den Button „Besuchen“ mit Link zur Produkt-Website. Der Link soll dort nicht stehen.
-  Ursache: `configuration_url=CONFIGURATION_URL` in `entity.py` (`DeviceInfo`).
-- **Definition of Done:** `DeviceInfo` ohne `configuration_url`. Die Konstante entfällt,
-  wenn sie sonst nicht genutzt wird. Test `tests/test_entities.py` (prüft bisher die URL)
-  angepasst, er verlangt jetzt `configuration_url is None`. CHANGELOG-Eintrag.
-- **Verweise:** Chat vom 2026-10-18; `custom_components/ff_agent/entity.py`,
-  `const.py`, `tests/test_entities.py`
-
-### 261018-einrichtung-zusage-optionen – Verkehrsmittel und Standort schon bei der Einrichtung abfragen
-- **Status:** in Arbeit (lokal-2026-10-18-v0-2-feedback, 2026-10-18)
-- **Priorität:** mittel
-- **Rolle(n):** architekt (kurzes Design), entwickler, tester, reviewer, doku
-- **Beschreibung:** Wunsch des Nutzers: Bei der Einrichtung soll man das Verkehrsmittel
-  und die Adresse für die Zusage festlegen können. Die Werte sollen in die vom Nutzer
-  eingetragene, generische Zusage-URL von FF Agent einfließen. Damit der erste Dialog
-  übersichtlich bleibt, kommt diese Abfrage als **eigener Schritt nach** der Eingabe
-  der URL (vor der Wahl der Alarmquelle oder danach, im Design festlegen).
-  - Stand im Code: Die Integration speichert die URL nicht, sondern nur Host und UUID,
-    und hängt beim Zusagen `transport` sowie `lat`/`lng` als Query-Parameter an
-    (`reply.py`). Verkehrsmittel (`default_transport`) und Standort-Entität
-    (`location_entity`) gibt es bisher nur in den Optionen, nicht in der Einrichtung.
-  - Kern der Aufgabe also: beide Felder als Schritt in die Einrichtung übernehmen,
-    Vorbelegung wie in den Optionen, später in den Optionen änderbar.
-  - **Rückfrage an den Nutzer:** Ist mit „Adresse“ die vorhandene Standort-Entität
-    gemeint (z. B. `person.x` oder `device_tracker`), oder eine feste Adresse bzw.
-    feste Koordinaten? Eine feste Adresse als Text unterstützt die Integration bisher
-    nicht; ob FF Agent einen Adress-Parameter kennt, ist ungeklärt (ggf. researcher).
-- **Definition of Done:** Nach der URL folgt ein Schritt mit Verkehrsmittel und Standort
-  (optional). Die Werte landen in den Optionen des Eintrags und wirken auf Button und
-  Aktion „Zusagen“. de und en, Config-Flow-Tests, README aktualisiert.
-- **Verweise:** Chat vom 2026-10-18; `config_flow.py`, `reply.py`, `const.py`
-  (`CONF_DEFAULT_TRANSPORT`, `CONF_LOCATION_ENTITY`)
-
-### 261018-reihenfolge-zusage – „Zusagen“ vor „Absagen“ anzeigen
-- **Status:** in Arbeit (lokal-2026-10-18-v0-2-feedback, 2026-10-18)
-- **Priorität:** niedrig
-- **Rolle(n):** researcher (kurz), entwickler, tester, reviewer
-- **Beschreibung:** Wunsch des Nutzers: In der Integration (Geräteseite, Bereich
-  Steuerelemente) steht „Absagen“ vor „Zusagen“. Gewünscht ist die umgekehrte
-  Reihenfolge. Vermutung: Home Assistant sortiert Entitäten dort alphabetisch nach Namen,
-  die Reihenfolge in `button.py` wirkt also nicht. Vorher klären, welche Stellschrauben
-  es gibt (Namen, z. B. „Rückmeldung: Zusage“/„Rückmeldung: Absage“ ändern nichts an
-  der Sortierung; ggf. andere Benennung oder keine Lösung ohne Umbenennung). Mögliche
-  Folgen für Entity-IDs und Automationen der Nutzer beachten.
-- **Definition of Done:** Auf der Geräteseite steht „Zusagen“ vor „Absagen“, ohne dass
-  bestehende Entity-IDs brechen; oder dem Nutzer ist begründet, warum es nicht geht,
-  mit Alternativvorschlag.
-- **Verweise:** Chat vom 2026-10-18; `custom_components/ff_agent/button.py`,
-  `translations/*.json` (`entity.button`)
-
-### 261018-alarm-reset – „Alarm aktiv“ von Hand zurücksetzen
-- **Status:** in Arbeit (lokal-2026-10-18-v0-2-feedback, 2026-10-18)
-- **Priorität:** mittel
-- **Rolle(n):** architekt, entwickler, tester, reviewer, doku
-- **Beschreibung:** „Alarm aktiv“ geht nur nach Ablauf der Rücksetzzeit oder bei
-  Neustart/Reload aus. Der Nutzer stimmt im Chat einem manuellen Zurücksetzen zu
-  („Das klingt gut“). Annahme des Projektleiters: ein Button „Alarm zurücksetzen“ und
-  eine Aktion `ff_agent.reset_alarm`. Eine Absage setzt den Alarm **nicht** automatisch
-  zurück, sonst gingen Automationen anderer Hausbewohner aus.
-- **Definition of Done:** Button und Aktion schalten „Alarm aktiv“ sofort aus und stoppen
-  den Timer. „Letzter Alarm“ bleibt. Ohne aktiven Alarm passiert nichts. de und en,
-  Tests, README.
-- **Verweise:** Chat vom 2026-10-18; `alarm.py`, `button.py`, `services.py`
-
 ### 261018-recherche-namen – Namen Dritter in öffentlichen Recherche-Dateien
 - **Status:** offen (Entscheidung des Nutzers)
 - **Priorität:** mittel
@@ -491,6 +358,136 @@ Gemeinsame Angaben für alle sechs Schritte:
   Calendar). Siehe ADR 0002, Abschnitt 7.
 
 ## Erledigt
+
+### 261018-leere-dialogtexte – Hinweis auf Browser-Cache nach Update (leere Menütexte in v0.2.0)
+- **Status:** erledigt (2026-10-18, PR rauchstefan/ha-ff-agent#8, 24d4f43)
+- **Priorität:** niedrig
+- **Rolle(n):** doku
+- **Beschreibung:** Rückmeldung des Nutzers nach Installation von v0.2.0 über HACS
+  (Nutzerpunkte 2–4): Die Menüs der Einrichtung und der Neukonfiguration zeigten nur
+  den Titel „FF Agent“ und Pfeile ohne Texte. Die Neukonfiguration zeigte noch Texte aus
+  v0.1.0 („Webhook-Zugang neu erzeugen“), die Auswahl-Optionen dagegen schon neue.
+  - Ursache: **Browser-Cache.** Home Assistant war neu gestartet, ohne Wirkung. Erst ein
+    harter Reload (Strg+F5) brachte die neuen Texte (Gegenprobe des Nutzers am
+    2026-10-18, Menü „Nutzt du Home Assistant Cloud?“ vollständig).
+  - Der Tag v0.2.0 enthält die richtigen Übersetzungen; am Code ist nichts zu ändern.
+  - Offen bleibt nur ein Hinweis für Nutzer: Nach einem Update Home Assistant neu
+    starten und den Browser hart neu laden (Strg+F5, in der App ggf. Cache leeren),
+    falls Dialoge leer oder veraltet aussehen.
+- **Definition of Done:** README (Abschnitt Installation/Update oder Fehlersuche) und
+  CHANGELOG des nächsten Release nennen Neustart plus harten Browser-Reload nach einem
+  Update. Kein Herstellername.
+- **Verweise:** Nutzerpunkte 2–4 im Chat vom 2026-10-18
+
+### 261018-reconfig-alarmquelle-text – Feld „Alarmquelle“ in der Neukonfiguration als Frage mit Hinweis
+- **Status:** erledigt (2026-10-18, PR rauchstefan/ha-ff-agent#8, 24d4f43)
+- **Priorität:** mittel
+- **Rolle(n):** entwickler, tester, reviewer
+- **Beschreibung:** Nutzerpunkt 1. In der Neukonfiguration steht über der Auswahl der
+  Alarmquelle „alarm_source“; das lag am Browser-Cache (261018-leere-dialogtexte). Der
+  aktuelle Text „Weg für den Alarm“ ist ebenfalls nur ein generisches Label. Gewünscht
+  ist statt eines generischen Labels eine **Frage**, wie die Integration die Alarme
+  erhält, etwa „Wie bekommt Home Assistant den Alarm?“. Bei der Option Home Assistant
+  Cloud soll direkt stehen, was sie voraussetzt: ein Abo (Home Assistant Cloud) **oder**
+  eine aus dem Internet erreichbare Adresse (IP/Domain) des eigenen Home Assistant.
+  Die ntfy-Option bleibt als kostenlose Alternative erkennbar.
+- **Definition of Done:** Label des Felds `alarm_source` im Schritt `reconfigure` ist
+  eine Frage (de und en). Optionstext oder Feldbeschreibung nennt die Voraussetzung
+  (Abo oder erreichbare Adresse). Kein Herstellername. Texte im Screenshot bzw. in
+  der Gegenprobe des Nutzers bestätigt.
+- **Verweise:** Nutzerpunkt 1 im Chat vom 2026-10-18; `translations/*.json` (`config.step.reconfigure`,
+  `selector.alarm_source`)
+
+### 261018-ntfy-abschluss-redundant – Abschlussdialog ntfy wiederholt die Webhook-Werte
+- **Status:** erledigt (2026-10-18, PR rauchstefan/ha-ff-agent#8, 24d4f43)
+- **Priorität:** niedrig
+- **Rolle(n):** entwickler, tester, reviewer
+- **Beschreibung:** Rückmeldung des Nutzers zur Einrichtung über ntfy. Der Dialog `ntfy`
+  (Schritt 3) nennt alle Werte für den Webhook in FF Agent. Nach „Erledigt, Entität
+  suchen“ zeigt der Abschlusstext (`config.create_entry.ntfy`) dieselbe Liste noch einmal
+  zur Prüfung. Das wirkt redundant.
+  - Vorschlag: Der Abschluss bestätigt nur kurz, dass die Einrichtung fertig ist, und
+    empfiehlt einen Testalarm. Den Hinweis „Gut zu wissen“ (ntfy sieht Alarmzeitpunkte,
+    keine Nachlieferung) behalten oder in den Schritt `ntfy` verschieben.
+  - Die volle Liste nur zeigen, wenn sich die Adresse von der in Schritt 3 gezeigten
+    unterscheidet. Das ist der Fall, wenn im Schritt `ntfy_select` eine andere Entität
+    bzw. ein anderes Thema gewählt wurde. Die Variante `ntfy_topic_unknown` bleibt
+    ausführlich, denn dort wurde keine Adresse gezeigt.
+  - Gleiches für die Neukonfiguration prüfen (`abort.reconfigure_successful_ntfy`).
+- **Definition of Done:** Nach dem Standardweg (Thema aus Schritt 3 gefunden) wiederholt
+  der Abschluss die Webhook-Werte nicht. Bei abweichendem oder unbekanntem Thema erhält
+  der Nutzer weiter alle nötigen Werte. de und en angepasst, Tests für beide Fälle.
+- **Verweise:** Chat vom 2026-10-18 (Screenshot nicht im Repo, enthält ein geheimes
+  Thema); `config_flow.py` (`async_step_ntfy_select`), `translations/*.json`
+
+### 261018-geraet-ohne-link – Kein Link zu FF Agent in der Dienst-Info
+- **Status:** erledigt (2026-10-18, PR rauchstefan/ha-ff-agent#8, 24d4f43)
+- **Priorität:** niedrig
+- **Rolle(n):** entwickler, tester, reviewer
+- **Beschreibung:** Wunsch des Nutzers: Die Karte „Dienst-Informationen“ des Geräts zeigt
+  den Button „Besuchen“ mit Link zur Produkt-Website. Der Link soll dort nicht stehen.
+  Ursache: `configuration_url=CONFIGURATION_URL` in `entity.py` (`DeviceInfo`).
+- **Definition of Done:** `DeviceInfo` ohne `configuration_url`. Die Konstante entfällt,
+  wenn sie sonst nicht genutzt wird. Test `tests/test_entities.py` (prüft bisher die URL)
+  angepasst, er verlangt jetzt `configuration_url is None`. CHANGELOG-Eintrag.
+- **Verweise:** Chat vom 2026-10-18; `custom_components/ff_agent/entity.py`,
+  `const.py`, `tests/test_entities.py`
+
+### 261018-einrichtung-zusage-optionen – Verkehrsmittel und Standort schon bei der Einrichtung abfragen
+- **Status:** erledigt (2026-10-18, PR rauchstefan/ha-ff-agent#8, 24d4f43)
+- **Priorität:** mittel
+- **Rolle(n):** architekt (kurzes Design), entwickler, tester, reviewer, doku
+- **Beschreibung:** Wunsch des Nutzers: Bei der Einrichtung soll man das Verkehrsmittel
+  und die Adresse für die Zusage festlegen können. Die Werte sollen in die vom Nutzer
+  eingetragene, generische Zusage-URL von FF Agent einfließen. Damit der erste Dialog
+  übersichtlich bleibt, kommt diese Abfrage als **eigener Schritt nach** der Eingabe
+  der URL (vor der Wahl der Alarmquelle oder danach, im Design festlegen).
+  - Stand im Code: Die Integration speichert die URL nicht, sondern nur Host und UUID,
+    und hängt beim Zusagen `transport` sowie `lat`/`lng` als Query-Parameter an
+    (`reply.py`). Verkehrsmittel (`default_transport`) und Standort-Entität
+    (`location_entity`) gibt es bisher nur in den Optionen, nicht in der Einrichtung.
+  - Kern der Aufgabe also: beide Felder als Schritt in die Einrichtung übernehmen,
+    Vorbelegung wie in den Optionen, später in den Optionen änderbar.
+  - **Rückfrage an den Nutzer:** Ist mit „Adresse“ die vorhandene Standort-Entität
+    gemeint (z. B. `person.x` oder `device_tracker`), oder eine feste Adresse bzw.
+    feste Koordinaten? Eine feste Adresse als Text unterstützt die Integration bisher
+    nicht; ob FF Agent einen Adress-Parameter kennt, ist ungeklärt (ggf. researcher).
+- **Definition of Done:** Nach der URL folgt ein Schritt mit Verkehrsmittel und Standort
+  (optional). Die Werte landen in den Optionen des Eintrags und wirken auf Button und
+  Aktion „Zusagen“. de und en, Config-Flow-Tests, README aktualisiert.
+- **Verweise:** Chat vom 2026-10-18; `config_flow.py`, `reply.py`, `const.py`
+  (`CONF_DEFAULT_TRANSPORT`, `CONF_LOCATION_ENTITY`)
+
+### 261018-reihenfolge-zusage – „Zusagen“ vor „Absagen“ anzeigen
+- **Status:** verworfen (2026-10-18, Entscheidung des Nutzers: Namen „Zusagen“/„Absagen“ bleiben; HA sortiert die Geräteseite alphabetisch, siehe docs/architektur.md)
+- **Priorität:** niedrig
+- **Rolle(n):** researcher (kurz), entwickler, tester, reviewer
+- **Beschreibung:** Wunsch des Nutzers: In der Integration (Geräteseite, Bereich
+  Steuerelemente) steht „Absagen“ vor „Zusagen“. Gewünscht ist die umgekehrte
+  Reihenfolge. Vermutung: Home Assistant sortiert Entitäten dort alphabetisch nach Namen,
+  die Reihenfolge in `button.py` wirkt also nicht. Vorher klären, welche Stellschrauben
+  es gibt (Namen, z. B. „Rückmeldung: Zusage“/„Rückmeldung: Absage“ ändern nichts an
+  der Sortierung; ggf. andere Benennung oder keine Lösung ohne Umbenennung). Mögliche
+  Folgen für Entity-IDs und Automationen der Nutzer beachten.
+- **Definition of Done:** Auf der Geräteseite steht „Zusagen“ vor „Absagen“, ohne dass
+  bestehende Entity-IDs brechen; oder dem Nutzer ist begründet, warum es nicht geht,
+  mit Alternativvorschlag.
+- **Verweise:** Chat vom 2026-10-18; `custom_components/ff_agent/button.py`,
+  `translations/*.json` (`entity.button`)
+
+### 261018-alarm-reset – „Alarm aktiv“ von Hand zurücksetzen
+- **Status:** erledigt (2026-10-18, PR rauchstefan/ha-ff-agent#8, 24d4f43)
+- **Priorität:** mittel
+- **Rolle(n):** architekt, entwickler, tester, reviewer, doku
+- **Beschreibung:** „Alarm aktiv“ geht nur nach Ablauf der Rücksetzzeit oder bei
+  Neustart/Reload aus. Der Nutzer stimmt im Chat einem manuellen Zurücksetzen zu
+  („Das klingt gut“). Annahme des Projektleiters: ein Button „Alarm zurücksetzen“ und
+  eine Aktion `ff_agent.reset_alarm`. Eine Absage setzt den Alarm **nicht** automatisch
+  zurück, sonst gingen Automationen anderer Hausbewohner aus.
+- **Definition of Done:** Button und Aktion schalten „Alarm aktiv“ sofort aus und stoppen
+  den Timer. „Letzter Alarm“ bleibt. Ohne aktiven Alarm passiert nichts. de und en,
+  Tests, README.
+- **Verweise:** Chat vom 2026-10-18; `alarm.py`, `button.py`, `services.py`
 
 ### 261016-ffagent-klaerung – Ausgehende FF-Agent-Schnittstelle klären
 - **Status:** erledigt (2026-10-17, ADR 0002 vorgeschlagen)

@@ -22,6 +22,33 @@ Das Journal ist Verlauf, keine Wissensbasis: Dauerhaftes gehört nach `docs/` od
 
 <!-- Neue Einträge direkt unter dieser Zeile einfügen -->
 
+## 2026-10-18 – lokal-2026-10-18-v0-2-feedback – Rückmeldungen des Nutzers zu v0.2.0
+- **Nutzer-Auftrag:** Erst Themen als TODOs sammeln, dann „starte jetzt mit der
+  Implementation der ToDos“.
+- **Delegiert:**
+  - architekt (Opus) für den Plan `docs/plaene/261018-v0-2-feedback.md`; er hatte kein
+    Bash, der Projektleiter hat committet
+  - entwickler (Sonnet) für die Umsetzung, danach entwickler mit `model: sonnet` explizit
+    für die Textkorrekturen aus dem Review
+  - tester (Sonnet) und reviewer (Opus) parallel; beide brachen an einem API-Limit ab und
+    wurden per SendMessage fortgesetzt
+- **Erledigt:**
+  - PR rauchstefan/ha-ff-agent#8 per Squash gemergt (24d4f43). tester PASS, reviewer
+    freigegeben, CI grün.
+  - Sechs TODOs erledigt, `261018-reihenfolge-zusage` verworfen: Der Nutzer will die
+    Namen behalten, und HA sortiert die Geräteseite alphabetisch nach Namen.
+  - Leere Menütexte nach dem Update: Ursache war der Browser-Cache (Strg+F5 half), kein
+    Code-Fehler. Der Hinweis steht jetzt in README und CHANGELOG.
+- **Nutzerentscheidungen:**
+  - Button-Namen bleiben „Zusagen“/„Absagen“.
+  - Reset-Button heißt „Alarm zurücksetzen“ und darf vorne stehen.
+  - Standort im Setup wie in den Optionen, nur person/device_tracker, ohne Zonen.
+- **Offen / Übergabe:** Nicht in echter HA-Instanz geprüft. Offen ist vor allem, ob der
+  alte Geräte-Link verschwindet. Kein Release, ein Versionssprung braucht die Freigabe des
+  Nutzers.
+- **Für die nächste Session:** Der Worktree-Branch `claude/v0-2-0-reconfig-adjustments-99f09e`
+  steht auf `main`; `ai/`-Commits gehen per `git push origin HEAD:main`.
+
 ## 2026-10-18 – lokal-2026-10-16-hacs-recherche – Release v0.2.0 (Vorabversion)
 - **Nutzer-Aufträge:**
   - „Bereite ein Release v0.2.0 als Vorabversion vor.“
