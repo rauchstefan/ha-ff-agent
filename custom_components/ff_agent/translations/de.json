@@ -10,7 +10,7 @@
         },
         "data_description": {
           "name": "Bezeichnung dieser Einrichtung, zum Beispiel dein Name.",
-          "reply_url": "Öffne die FF-Agent-Web-UI, gehe zu Automatisierung > Einsatzrückmeldungen und kopiere die Zusage-URL hierher. Die URL ist ein Geheimnis: Mit ihr kann jemand in deinem Namen zu- oder absagen. Gib sie niemandem weiter."
+          "reply_url": "Öffne die FF-Agent-Web-UI, gehe zu Personen > dein Name > Bereich „Übung/Einsatz“ > „Weblinks für Einsatzmeldung“ und kopiere die Zusage-URL hierher. Die URL gilt nur für dich und für den jeweils aktiven Einsatz. Sie ist ein Geheimnis: Mit ihr kann jemand in deinem Namen zu- oder absagen. Gib sie niemandem weiter."
         }
       },
       "reconfigure": {
@@ -112,13 +112,15 @@
       "message": "FF Agent hat mit dem HTTP-Status {status} geantwortet. Die Rückmeldung wurde vermutlich nicht erfasst. Prüfe in FF Agent, ob für den aktuellen Einsatz eine Rückmeldung möglich ist."
     },
     "invalid_transport": {
-      "message": "Das Verkehrsmittel \"{transport}\" wird nicht unterstützt. Unterstützt wird nur car (Auto)."
+      "message": "Das Verkehrsmittel \"{transport}\" wird nicht unterstützt. Unterstützt werden car (Auto), feet (zu Fuß) und bicycle (Fahrrad)."
     }
   },
   "selector": {
     "transport": {
       "options": {
-        "car": "Auto"
+        "car": "Auto",
+        "feet": "Zu Fuß",
+        "bicycle": "Fahrrad"
       }
     }
   },
@@ -133,7 +135,7 @@
         },
         "transport": {
           "name": "Verkehrsmittel",
-          "description": "Wie die Person zum Einsatz kommt. Unterstützt wird nur Auto."
+          "description": "Wie die Person zum Einsatz kommt: Auto, zu Fuß oder Fahrrad."
         },
         "latitude": {
           "name": "Breitengrad",

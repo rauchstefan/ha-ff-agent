@@ -73,10 +73,12 @@ von FF Agent, es gibt kein Abfragen.
 
 <!-- docs-installation-parameters -->
 
-1. **Rückmelde-URL kopieren.** In der FF-Agent-Web-UI unter *Automatisierung →
-   Einsatzrückmeldungen* die Zusage-URL kopieren. Sie sieht so aus:
+1. **Rückmelde-URL kopieren.** In der FF-Agent-Web-UI unter *Personen → (dein Name) →
+   Bereich „Übung/Einsatz“ → „Weblinks für Einsatzmeldung“* (die Seite heißt „URLs für
+   Einsatzmeldung“) die Zusage-URL kopieren. Sie sieht so aus:
    `https://www.ff-agent.com/app2/missionreplies/<REPLY_ID>/accept?transport=CAR`.
-   Akzeptiert werden auch die Absage-URL oder die blanke UUID.
+   Akzeptiert werden auch die Absage-URL oder die blanke UUID. Die URLs gelten nur für diese
+   Person und beziehen sich auf den jeweils aktiven Einsatz.
 2. **Integration hinzufügen.** In Home Assistant *Integration hinzufügen → FF Agent*. Felder:
    - **Name:** Bezeichnung dieser Einrichtung, zum Beispiel dein Name. Der Name wird zum
      Gerätenamen und damit Teil der Entity-IDs.
@@ -154,7 +156,7 @@ aktuelle Webhook-URL, die Art der Adresse, den Header-Namen und das Token.
 |---|---|
 | Zusatz-Token verlangen | Wie oben. Standard: aus. |
 | Rücksetzzeit „Alarm aktiv“ | Minuten ohne neuen Alarm, nach denen „Alarm aktiv“ ausgeht (1 bis 1440, Standard 30). Ein neuer Alarm startet die Zeit neu. |
-| Standard-Verkehrsmittel | Wird beim Zusagen gesendet, wenn die Action keines angibt. Zur Auswahl steht nur „Auto“. |
+| Standard-Verkehrsmittel | Wird beim Zusagen gesendet, wenn die Action keines angibt. Zur Auswahl stehen „Auto“, „Zu Fuß“ und „Fahrrad“. |
 | Standort-Entität | Optional: eine Person oder ein Gerät-Tracker. Sein Standort wird beim Zusagen mitgesendet. Leer lassen, um keinen Standort zu senden. |
 
 **Wichtig:** Das Speichern der Optionen lädt die Integration neu. Ein gerade aktiver Alarm
@@ -215,19 +217,22 @@ Oberfläche über die Auswahl „Eintrag“.
 
 - **`ff_agent.accept`** (Zusagen)
   - `config_entry_id` (Pflicht): der Eintrag der Person, die zusagt
-  - `transport` (optional): Verkehrsmittel, nur `car` (Auto). Ohne Angabe gilt das Standard-Verkehrsmittel
-    aus den Optionen. Home Assistant speichert `car`, an FF Agent geht `CAR`. Nur dieser Wert ist
-    belegt.
+  - `transport` (optional): Verkehrsmittel `car` (Auto, Standard), `feet` (zu Fuß) oder
+    `bicycle` (Fahrrad). Ohne Angabe gilt das Standard-Verkehrsmittel aus den Optionen.
+    Home Assistant speichert die Werte klein geschrieben, an FF Agent gehen `CAR`, `FEET`
+    und `BICYCLE`.
   - `latitude` und `longitude` (optional): Standort, nur beide zusammen. Ohne Angabe wird
     der Standort der Standort-Entität aus den Optionen gesendet, falls gesetzt, sonst kein
     Standort.
 - **`ff_agent.reject`** (Absagen)
   - `config_entry_id` (Pflicht)
 
-Die Rückmeldung bezieht sich auf den **aktuellen Einsatz** in FF Agent. Schlägt sie fehl,
-melden die Buttons und Actions einen Fehler („FF Agent war nicht erreichbar …“ bzw. „FF
-Agent hat mit dem HTTP-Status … geantwortet“). Eine gleiche Rückmeldung innerhalb von 10
-Sekunden nach einem Erfolg wird ohne zweiten Aufruf übersprungen.
+Die Rückmeldung bezieht sich auf den **aktuellen Einsatz** in FF Agent. Zu- und Absage
+funktionieren nur, wenn die Person für diesen Einsatz alarmiert wurde (wie in der
+FF-Agent-App). Schlägt sie fehl, melden die Buttons und Actions einen Fehler („FF Agent
+war nicht erreichbar …“ bzw. „FF Agent hat mit dem HTTP-Status … geantwortet“). Eine
+gleiche Rückmeldung innerhalb von 10 Sekunden nach einem Erfolg wird ohne zweiten Aufruf
+übersprungen.
 
 **Eine Antwort 2xx von FF Agent heißt nur „gesendet“, nicht sicher „verbucht“.** Wie FF
 Agent auf eine ungültige UUID oder einen fehlenden Einsatz antwortet, ist ungeprüft.
@@ -307,7 +312,7 @@ automation:
 
 - Für die Absage denselben zweiten Block mit `FF_AGENT_REJECT` und `ff_agent.reject`
   anlegen.
-- Optionale Felder bei `ff_agent.accept`: `transport: car` (einziger belegter Wert) sowie
+- Optionale Felder bei `ff_agent.accept`: `transport` (`car`, `feet` oder `bicycle`) sowie
   `latitude` und `longitude`, nur beide zusammen.
 - Ist in FF Agent „auch für Testalarme“ an, lösen Testalarme die Automation ebenfalls aus.
 - Der Standort wird nur gesendet, wenn er angegeben ist oder in den Optionen eine
@@ -367,8 +372,9 @@ zwei Sensoren, zwei Buttons).
   ankommt (siehe Diagnose).
 - Ein Neustart, ein Reload, das Speichern der Optionen und ein Reconfigure setzen „Alarm
   aktiv“ zurück. Wiederhergestellt wird nur „Letzter Alarm“.
-- Als Verkehrsmittel ist nur `car` (an FF Agent `CAR`) belegt.
-- Die Rückmeldung gilt für den aktiven Einsatz.
+- Die Rückmeldung gilt für den aktiven Einsatz. Zu- und Absage funktionieren nur, wenn die
+  Person für diesen Einsatz alarmiert wurde. Wie FF Agent sonst antwortet, ist noch nicht
+  geprüft (Annahme A7).
 - Erfolg heißt „HTTP 2xx“, nicht unbedingt „von FF Agent verbucht“.
 - Kein Reauth-Flow: Eine ungültige Rückmelde-UUID erkennt die Integration erst an einem
   Fehler beim Zusagen, oder gar nicht, falls FF Agent auch dann mit 2xx antwortet
@@ -431,7 +437,8 @@ der letzten Rückmeldung (ohne Adresse).
 ein Reconfigure setzt den Zustand zurück.
 
 **Zusage meldet einen Fehler:** Prüfe die Internetverbindung und, ob in FF Agent für den
-aktuellen Einsatz eine Rückmeldung möglich ist. Prüfe außerdem, ob die Rückmelde-URL noch
+aktuellen Einsatz eine Rückmeldung möglich ist (die Person muss dafür alarmiert worden
+sein). Prüfe außerdem, ob die Rückmelde-URL noch
 gilt (*Neu konfigurieren*).
 
 **„Das ist keine gültige Rückmelde-URL“:** Die URL muss `/app2/missionreplies/` enthalten

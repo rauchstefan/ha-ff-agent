@@ -256,7 +256,7 @@ async def async_send_reply(
             configured = entry.options.get(CONF_DEFAULT_TRANSPORT)
             transport = configured_transport(configured)
         elif transport not in TRANSPORTS:
-            # Only verified values are sent (A9).
+            # Only the values named by FF Agent are sent (A9).
             raise ServiceValidationError(
                 translation_domain=DOMAIN,
                 translation_key="invalid_transport",

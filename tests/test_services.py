@@ -81,6 +81,32 @@ async def test_accept_uses_the_default_transport(
     assert dict(url.query) == {"transport": "CAR"}
 
 
+@pytest.mark.parametrize(
+    ("transport", "expected"),
+    [("car", "CAR"), ("feet", "FEET"), ("bicycle", "BICYCLE")],
+)
+async def test_accept_sends_each_transport_in_upper_case(
+    hass: HomeAssistant,
+    aioclient_mock: AiohttpClientMocker,
+    mock_config_entry: MockConfigEntry,
+    transport: str,
+    expected: str,
+) -> None:
+    """Every transport of the action reaches FF Agent as its upper case value."""
+    aioclient_mock.get(ACCEPT_URL)
+    await async_setup_entry(hass, mock_config_entry)
+
+    await _call(
+        hass,
+        "accept",
+        {"config_entry_id": mock_config_entry.entry_id, "transport": transport},
+    )
+
+    assert aioclient_mock.call_count == 1
+    url = aioclient_mock.mock_calls[0][1]
+    assert dict(url.query) == {"transport": expected}
+
+
 async def test_accept_with_transport_and_coordinates(
     hass: HomeAssistant,
     aioclient_mock: AiohttpClientMocker,
@@ -285,9 +311,13 @@ async def test_the_entry_is_required(
         # Out of range.
         ("accept", {"latitude": 90.5, "longitude": LONGITUDE}),
         ("accept", {"latitude": LATITUDE, "longitude": -180.5}),
-        # Only verified transports.
+        # Only the three transports of FF Agent, in lower case.
         ("accept", {"transport": "BIKE"}),
+        ("accept", {"transport": "bike"}),
+        ("accept", {"transport": "walk"}),
         ("accept", {"transport": "CAR"}),
+        ("accept", {"transport": "FEET"}),
+        ("accept", {"transport": "BICYCLE"}),
         # The rejection has no further fields.
         ("reject", {"transport": "CAR"}),
         ("reject", {"latitude": LATITUDE, "longitude": LONGITUDE}),

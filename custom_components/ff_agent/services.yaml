@@ -12,6 +12,8 @@ accept:
         select:
           options:
             - car
+            - feet
+            - bicycle
           translation_key: transport
     latitude:
       required: false

@@ -10,7 +10,7 @@
         },
         "data_description": {
           "name": "Label for this entry, for example your name.",
-          "reply_url": "Open the FF Agent web UI, go to Automation > Mission replies and copy the accept URL here. The URL is a secret: anyone who has it can accept or decline on your behalf. Do not share it."
+          "reply_url": "Open the FF Agent web UI, go to Persons > your name > section \"Übung/Einsatz\" (exercise/operation) > \"Weblinks für Einsatzmeldung\" (web links for mission reply) and copy the accept URL here. The URL only applies to you and to the currently active mission. It is a secret: anyone who has it can accept or decline on your behalf. Do not share it."
         }
       },
       "reconfigure": {
@@ -112,13 +112,15 @@
       "message": "FF Agent answered with HTTP status {status}. The reply was probably not recorded. Check in FF Agent whether a reply is possible for the current mission."
     },
     "invalid_transport": {
-      "message": "The mode of transport \"{transport}\" is not supported. Only car is supported."
+      "message": "The mode of transport \"{transport}\" is not supported. Supported are car, feet (on foot) and bicycle."
     }
   },
   "selector": {
     "transport": {
       "options": {
-        "car": "Car"
+        "car": "Car",
+        "feet": "On foot",
+        "bicycle": "Bicycle"
       }
     }
   },
@@ -133,7 +135,7 @@
         },
         "transport": {
           "name": "Mode of transport",
-          "description": "How the person gets to the mission. Only car is supported."
+          "description": "How the person gets to the mission: by car, on foot or by bicycle."
         },
         "latitude": {
           "name": "Latitude",

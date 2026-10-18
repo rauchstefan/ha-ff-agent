@@ -305,8 +305,9 @@ Persönliche Webhooks > Webhook hinzufügen.
      `CloudNotAvailable` und `ValueError` werden mit `contextlib.suppress` ignoriert.
 7. **Translations** (de/en):
    - `config.step.user`: Titel, Beschreibung und Feldtexte. `data_description` erklärt, wo
-     die URL in FF Agent steht: Web-UI > Automatisierung > Einsatzrückmeldungen, die
-     Zusage-URL kopieren. Hinweis: Die URL ist ein Geheimnis.
+     die URL in FF Agent steht: Web-UI > Personen > (eigener Name) > Bereich
+     „Übung/Einsatz“ > „Weblinks für Einsatzmeldung“, die Zusage-URL kopieren. Hinweis: Die URL ist ein
+     Geheimnis.
    - `config.error`: `invalid_reply_url`, `cloud_not_connected`
    - `config.abort`: `already_configured`
    - `config.create_entry.cloud|external|internal|path_only`:
@@ -814,7 +815,8 @@ nie statt.
    - Installation über HACS (Custom Repository) und manuell
      (`docs-installation-instructions`)
    - Einrichtung Schritt für Schritt (`docs-installation-parameters`):
-     1. In FF Agent unter Automatisierung > Einsatzrückmeldungen die Zusage-URL kopieren.
+     1. In FF Agent unter Personen > (eigener Name) > Bereich „Übung/Einsatz“ > „Weblinks für
+        Einsatzmeldung“ die Zusage-URL kopieren.
      2. In HA die Integration hinzufügen, Name und Zusage-URL eintragen.
      3. Die angezeigte Webhook-URL kopieren.
      4. In FF Agent unter Automatisierung > Persönliche Webhooks > „Webhook hinzufügen“
@@ -843,7 +845,7 @@ nie statt.
      - Filter und Zeitplan liegen in FF Agent
      - Token-Prüfung über Nabu Casa erst nach Bestätigung, dass der Header ankommt
      - Neustart setzt „Alarm aktiv“ zurück
-     - nur `CAR` als Verkehrsmittel belegt
+     - Verkehrsmittel: `CAR`, `FEET`, `BICYCLE` (nachgetragen, siehe CHANGELOG)
      - Rückmeldung gilt für den aktiven Einsatz
      - Erfolg heißt „HTTP 2xx“, nicht unbedingt „von FF Agent verbucht“
    - Optional: iCal über die Core-Integration „Remote Calendar“, mit Recorder-Hinweis

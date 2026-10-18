@@ -205,22 +205,58 @@ async def test_saving_the_defaults_keeps_the_current_options(
     assert mock_config_entry.runtime_data.alarm is alarm
 
 
-async def test_a_legacy_transport_is_offered_as_car(
-    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+@pytest.mark.parametrize(
+    ("stored", "expected"),
+    [("car", "CAR"), ("feet", "FEET"), ("bicycle", "BICYCLE")],
+)
+async def test_each_transport_can_be_chosen_in_the_form(
+    hass: HomeAssistant,
+    aioclient_mock: AiohttpClientMocker,
+    mock_config_entry: MockConfigEntry,
+    stored: str,
+    expected: str,
 ) -> None:
-    """The first version stored the API value; the form shows the lower case key."""
+    """The form offers all three transports; the next acceptance sends the choice."""
+    aioclient_mock.get(ACCEPT_URL)
+    await async_setup_entry(hass, mock_config_entry)
+    result = await _open(hass, mock_config_entry)
+    transport_key = next(
+        key for key in result["data_schema"].schema if key == CONF_DEFAULT_TRANSPORT
+    )
+    assert result["data_schema"].schema[transport_key].config["options"] == [
+        "car",
+        "feet",
+        "bicycle",
+    ]
+
+    saved = await _save(hass, result["flow_id"], {CONF_DEFAULT_TRANSPORT: stored})
+
+    assert saved["data"][CONF_DEFAULT_TRANSPORT] == stored
+    assert mock_config_entry.options[CONF_DEFAULT_TRANSPORT] == stored
+    await async_send_reply(hass, mock_config_entry, ReplyAction.ACCEPT)
+    url = aioclient_mock.mock_calls[0][1]
+    assert dict(url.query) == {"transport": expected}
+
+
+@pytest.mark.parametrize(
+    ("legacy", "key"), [("CAR", "car"), ("FEET", "feet"), ("BICYCLE", "bicycle")]
+)
+async def test_a_legacy_transport_is_offered_in_lower_case(
+    hass: HomeAssistant, mock_config_entry: MockConfigEntry, legacy: str, key: str
+) -> None:
+    """An option stored as the API value is shown and saved as the lower case key."""
     await async_setup_entry(hass, mock_config_entry)
     hass.config_entries.async_update_entry(
         mock_config_entry,
-        options={**mock_config_entry.options, CONF_DEFAULT_TRANSPORT: "CAR"},
+        options={**mock_config_entry.options, CONF_DEFAULT_TRANSPORT: legacy},
     )
     await hass.async_block_till_done()
     result = await _open(hass, mock_config_entry)
 
     saved = await _save(hass, result["flow_id"])
 
-    assert saved["data"][CONF_DEFAULT_TRANSPORT] == "car"
-    assert mock_config_entry.options[CONF_DEFAULT_TRANSPORT] == "car"
+    assert saved["data"][CONF_DEFAULT_TRANSPORT] == key
+    assert mock_config_entry.options[CONF_DEFAULT_TRANSPORT] == key
 
 
 @pytest.mark.parametrize(
@@ -231,7 +267,10 @@ async def test_a_legacy_transport_is_offered_as_car(
         {CONF_RESET_MINUTES: -5},
         {CONF_RESET_MINUTES: "soon"},
         {CONF_DEFAULT_TRANSPORT: "CAR"},
+        {CONF_DEFAULT_TRANSPORT: "FEET"},
+        {CONF_DEFAULT_TRANSPORT: "BICYCLE"},
         {CONF_DEFAULT_TRANSPORT: "bike"},
+        {CONF_DEFAULT_TRANSPORT: "walk"},
         {CONF_LOCATION_ENTITY: "light.kitchen"},
         {CONF_LOCATION_ENTITY: "not an entity"},
     ],
