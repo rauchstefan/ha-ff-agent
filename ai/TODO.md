@@ -187,6 +187,19 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
     Einzelfall.
 - **Definition of Done:** Zugriff eingerichtet und dokumentiert, oder bewusst verworfen.
 
+### 261018-configflow-aufteilen – config_flow.py aufteilen
+- **Status:** offen (nach Merge von PR rauchstefan/ha-ff-agent#6)
+- **Priorität:** niedrig
+- **Rolle(n):** entwickler, reviewer
+- **Beschreibung:** Hinweis des reviewers zu #6: `config_flow.py` hat rund 820 Zeilen.
+  - Vorschlag: `options_flow.py` (FFAgentOptionsFlow) abtrennen und ein ntfy-Mixin
+    (`_ntfy_*`, `async_step_ntfy*`, `_async_finish_ntfy`) bilden.
+  - Den gemeinsamen Reconfigure-Abschluss von `_async_finish_webhook` und
+    `_async_finish_ntfy` in eine Hilfsfunktion legen.
+  - Reines Refactoring, Tests bleiben unverändert grün.
+- **Zusätzlich (optional):** CI-Matrix auch gegen die Mindestversion HA 2026.3.0
+  (heute nur 2026.10.1).
+
 ### 261017-quality-todos – Offene Quality-Scale-Regeln
 - **Status:** offen
 - **Priorität:** niedrig
