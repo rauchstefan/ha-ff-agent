@@ -95,16 +95,26 @@ class AlarmManager:
 
         self.calls_total += 1
         self.last_call = call
+        self.async_handle_alarm(call.received_at)
+
+    @callback
+    def async_handle_alarm(self, received_at: datetime) -> bool:
+        """Handle an alarm of any source: a new alarm or a repetition.
+
+        Return True for a new alarm, False for a repetition or after the shutdown.
+        """
+        if self._closed:
+            return False
 
         last = self.last_alarm
         # A negative difference means the clock jumped back: that is a new alarm, not a
         # repetition.
-        if last is not None and ZERO <= call.received_at - last < DEDUP_WINDOW:
+        if last is not None and ZERO <= received_at - last < DEDUP_WINDOW:
             self.deduplicated_total += 1
-            _LOGGER.debug("Webhook call counted as a repetition of the last alarm")
-            return
+            _LOGGER.debug("Alarm counted as a repetition of the last alarm")
+            return False
 
-        self.last_alarm = call.received_at
+        self.last_alarm = received_at
         self.alarms_total += 1
         self.active = True
         self.active_until = dt_util.utcnow() + self._reset
@@ -116,10 +126,9 @@ class AlarmManager:
             self._hass, self._reset.total_seconds(), self._reset_job
         )
 
-        async_dispatcher_send(
-            self._hass, self._signal_alarm, AlarmEvent(call.received_at)
-        )
+        async_dispatcher_send(self._hass, self._signal_alarm, AlarmEvent(received_at))
         async_dispatcher_send(self._hass, self._signal_state)
+        return True
 
     @callback
     def _async_reset(self, _now: datetime) -> None:

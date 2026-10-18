@@ -19,6 +19,21 @@ Alle nennenswerten Änderungen an dieser Integration. Format angelehnt an
 - **Verkehrsmittel zu Fuß und Fahrrad:** Neben `car` (Auto) gibt es `feet` (zu Fuß) und
   `bicycle` (Fahrrad), in der Action `ff_agent.accept` und als Standard-Verkehrsmittel in
   den Optionen. An FF Agent gehen `CAR`, `FEET` und `BICYCLE`.
+- **Alarm über ntfy:** Ohne Home Assistant Cloud und ohne eigene Internetadresse kommt der
+  Alarm jetzt kostenlos über den Dienst ntfy. FF Agent ruft per GET eine ntfy-Adresse auf,
+  die Core-Integration ntfy holt die Meldung ab, und FF Agent in Home Assistant wertet ihre
+  Event-Entität aus. Neustarts, Reloads und Verbindungsabbrüche lösen in aller Regel keinen
+  Fehlalarm aus (seltene Ausnahmen siehe README, „Grenzen von ntfy“). Fehlt die
+  ntfy-Entität, erscheint eine Reparatur-Meldung; ein neues Abo mit demselben Thema
+  übernimmt die Einrichtung selbst. Im ntfy-Modus ist kein Webhook offen (ADR 0003).
+- **Verständliche Hilfe, wenn Home Assistant nicht erreichbar ist:** Die Einrichtung fragt
+  „Nutzt du Home Assistant Cloud?“ und führt je Weg mit nummerierten Schritten und Links
+  durch die Einrichtung. Statt einer Sackgasse gibt es „Erneut prüfen“, „Stattdessen ntfy
+  nutzen“ und „Trotzdem fortfahren“.
+- **Weg wechseln:** Unter „Neu konfigurieren“ lässt sich der Alarmweg in beide Richtungen
+  wechseln; „Neue geheime Adresse erzeugen“ gilt für Webhook und ntfy.
+- Bestehende Einträge werden beim Update automatisch übernommen und bleiben beim Webhook
+  (Config-Eintrag Version 1.2).
 
 ## [0.1.0] – 2026-10-17 (Vorabversion)
 

@@ -43,6 +43,7 @@ from homeassistant.data_entry_flow import FlowResultType
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers import issue_registry as ir
+from homeassistant.util import dt as dt_util
 from homeassistant.util.aiohttp import MockRequest
 
 from custom_components.ff_agent.const import (
@@ -54,12 +55,13 @@ from custom_components.ff_agent.const import (
     CONF_REQUIRE_TOKEN,
     CONF_RESET_MINUTES,
     DOMAIN,
+    ISSUE_NTFY_ENTITY_MISSING,
     ISSUE_TOKEN_REJECTED,
     TOKEN_HEADER,
 )
 from custom_components.ff_agent.diagnostics import async_get_config_entry_diagnostics
 
-from .common import patch_cloud
+from .common import add_ntfy_entity, add_ntfy_entry, fire_ntfy, patch_cloud
 from .const import (
     ACCEPT_URL,
     CLOUDHOOK_URL,
@@ -67,7 +69,11 @@ from .const import (
     LOCATION_ENTITY,
     LONGITUDE,
     NEW_CLOUDHOOK_URL,
+    NTFY_ENTITY_ID,
+    NTFY_SUBENTRY_ID,
     OTHER_ACCEPT_URL,
+    OTHER_NTFY_ENTITY_ID,
+    OTHER_NTFY_SUBENTRY_ID,
     OTHER_REPLY_ID,
     OTHER_REPLY_URL,
     REJECT_URL,
@@ -208,6 +214,10 @@ async def test_whole_life_cycle_leaks_no_secret(
         )
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"], {CONF_NAME: "Test Person", CONF_REPLY_URL: REPLY_URL}
+        )
+        assert result["type"] is FlowResultType.MENU
+        result = await hass.config_entries.flow.async_configure(
+            result["flow_id"], {"next_step_id": "cloud"}
         )
         await hass.async_block_till_done()
         assert result["type"] is FlowResultType.CREATE_ENTRY
@@ -409,3 +419,145 @@ async def test_whole_life_cycle_leaks_no_secret(
             )
         )
         assert _leaks(rendered, secrets) == []
+
+
+async def test_ntfy_life_cycle_leaks_no_topic(
+    hass: HomeAssistant,
+    freezer: FrozenDateTimeFactory,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """In ntfy mode, topic, entity ID and UUID stay where they belong.
+
+    Setup, message, options (reload), a new topic through reconfigure, a removed
+    ntfy entity (repair issue), diagnostics, unload and removal.
+    """
+    caplog.set_level(logging.DEBUG, logger="custom_components.ff_agent")
+    freezer.move_to("2026-10-17 12:00:00+00:00")
+    registry = er.async_get(hass)
+    secrets: dict[str, str] = {"reply ID": REPLY_ID, "reply URL": REPLY_URL}
+    artifacts: list[str] = []
+
+    async def snapshot() -> None:
+        """Look at diagnostics, issues and the states of the own entities."""
+        diagnostics = await async_get_config_entry_diagnostics(hass, entry)
+        artifacts.append(json.dumps(diagnostics, default=str))
+        for registry_entry in er.async_entries_for_config_entry(
+            registry, entry.entry_id
+        ):
+            state = hass.states.get(registry_entry.entity_id)
+            if state is not None:
+                artifacts.append(json.dumps(state.as_dict(), default=str))
+        for (domain, _id), issue in ir.async_get(hass).issues.items():
+            if domain == DOMAIN:
+                artifacts.append(repr(issue))
+
+    # 1. Config flow through ntfy.
+    result = await hass.config_entries.flow.async_init(
+        DOMAIN, context={"source": config_entries.SOURCE_USER}
+    )
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], {CONF_NAME: "Test Person", CONF_REPLY_URL: REPLY_URL}
+    )
+    for option in ("no_cloud", "ntfy"):
+        result = await hass.config_entries.flow.async_configure(
+            result["flow_id"], {"next_step_id": option}
+        )
+    topic = result["description_placeholders"]["ntfy_topic"]
+    ntfy_entry = add_ntfy_entry(hass, {NTFY_SUBENTRY_ID: topic})
+    ntfy_entity = add_ntfy_entity(hass, ntfy_entry)
+    secrets |= {
+        "topic": topic,
+        "publish URL": result["description_placeholders"]["ntfy_publish_url"],
+        "entity ID": NTFY_ENTITY_ID,
+        "entity UUID": ntfy_entity.id,
+    }
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], {"next_step_id": "ntfy_find"}
+    )
+    await hass.async_block_till_done()
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    entry = result["result"]
+    assert entry.state is ConfigEntryState.LOADED
+    await snapshot()
+
+    # 2. A message: the first value is the restored one, the next is an alarm.
+    fire_ntfy(hass, dt_util.utcnow() - timedelta(hours=1), {"topic": topic})
+    fire_ntfy(hass, attributes={"topic": topic})
+    await hass.async_block_till_done()
+    assert entry.runtime_data.alarm.alarms_total == 1
+    await snapshot()
+
+    # 3. Options: saving reloads the entry; the listener starts again.
+    options = await hass.config_entries.options.async_init(entry.entry_id)
+    assert options["step_id"] == "ntfy"
+    await hass.config_entries.options.async_configure(
+        options["flow_id"], {CONF_RESET_MINUTES: 10}
+    )
+    await hass.async_block_till_done()
+    freezer.tick(timedelta(minutes=1))
+    fire_ntfy(hass, attributes={"topic": topic})
+    await hass.async_block_till_done()
+    assert entry.runtime_data.alarm.alarms_total == 1
+    await snapshot()
+
+    # 4. Reconfigure with a new topic and its own subscription.
+    result = await hass.config_entries.flow.async_init(
+        DOMAIN,
+        context={
+            "source": config_entries.SOURCE_RECONFIGURE,
+            "entry_id": entry.entry_id,
+        },
+    )
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], {CONF_REGENERATE_WEBHOOK: True}
+    )
+    new_topic = result["description_placeholders"]["ntfy_topic"]
+    assert new_topic != topic
+    new_ntfy_entry = add_ntfy_entry(hass, {OTHER_NTFY_SUBENTRY_ID: new_topic})
+    new_entity = add_ntfy_entity(
+        hass, new_ntfy_entry, OTHER_NTFY_SUBENTRY_ID, OTHER_NTFY_ENTITY_ID
+    )
+    secrets |= {
+        "new topic": new_topic,
+        "new entity ID": OTHER_NTFY_ENTITY_ID,
+        "new entity UUID": new_entity.id,
+    }
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], {"next_step_id": "ntfy_find"}
+    )
+    await hass.async_block_till_done()
+    assert result["reason"] == "reconfigure_successful_ntfy"
+    assert new_topic in result["description_placeholders"]["ntfy_publish_url"]
+    await snapshot()
+
+    # 5. The ntfy entity disappears: the repair issue names only the title.
+    registry.async_remove(OTHER_NTFY_ENTITY_ID)
+    await hass.async_block_till_done()
+    issue_id = ISSUE_NTFY_ENTITY_MISSING.format(entry_id=entry.entry_id)
+    assert ir.async_get(hass).async_get_issue(DOMAIN, issue_id) is not None
+    await snapshot()
+
+    # 6. Unload and remove.
+    assert await hass.config_entries.async_unload(entry.entry_id)
+    await hass.async_block_till_done()
+    await snapshot()
+    assert await hass.config_entries.async_remove(entry.entry_id)
+    await hass.async_block_till_done()
+    assert ir.async_get(hass).async_get_issue(DOMAIN, issue_id) is None
+
+    ours = "\n".join(
+        _render(record)
+        for record in caplog.records
+        if record.name.startswith("custom_components.ff_agent")
+    )
+    assert "ntfy event accepted" in ours
+    assert _leaks(ours, secrets) == []
+    serious = "\n".join(
+        _render(record)
+        for record in caplog.records
+        if record.levelno >= logging.WARNING
+    )
+    assert _leaks(serious, secrets) == []
+    assert len(artifacts) >= 6
+    for artifact in artifacts:
+        assert _leaks(artifact, secrets) == []

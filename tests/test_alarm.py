@@ -325,3 +325,40 @@ async def test_call_after_the_clock_jumped_back_is_a_new_alarm(
         AlarmEvent(first.received_at),
         AlarmEvent(second.received_at),
     ]
+
+
+# --- Alarms of any source (ntfy) -----------------------
+
+
+async def test_handle_alarm_returns_whether_it_is_new(
+    hass: HomeAssistant,
+    freezer: FrozenDateTimeFactory,
+    manager: AlarmManager,
+    signals: Signals,
+) -> None:
+    """A new alarm returns True, a repetition False; no webhook call is counted."""
+    now = dt_util.utcnow()
+
+    assert manager.async_handle_alarm(now) is True
+    assert manager.async_handle_alarm(now + timedelta(seconds=5)) is False
+    await hass.async_block_till_done()
+
+    assert (manager.alarms_total, manager.deduplicated_total) == (1, 1)
+    assert (manager.calls_total, manager.last_call) == (0, None)
+    assert manager.active
+    assert manager.last_alarm == now
+    assert [event.received_at for event in signals.alarms] == [now]
+
+
+async def test_handle_alarm_after_shutdown_does_nothing(
+    hass: HomeAssistant, manager: AlarmManager, signals: Signals
+) -> None:
+    """After the shutdown no alarm is recognized and no timer starts."""
+    manager.async_shutdown()
+
+    assert manager.async_handle_alarm(dt_util.utcnow()) is False
+    await hass.async_block_till_done()
+
+    assert manager.alarms_total == 0
+    assert not manager.active
+    assert signals.alarms == []

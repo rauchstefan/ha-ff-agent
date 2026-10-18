@@ -3,7 +3,7 @@
     "step": {
       "user": {
         "title": "FF Agent einrichten",
-        "description": "Eine Einrichtung gehört zu genau einer Person. Es wird nichts an FF Agent gesendet.",
+        "description": "Eine Einrichtung gehört zu genau einer Person. Es wird nichts an FF Agent gesendet. Im nächsten Schritt wählst du, wie der Alarm bei Home Assistant ankommt.",
         "data": {
           "name": "Name",
           "reply_url": "Rückmelde-URL (Zusage)"
@@ -13,42 +13,121 @@
           "reply_url": "Öffne die FF-Agent-Web-UI, gehe zu Personen > dein Name > Bereich „Übung/Einsatz“ > „Weblinks für Einsatzmeldung“ und kopiere die Zusage-URL hierher. Die URL gilt nur für dich und für den jeweils aktiven Einsatz. Sie ist ein Geheimnis: Mit ihr kann jemand in deinem Namen zu- oder absagen. Gib sie niemandem weiter."
         }
       },
+      "alarm_source": {
+        "title": "Nutzt du Home Assistant Cloud?",
+        "description": "Bei einem Alarm muss FF Agent deinem Home Assistant Bescheid geben. Am einfachsten geht das mit **Home Assistant Cloud** von Nabu Casa (neuer Name ab Dezember 2026: Home Assistant Link). Das ist ein kostenpflichtiges Abo, das du zunächst kostenlos testen kannst. Wähle „Ja“ auch, wenn du es jetzt einrichten möchtest. Die Einrichtung zeigt dir die Schritte.\n\nOhne Home Assistant Cloud geht es kostenlos über den Dienst **ntfy**.\n\nDen Weg kannst du später unter „Neu konfigurieren“ wechseln.",
+        "menu_options": {
+          "cloud": "Ja (empfohlen)",
+          "no_cloud": "Nein"
+        }
+      },
+      "alarm_source_cloud": {
+        "title": "Nutzt du Home Assistant Cloud?",
+        "description": "Home Assistant Cloud ist bei dir bereits aktiv. Wähle „Ja“, dann bekommst du sofort die Adresse für FF Agent.\n\nMöchtest du Home Assistant Cloud dafür nicht nutzen, wähle „Nein“. Dann geht es kostenlos über den Dienst ntfy.\n\nDen Weg kannst du später unter „Neu konfigurieren“ wechseln.",
+        "menu_options": {
+          "cloud": "Ja (empfohlen)",
+          "no_cloud": "Nein"
+        }
+      },
+      "no_cloud": {
+        "title": "Kostenlose Alternative: ntfy",
+        "description": "Kein Problem. Ohne Home Assistant Cloud kommt der Alarm über den kostenlosen Dienst **ntfy**: FF Agent schickt den Alarm dorthin, und Home Assistant holt ihn ab. Home Assistant muss dafür nicht von außen erreichbar sein. Du brauchst zusätzlich die Integration ntfy; die Einrichtung zeigt dir jeden Schritt.\n\nDer Dienst ntfy sieht, wann du alarmiert wirst, aber keine Einsatzdaten.\n\nHast du eine eigene Internetadresse für Home Assistant (für Fortgeschrittene), kannst du stattdessen diese nutzen. Ist ein Home-Assistant-Cloud-Abo aktiv, verwendet die Einrichtung allerdings die Cloud-Adresse.",
+        "menu_options": {
+          "ntfy": "Weiter mit ntfy (kostenlos)",
+          "cloud": "Doch Home Assistant Cloud nutzen",
+          "own_address": "Ich habe eine eigene Internetadresse (für Fortgeschrittene)"
+        }
+      },
+      "cloud_setup": {
+        "title": "Home Assistant Cloud einrichten",
+        "description": "Dein Home Assistant ist von außen noch nicht erreichbar. FF Agent kann ihn bei einem Alarm deshalb noch nicht erreichen. So richtest du Home Assistant Cloud ein (neuer Name ab Dezember 2026: Home Assistant Link):\n\n1. [Home Assistant Cloud öffnen]({cloud_url}). Der Link öffnet die Cloud-Seite deines Home Assistant.\n2. Ein Konto anlegen oder dich anmelden. Das Abo ist kostenpflichtig, du kannst es aber zunächst kostenlos testen.\n3. Warten, bis dort „Verbunden“ steht. Das kann ein bis zwei Minuten dauern.\n4. Zurück in dieses Fenster und „Erneut prüfen“ wählen. Danach bekommst du die Adresse und die Einstellungen für FF Agent.\n\n**Eigene Internetadresse?** Trage sie unter [Einstellungen > System > Netzwerk]({network_url}) ein und wähle dann „Erneut prüfen“.\n\nOhne Home Assistant Cloud geht es auch kostenlos über ntfy. Mit „Trotzdem fortfahren“ funktionieren nur Zusagen und Absagen; den Alarm kannst du später unter „Neu konfigurieren“ nachrüsten.",
+        "menu_options": {
+          "cloud": "Erneut prüfen",
+          "ntfy": "Stattdessen ntfy nutzen (kostenlos)",
+          "webhook_anyway": "Trotzdem fortfahren (nur Zusagen und Absagen, Alarm später nachrüsten)"
+        }
+      },
+      "cloud_setup_retry": {
+        "title": "Noch nicht erreichbar",
+        "description": "Home Assistant ist weiterhin nur in deinem Heimnetz erreichbar. Prüfe bitte:\n\n1. Bist du in [Home Assistant Cloud]({cloud_url}) angemeldet, und ist das Abo oder der Test aktiv?\n2. Steht dort „Verbunden“? Nach dem Anmelden kann das ein bis zwei Minuten dauern.\n3. Oder, bei eigener Adresse: Steht unter [Netzwerk]({network_url}) eine Internetadresse, die mit https beginnt?\n\nDanach „Erneut prüfen“ wählen. Du kannst auch den kostenlosen Weg über ntfy nehmen.",
+        "menu_options": {
+          "cloud": "Erneut prüfen",
+          "ntfy": "Stattdessen ntfy nutzen (kostenlos)",
+          "webhook_anyway": "Trotzdem fortfahren (nur Zusagen und Absagen, Alarm später nachrüsten)"
+        }
+      },
+      "cloud_not_connected": {
+        "title": "Home Assistant Cloud ist nicht verbunden",
+        "description": "Home Assistant Cloud ist eingerichtet, aber gerade nicht verbunden.\n\n1. [Home Assistant Cloud öffnen]({cloud_url}).\n2. Prüfen, ob du angemeldet bist und dort „Verbunden“ steht.\n3. Zurück in dieses Fenster und „Erneut versuchen“ wählen.",
+        "menu_options": {
+          "cloud": "Erneut versuchen",
+          "ntfy": "Stattdessen ntfy nutzen (kostenlos)"
+        }
+      },
+      "ntfy": {
+        "title": "Alarm über ntfy einrichten",
+        "description": "So kommt der Alarm über ntfy an. Öffne die Links am besten in einem neuen Tab und lass dieses Fenster offen.\n\n**1. Integration ntfy hinzufügen:** [ntfy hinzufügen]({ntfy_setup_url}). Die Dienst-URL lässt du unverändert, Benutzername und Passwort bleiben leer. Ist ntfy schon eingerichtet, öffne stattdessen [die Integration ntfy]({ntfy_integration_url}) und wähle „Thema hinzufügen“.\n\n**2. Dieses Thema abonnieren:** Wähle „Thema eingeben“ und trage ein:\n\n- Thema: `{ntfy_topic}`\n- Anzeigename: `FF Agent Alarm` (sonst erscheint das geheime Thema als Name)\n\n**3. In FF Agent eintragen:** Web-UI > Automatisierung > Persönliche Webhooks > Webhook hinzufügen:\n\n- Type: Alarm, Webhooktyp: Generischer Webhook\n- Methode: GET\n- URL: `{ntfy_publish_url}`\n- Aktiv: an; auch für Testalarme: an (zum Testen); auch für Infoalarme: aus; Zeitplan: aus\n- Basis-Authentifizierung, Header, Inhalt und Query-Parameter: leer\n\n**4. Hier „Erledigt“ wählen.** Die Integration sucht dann die neue ntfy-Entität.\n\nDas Thema ist geheim wie ein Passwort. Wer es kennt, sieht deine Alarmzeitpunkte und kann falsche Alarme auslösen. Trage es nur in der Integration ntfy und in FF Agent ein.",
+        "menu_options": {
+          "ntfy_find": "Erledigt, Entität suchen",
+          "cloud": "Doch Home Assistant Cloud nutzen"
+        }
+      },
+      "ntfy_select": {
+        "title": "ntfy-Entität auswählen",
+        "description": "Die Integration hat das ntfy-Abo für das Thema `{ntfy_topic}` noch nicht gefunden.\n\n1. Prüfe in der [Integration ntfy]({ntfy_integration_url}), ob das Thema abonniert ist (Schritt 2 im vorigen Dialog).\n2. Warte ein paar Sekunden und wähle „Absenden“ mit leerem Feld. Die Integration sucht dann erneut.\n3. Oder wähle die Entität unten selbst aus, zum Beispiel ein Thema, das du schon abonniert hast.\n\nIn FF Agent gehört dann diese Adresse mit Methode GET: `{ntfy_publish_url}`. Wählst du ein anderes Thema, zeigt der nächste Dialog die passende Adresse.",
+        "data": {
+          "ntfy_entity": "ntfy-Entität"
+        },
+        "data_description": {
+          "ntfy_entity": "Die Event-Entität des abonnierten Themas. Leer lassen, damit die Integration erneut über das Thema sucht."
+        }
+      },
       "reconfigure": {
         "title": "FF Agent neu konfigurieren",
-        "description": "Hier kannst du die Rückmelde-URL ersetzen (zum Beispiel nach dem Neuerzeugen der UUID in FF Agent) oder den Webhook-Zugang neu erzeugen. Lässt du beide Felder unverändert, passiert nichts. Es wird nichts an FF Agent gesendet.\n\nSpeichern lädt die Integration neu; ein gerade aktiver Alarm wird dabei zurückgesetzt.",
+        "description": "Hier kannst du die Rückmelde-URL ersetzen (zum Beispiel nach dem Neuerzeugen in FF Agent), den Weg für den Alarm wechseln oder eine neue geheime Adresse erzeugen. Lässt du alles unverändert, passiert nichts. Es wird nichts an FF Agent gesendet.\n\nSpeichern lädt die Integration neu; ein gerade aktiver Alarm wird dabei zurückgesetzt.",
         "data": {
           "reply_url": "Neue Rückmelde-URL (Zusage)",
-          "regenerate_webhook": "Webhook-Zugang neu erzeugen"
+          "alarm_source": "Weg für den Alarm",
+          "regenerate_webhook": "Neue geheime Adresse erzeugen"
         },
         "data_description": {
           "reply_url": "Nur ausfüllen, wenn sich die URL geändert hat. Leer bedeutet: unverändert. Die bisherige URL wird nicht angezeigt, denn sie ist ein Geheimnis.",
-          "regenerate_webhook": "Erzeugt eine neue Webhook-Adresse und ein neues Token. Der alte Zugang funktioniert danach nicht mehr, beides musst du anschließend in FF Agent eintragen. Sinnvoll, wenn die Adresse bekannt geworden ist oder wenn erst nach der Einrichtung eine externe URL oder Nabu Casa dazugekommen ist."
+          "alarm_source": "Home Assistant Cloud bzw. eigene Internetadresse (empfohlen) oder der kostenlose Dienst ntfy. Beim Wechsel führt dich die Einrichtung Schritt für Schritt durch alles Nötige.",
+          "regenerate_webhook": "Erzeugt eine neue Adresse für FF Agent: beim direkten Weg eine neue Webhook-Adresse und ein neues Token, bei ntfy ein neues Thema. Die alte Adresse funktioniert danach nicht mehr; die neue musst du in FF Agent eintragen. Sinnvoll, wenn die Adresse bekannt geworden ist."
         }
       }
     },
     "error": {
       "invalid_reply_url": "Das ist keine gültige Rückmelde-URL. Sie enthält /app2/missionreplies/ und endet auf /accept oder /reject.",
-      "cloud_not_connected": "Home Assistant Cloud (Nabu Casa) ist eingerichtet, aber gerade nicht verbunden. Prüfe die Verbindung und versuche es erneut.",
-      "unknown": "Beim Erzeugen der Webhook-URL ist ein unerwarteter Fehler aufgetreten. Details stehen im Home-Assistant-Log, enthalten aber keine Adressen. Bitte versuche es erneut."
+      "ntfy_not_set_up": "Die Integration ntfy ist noch nicht eingerichtet. Richte sie zuerst ein (Schritt 1 im vorigen Dialog) und versuche es dann erneut.",
+      "ntfy_entity_not_found": "Kein ntfy-Abo mit diesem Thema gefunden. Prüfe Schritt 2 und versuche es nach einigen Sekunden erneut, oder wähle die Entität selbst aus.",
+      "ntfy_entity_invalid": "Diese Entität ist keine aktive Event-Entität der Integration ntfy. Wähle die Entität eines ntfy-Themas.",
+      "ntfy_entity_in_use": "Diese ntfy-Entität nutzt schon eine andere FF-Agent-Einrichtung. Jede Person braucht ein eigenes Thema."
     },
     "abort": {
       "already_in_progress": "Die Einrichtung für diese Rückmelde-URL läuft bereits.",
       "already_configured": "Für diese Rückmelde-URL ist FF Agent bereits eingerichtet.",
+      "unknown": "Beim Erzeugen der Webhook-URL ist ein unerwarteter Fehler aufgetreten. Details stehen im Home-Assistant-Log, enthalten aber keine Adressen. Bitte versuche es erneut.",
       "reconfigure_successful": "Die Konfiguration ist gespeichert. Falls sich etwas geändert hat, wird die Integration neu geladen.",
-      "reconfigure_successful_new_webhook": "Der Webhook-Zugang ist erneuert, der alte Zugang gilt nicht mehr. Ersetze jetzt in FF Agent (Web-UI > Automatisierung > Persönliche Webhooks) die URL des Webhooks durch diese: `{webhook_url}`\n\nNutzt du das Zusatz-Token, ersetze auch den Header: Name `{token_header}`, Wert `{token}`. Ist die Token-Pflicht eingeschaltet, lehnt Home Assistant Alarme ab, bis der neue Header in FF Agent steht.\n\nDie URL und das Token sind Geheimnisse. Trage sie nur in FF Agent ein.\n\nIst die Adresse nur eine interne oder nur ein Pfad, erreicht FF Agent sie nicht. Richte dann eine externe URL oder Nabu Casa ein und erzeuge den Zugang erneut.\n\nDie Integration wird neu geladen; ein gerade aktiver Alarm wird dabei zurückgesetzt."
+      "reconfigure_successful_new_webhook": "Der Alarm kommt direkt über das Internet. Trage in FF Agent (Web-UI > Automatisierung > Persönliche Webhooks) beim Webhook diese URL ein bzw. ersetze die bisherige: `{webhook_url}`\n\nNutzt du das Zusatz-Token, trage auch den Header ein: Name `{token_header}`, Wert `{token}`. Ist die Token-Pflicht eingeschaltet, lehnt Home Assistant Alarme ab, bis der Header in FF Agent steht.\n\nDie URL und das Token sind Geheimnisse. Trage sie nur in FF Agent ein.\n\nHast du vorher ntfy genutzt, lösche in FF Agent den Webhook mit der ntfy-Adresse.\n\nDie Integration wird neu geladen; ein gerade aktiver Alarm wird dabei zurückgesetzt.",
+      "reconfigure_successful_local": "**Gespeichert. Zusagen und Absagen funktionieren, Alarme kommen aber noch nicht an.** Dein Home Assistant ist nur in deinem Heimnetz erreichbar (`{webhook_url}`), FF Agent sitzt im Internet.\n\nSo rüstest du den Alarm später nach:\n\n1. [Home Assistant Cloud]({cloud_url}) einrichten (neuer Name ab Dezember 2026: Home Assistant Link) oder eine eigene Internetadresse eintragen.\n2. Bei dieser Einrichtung erneut „Neu konfigurieren“ öffnen und speichern. Du bekommst dann die Adresse und die Einstellungen für FF Agent.\n\nOder wähle unter „Neu konfigurieren“ den kostenlosen Weg über ntfy.\n\nHast du vorher ntfy genutzt, lösche in FF Agent den Webhook mit der ntfy-Adresse. Lege den neuen Webhook erst an, wenn du die neue Adresse hast.\n\nDie Integration wird neu geladen; ein gerade aktiver Alarm wird dabei zurückgesetzt.",
+      "reconfigure_successful_ntfy_topic_unknown": "Der Alarm kommt jetzt über ntfy. Das Thema der gewählten ntfy-Entität kann die Integration nicht lesen, deshalb zeigt sie keine Adresse an. Trage in FF Agent (Web-UI > Automatisierung > Persönliche Webhooks) Methode GET ein und als URL die Dienst-URL deines ntfy-Abos, gefolgt von /THEMA/trigger (THEMA ist das abonnierte Thema). Basis-Authentifizierung, Header, Inhalt und Query-Parameter bleiben leer.\n\nEinen bisherigen Webhook, der direkt auf Home Assistant zeigt, löschst du in FF Agent; er funktioniert nicht mehr.\n\nDie Integration wird neu geladen; ein gerade aktiver Alarm wird dabei zurückgesetzt.",
+      "reconfigure_successful_ntfy": "Der Alarm kommt jetzt über ntfy. Trage in FF Agent (Web-UI > Automatisierung > Persönliche Webhooks) diese Adresse ein: Methode GET, URL `{ntfy_publish_url}`, Basis-Authentifizierung, Header, Inhalt und Query-Parameter leer.\n\nEinen bisherigen Webhook, der direkt auf Home Assistant zeigt, löschst du in FF Agent; er funktioniert nicht mehr.\n\nDie URL enthält dein geheimes Thema. Trage sie nur in FF Agent ein.\n\nDie Integration wird neu geladen; ein gerade aktiver Alarm wird dabei zurückgesetzt."
     },
     "create_entry": {
-      "cloud": "Die Einrichtung ist abgeschlossen. Lege jetzt in FF Agent einen Webhook an (Web-UI > Automatisierung > Persönliche Webhooks > Webhook hinzufügen) mit diesen Werten:\n\n- Type: Alarm\n- Webhooktyp: Generischer Webhook\n- Methode: POST\n- URL: `{webhook_url}`\n- Aktiv: an\n- auch für Testalarme: an (zum Testen; Automationen laufen dann auch bei Testalarmen)\n- auch für Infoalarme: aus\n- Zeitplan aktiviert: aus\n- Basis-Authentifizierung, Inhalt und Query-Parameter: leer\n\nDie URL ist ein Geheimnis. Trage sie nur in FF Agent ein.",
-      "external": "Die Einrichtung ist abgeschlossen. Lege jetzt in FF Agent einen Webhook an (Web-UI > Automatisierung > Persönliche Webhooks > Webhook hinzufügen) mit diesen Werten:\n\n- Type: Alarm\n- Webhooktyp: Generischer Webhook\n- Methode: POST\n- URL: `{webhook_url}`\n- Aktiv: an\n- auch für Testalarme: an (zum Testen; Automationen laufen dann auch bei Testalarmen)\n- auch für Infoalarme: aus\n- Zeitplan aktiviert: aus\n- Basis-Authentifizierung, Inhalt und Query-Parameter: leer\n\nDie URL ist ein Geheimnis. Trage sie nur in FF Agent ein.",
-      "internal": "**Achtung:** Home Assistant hat keine externe URL und keine Nabu-Casa-Verbindung. FF Agent erreicht die folgende interne Adresse nicht: `{webhook_url}`\n\nRichte zuerst eine externe URL oder Nabu Casa ein. Öffne danach bei dieser Einrichtung das Menü „Neu konfigurieren“ und aktiviere „Webhook-Zugang neu erzeugen“, damit eine erreichbare Adresse entsteht. Erst dann in FF Agent einen Webhook anlegen (Web-UI > Automatisierung > Persönliche Webhooks > Webhook hinzufügen):\n\n- Type: Alarm\n- Webhooktyp: Generischer Webhook\n- Methode: POST\n- URL: die neue Adresse\n- Aktiv: an\n- auch für Testalarme: an (zum Testen; Automationen laufen dann auch bei Testalarmen)\n- auch für Infoalarme: aus\n- Zeitplan aktiviert: aus\n- Basis-Authentifizierung, Inhalt und Query-Parameter: leer",
-      "path_only": "**Achtung:** Home Assistant hat weder eine externe noch eine interne URL und keine Nabu-Casa-Verbindung. Die Einrichtung kennt nur den Pfad `{webhook_url}`, FF Agent kann damit nichts anfangen.\n\nRichte zuerst eine externe URL oder Nabu Casa ein. Öffne danach bei dieser Einrichtung das Menü „Neu konfigurieren“ und aktiviere „Webhook-Zugang neu erzeugen“, damit eine vollständige Adresse entsteht. Erst dann in FF Agent einen Webhook anlegen (Web-UI > Automatisierung > Persönliche Webhooks > Webhook hinzufügen):\n\n- Type: Alarm\n- Webhooktyp: Generischer Webhook\n- Methode: POST\n- URL: die neue Adresse\n- Aktiv: an\n- auch für Testalarme: an (zum Testen; Automationen laufen dann auch bei Testalarmen)\n- auch für Infoalarme: aus\n- Zeitplan aktiviert: aus\n- Basis-Authentifizierung, Inhalt und Query-Parameter: leer"
+      "cloud": "Geschafft: Home Assistant ist über Home Assistant Cloud erreichbar. Jetzt nur noch FF Agent einrichten:\n\n1. FF Agent im Browser öffnen: Web-UI > Automatisierung > Persönliche Webhooks > Webhook hinzufügen.\n2. Type: Alarm, Webhooktyp: Generischer Webhook.\n3. Methode: POST.\n4. URL: `{webhook_url}`\n5. Aktiv: an; auch für Testalarme: an (zum Testen; Automationen laufen dann auch bei Testalarmen); auch für Infoalarme: aus; Zeitplan aktiviert: aus.\n6. Basis-Authentifizierung, Inhalt und Query-Parameter leer lassen, speichern.\n7. Mit einem Testalarm prüfen: In Home Assistant springt „Alarm aktiv“ an.\n\nDie URL ist ein Geheimnis. Trage sie nur in FF Agent ein.",
+      "external": "Geschafft: Home Assistant ist über deine eigene Internetadresse erreichbar. Jetzt nur noch FF Agent einrichten:\n\n1. FF Agent im Browser öffnen: Web-UI > Automatisierung > Persönliche Webhooks > Webhook hinzufügen.\n2. Type: Alarm, Webhooktyp: Generischer Webhook.\n3. Methode: POST.\n4. URL: `{webhook_url}`\n5. Aktiv: an; auch für Testalarme: an (zum Testen; Automationen laufen dann auch bei Testalarmen); auch für Infoalarme: aus; Zeitplan aktiviert: aus.\n6. Basis-Authentifizierung, Inhalt und Query-Parameter leer lassen, speichern.\n7. Mit einem Testalarm prüfen: In Home Assistant springt „Alarm aktiv“ an.\n\nDie URL ist ein Geheimnis. Trage sie nur in FF Agent ein.",
+      "internal": "**Gespeichert. Zusagen und Absagen funktionieren, Alarme kommen aber noch nicht an.** Dein Home Assistant ist nur in deinem Heimnetz erreichbar (`{webhook_url}`), FF Agent sitzt im Internet.\n\nSo rüstest du den Alarm später nach:\n\n1. [Home Assistant Cloud]({cloud_url}) einrichten (neuer Name ab Dezember 2026: Home Assistant Link) oder eine eigene Internetadresse eintragen.\n2. Bei dieser Einrichtung „Neu konfigurieren“ öffnen und speichern. Du bekommst dann die Adresse und die Einstellungen für FF Agent.\n\nOder wähle unter „Neu konfigurieren“ den kostenlosen Weg über ntfy.\n\nLege den Webhook in FF Agent erst an, wenn du die neue Adresse hast.",
+      "path_only": "**Gespeichert. Zusagen und Absagen funktionieren, Alarme kommen aber noch nicht an.** Home Assistant kennt noch keine eigene Adresse, nur den Pfad `{webhook_url}`, und FF Agent sitzt im Internet.\n\nSo rüstest du den Alarm später nach:\n\n1. [Home Assistant Cloud]({cloud_url}) einrichten (neuer Name ab Dezember 2026: Home Assistant Link) oder eine eigene Internetadresse eintragen.\n2. Bei dieser Einrichtung „Neu konfigurieren“ öffnen und speichern. Du bekommst dann die Adresse und die Einstellungen für FF Agent.\n\nOder wähle unter „Neu konfigurieren“ den kostenlosen Weg über ntfy.\n\nLege den Webhook in FF Agent erst an, wenn du die neue Adresse hast.",
+      "ntfy_topic_unknown": "Geschafft: Die ntfy-Entität ist gewählt, die Einrichtung ist abgeschlossen.\n\nDas Thema dieser ntfy-Entität kann die Integration nicht lesen, deshalb zeigt sie keine Adresse an. Lege in FF Agent (Web-UI > Automatisierung > Persönliche Webhooks) einen Webhook an:\n\n- Type: Alarm\n- Webhooktyp: Generischer Webhook\n- Methode: GET\n- URL: die Dienst-URL deines ntfy-Abos, gefolgt von /THEMA/trigger (THEMA ist das abonnierte Thema)\n- Aktiv: an; Zeitplan aktiviert: aus\n- Basis-Authentifizierung, Header, Inhalt und Query-Parameter: leer\n\nDas Thema ist ein Geheimnis. Trage die URL nur in FF Agent ein.",
+      "ntfy": "Geschafft: Die ntfy-Entität ist gefunden, die Einrichtung ist abgeschlossen.\n\nPrüfe, ob der Webhook in FF Agent (Web-UI > Automatisierung > Persönliche Webhooks) genau diese Werte hat, und lege ihn sonst jetzt an:\n\n- Type: Alarm\n- Webhooktyp: Generischer Webhook\n- Methode: GET\n- URL: `{ntfy_publish_url}`\n- Aktiv: an\n- auch für Testalarme: an (zum Testen; Automationen laufen dann auch bei Testalarmen)\n- auch für Infoalarme: aus\n- Zeitplan aktiviert: aus\n- Basis-Authentifizierung, Header, Inhalt und Query-Parameter: leer\n\nDie URL enthält dein geheimes Thema. Trage sie nur in FF Agent ein.\n\n**Gut zu wissen:** Der Dienst ntfy sieht, wann du alarmiert wirst, aber keine Einsatzdaten. Ist Home Assistant oder die Internetverbindung beim Alarm gerade weg, geht der Alarm verloren, denn ntfy liefert ihn nicht nach."
     }
   },
   "options": {
     "step": {
       "init": {
         "title": "FF Agent: Optionen",
-        "description": "**Webhook-Zugang für FF Agent**\n\n- URL: `{webhook_url}`\n- Art der Adresse: `{url_kind}` (cloud = Nabu Casa, external = externe URL, internal = nur intern, path_only = nur Pfad)\n- Header-Name: `{token_header}`\n- Token: `{token}`\n\nIn FF Agent (Web-UI > Automatisierung > Persönliche Webhooks) gelten diese Werte: Type Alarm, Webhooktyp Generischer Webhook, Methode POST, die URL von oben, Aktiv an, Zeitplan aus, Basis-Authentifizierung, Inhalt und Query-Parameter leer. Den Header mit dem Token brauchst du nur, wenn unten „Zusatz-Token verlangen“ eingeschaltet ist.\n\nIst die Art `internal` oder `path_only`, erreicht FF Agent die Adresse nicht. Richte dann eine externe URL oder Nabu Casa ein und aktiviere im Menü „Neu konfigurieren“ dieser Einrichtung „Webhook-Zugang neu erzeugen“.\n\nURL und Token sind Geheimnisse. Gib sie niemandem weiter und teile keine Screenshots dieser Seite.\n\n**Speichern lädt die Integration neu; ein gerade aktiver Alarm wird dabei zurückgesetzt.**",
+        "description": "**Webhook-Zugang für FF Agent**\n\n- URL: `{webhook_url}`\n- Art der Adresse: `{url_kind}` (cloud = Home Assistant Cloud, external = eigene Internetadresse, internal = nur intern, path_only = nur Pfad)\n- Header-Name: `{token_header}`\n- Token: `{token}`\n\nIn FF Agent (Web-UI > Automatisierung > Persönliche Webhooks) gelten diese Werte: Type Alarm, Webhooktyp Generischer Webhook, Methode POST, die URL von oben, Aktiv an, Zeitplan aus, Basis-Authentifizierung, Inhalt und Query-Parameter leer. Den Header mit dem Token brauchst du nur, wenn unten „Zusatz-Token verlangen“ eingeschaltet ist.\n\nSteht oben bei der Art `internal` oder `path_only`, erreicht FF Agent die Adresse nicht. Richte [Home Assistant Cloud]({cloud_url}) ein und öffne dann „Neu konfigurieren“, oder wechsle dort zum kostenlosen Weg über ntfy.\n\nURL und Token sind Geheimnisse. Gib sie niemandem weiter und teile keine Screenshots dieser Seite.\n\n**Speichern lädt die Integration neu; ein gerade aktiver Alarm wird dabei zurückgesetzt.**",
         "data": {
           "require_token": "Zusatz-Token verlangen",
           "reset_minutes": "Rücksetzzeit „Alarm aktiv“",
@@ -57,6 +136,20 @@
         },
         "data_description": {
           "require_token": "Erst einschalten, wenn der Header in FF Agent eingetragen ist und ein Testalarm in der Diagnose `x-ff-agent-token` unter `header_names` zeigt. Empfohlen, wenn Automationen Tore oder Türen steuern. Aufrufe ohne gültiges Token werden dann abgelehnt.",
+          "reset_minutes": "Minuten ohne neuen Alarm, nach denen „Alarm aktiv“ wieder ausgeht (1 bis 1440).",
+          "default_transport": "Wird beim Zusagen mitgesendet, wenn die Action kein Verkehrsmittel angibt.",
+          "location_entity": "Optional: eine Person oder ein Gerät-Tracker, dessen Standort beim Zusagen mitgesendet wird. Leer lassen, um keinen Standort zu senden."
+        }
+      },
+      "ntfy": {
+        "title": "FF Agent: Optionen",
+        "description": "**Alarm über ntfy**\n\n- Entität: `{ntfy_entity}`\n- Adresse für FF Agent: `{ntfy_publish_url}` (Methode GET)\n\nIn FF Agent (Web-UI > Automatisierung > Persönliche Webhooks) gelten diese Werte: Type Alarm, Webhooktyp Generischer Webhook, Methode GET, die Adresse von oben, Aktiv an, Zeitplan aus, Basis-Authentifizierung, Header, Inhalt und Query-Parameter leer.\n\nEin Zusatz-Token gibt es bei ntfy nicht. Das Thema in der Adresse ist der einzige Schutz: Gib es niemandem weiter und teile keine Screenshots dieser Seite. Weg, Entität oder Thema änderst du unter „Neu konfigurieren“.\n\n**Speichern lädt die Integration neu; ein gerade aktiver Alarm wird dabei zurückgesetzt.**",
+        "data": {
+          "reset_minutes": "Rücksetzzeit „Alarm aktiv“",
+          "default_transport": "Standard-Verkehrsmittel",
+          "location_entity": "Standort-Entität"
+        },
+        "data_description": {
           "reset_minutes": "Minuten ohne neuen Alarm, nach denen „Alarm aktiv“ wieder ausgeht (1 bis 1440).",
           "default_transport": "Wird beim Zusagen mitgesendet, wenn die Action kein Verkehrsmittel angibt.",
           "location_entity": "Optional: eine Person oder ein Gerät-Tracker, dessen Standort beim Zusagen mitgesendet wird. Leer lassen, um keinen Standort zu senden."
@@ -116,6 +209,12 @@
     }
   },
   "selector": {
+    "alarm_source": {
+      "options": {
+        "webhook": "Home Assistant Cloud oder eigene Internetadresse (empfohlen)",
+        "ntfy": "Kostenloser Dienst ntfy"
+      }
+    },
     "transport": {
       "options": {
         "car": "Auto",
@@ -162,6 +261,10 @@
     "webhook_token_rejected": {
       "title": "FF-Agent-Webhook-Aufruf abgelehnt",
       "description": "Ein Aufruf des FF-Agent-Webhooks von \"{title}\" wurde abgelehnt, weil der Header X-FF-Agent-Token fehlte oder falsch war. Möglicherweise ging ein Alarm verloren.\n\nPrüfe in FF Agent (Web-UI > Automatisierung > Persönliche Webhooks), ob der Header X-FF-Agent-Token mit dem Token dieser Einrichtung eingetragen ist. Nutzt du Home Assistant Cloud (Nabu Casa) und der Header kommt nicht an, schalte in den Optionen dieser Einrichtung die Pflicht für das Zusatz-Token aus.\n\nDieser Hinweis verschwindet beim nächsten angenommenen Aufruf."
+    },
+    "ntfy_entity_missing": {
+      "title": "FF Agent: ntfy-Abo für den Alarm fehlt",
+      "description": "Die Einrichtung „{title}“ empfängt Alarme über ntfy, findet aber die ntfy-Entität nicht mehr, oder sie ist deaktiviert. Solange kommen keine Alarme an; Zusagen und Absagen funktionieren weiter.\n\nAbonniere dasselbe Thema in der Integration ntfy erneut, oder wähle unter „Neu konfigurieren“ dieser Einrichtung eine vorhandene ntfy-Entität bzw. den direkten Weg über das Internet.\n\nEin neues Abo mit demselben Thema übernimmt die Einrichtung selbst, dann verschwindet der Hinweis. Falls der Hinweis bleibt: Wähle unter „Neu konfigurieren“ die neue Entität."
     }
   }
 }

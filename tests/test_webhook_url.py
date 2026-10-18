@@ -12,9 +12,11 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry
 from custom_components.ff_agent.const import CONF_CLOUDHOOK, CONF_CLOUDHOOK_URL, DOMAIN
 from custom_components.ff_agent.webhook_url import (
     CloudhookUnavailable,
+    Reachability,
     UrlKind,
     async_create_webhook_url,
     async_get_webhook_url,
+    async_probe_reachability,
 )
 
 from .common import CloudNotAvailable, patch_cloud
@@ -162,3 +164,35 @@ async def test_unexpected_cloudhook_error_is_not_swallowed(
         cloud_mocks["get_or_create"].side_effect = RuntimeError
         with pytest.raises(RuntimeError):
             await async_create_webhook_url(hass, WEBHOOK_ID)
+
+
+# --- The reachability probe -----------------------
+
+
+@pytest.mark.parametrize("connected", [True, False])
+async def test_probe_with_an_active_subscription(
+    hass: HomeAssistant, connected: bool
+) -> None:
+    """An active subscription counts as cloud, connected or not; nothing is created."""
+    with patch_cloud(hass, connected=connected) as cloud_mocks:
+        assert async_probe_reachability(hass) is Reachability.CLOUD
+
+    cloud_mocks["get_or_create"].assert_not_called()
+
+
+@pytest.mark.usefixtures("external_url")
+async def test_probe_with_an_external_url(hass: HomeAssistant) -> None:
+    """An external URL counts, also with a cloud that has no subscription."""
+    assert async_probe_reachability(hass) is Reachability.EXTERNAL
+    with patch_cloud(hass, subscription=False) as cloud_mocks:
+        assert async_probe_reachability(hass) is Reachability.EXTERNAL
+
+    cloud_mocks["get_or_create"].assert_not_called()
+
+
+async def test_probe_without_any_address(hass: HomeAssistant) -> None:
+    """An internal URL does not count; neither does a cloud without subscription."""
+    await async_process_ha_core_config(hass, {"internal_url": INTERNAL_URL})
+    assert async_probe_reachability(hass) is Reachability.NONE
+    with patch_cloud(hass, subscription=False):
+        assert async_probe_reachability(hass) is Reachability.NONE

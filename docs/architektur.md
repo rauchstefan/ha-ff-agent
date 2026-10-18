@@ -3,15 +3,24 @@
 Gesamtbild der Integration. Gepflegt vom `architekt`. Einzelentscheidungen stehen als ADR
 in `docs/adr/`.
 
-Stand 2026-10-17. Der Integrationsweg ist in ADR 0002 entschieden (Status: angenommen).
+Stand 2026-10-17. Der Integrationsweg ist in ADR 0002 entschieden und durch ADR 0003
+(Alarmquelle Webhook oder ntfy) ergänzt (beide angenommen).
 Die Umsetzung folgt `docs/plaene/261017-mvp-alarm-zusage.md`. Der Code im Repo ist noch
 das Gerüst; die Struktur unten beschreibt das **Zielbild des MVP**.
 
 ## Integrationsweg (ADR 0002)
 
-- **Alarm-Eingang:** Ein persönlicher Webhook in FF Agent (Typ „Generischer Webhook“,
-  Methode GET oder POST, empfohlen POST) ruft einen HA-Webhook auf. Dabei wird nichts über
-  den Inhalt vorausgesetzt. HA antwortet sofort, denn FF Agent bricht nach 5 s ab.
+- **Alarm-Eingang, zwei Quellen (ADR 0003):** Je Eintrag ist genau eine aktiv
+  (`data.alarm_source`), beide speisen denselben `AlarmManager`.
+  - `webhook`: Ein persönlicher Webhook in FF Agent (Typ „Generischer Webhook“, Methode GET
+    oder POST, empfohlen POST) ruft einen HA-Webhook auf, über Home Assistant Cloud
+    (Cloudhook) oder eine externe URL. Dabei wird nichts über den Inhalt vorausgesetzt. HA
+    antwortet sofort, denn FF Agent bricht nach 5 s ab.
+  - `ntfy`: FF Agent ruft `GET https://<server>/<thema>/trigger` auf, die Core-Integration
+    ntfy hat das Thema abonniert, und ihre Event-Entität meldet die Nachricht. Die
+    Integration hört auf diese Entität (`ntfy_source.py`), ohne eigenen ntfy-Client. HA muss
+    dafür nicht von außen erreichbar sein. Im ntfy-Modus ist **kein** HA-Webhook
+    registriert und kein Cloudhook vorhanden.
 - **Zusatz-Token (optional, Standard aus):** Header `X-FF-Agent-Token`, Prüfung mit
   `hmac.compare_digest`. Bei Fehlschlag gibt es 401 und ein Repair-Issue. Es ist keine
   Pflicht, solange nicht belegt ist, dass Nabu Casa den Header durchreicht (A12).
@@ -33,7 +42,8 @@ custom_components/ff_agent/
   const.py           Konstanten, Optionen, Grenzwerte
   models.py          WebhookCall, AlarmEvent, ReplyResult, FFAgentData (runtime_data)
   reply_url.py       Rückmelde-URL prüfen, UUID und Host extrahieren
-  webhook_url.py     Webhook-URL: Cloudhook > extern > intern > Pfad
+  webhook_url.py     Webhook-URL: Cloudhook > extern > intern > Pfad; Erreichbarkeit prüfen
+  ntfy_source.py     ntfy-Abo suchen (Subentry/Registry), Listener mit Filterregel
   webhook.py         Handler; erfasst nur die Form des Aufrufs, keine Werte
   alarm.py           AlarmManager: Dedup (30 s), Rücksetz-Timer, Dispatcher-Signale
   reply.py           ReplyClient: GET, Timeout 10 s, Lock, Doppelklick-Schutz
@@ -45,7 +55,7 @@ custom_components/ff_agent/
   sensor.py          last_alarm, last_reply
   button.py          accept, reject
   diagnostics.py     redigierte Diagnose
-  config_flow.py     user, reconfigure, Options Flow
+  config_flow.py     user, Menüs je Alarmweg, reconfigure, Options Flow (je Quelle)
   icons.json
   translations/      de.json, en.json, handgeschrieben (kein strings.json bei Custom)
   brand/             icon.png (256 px), icon@2x.png (512 px), ab HA 2026.3
@@ -54,6 +64,18 @@ hacs.json            HACS-Metadaten
 ```
 
 Ein `coordinator.py` entfällt, weil es kein Polling gibt.
+
+Zweiter Eingang (ntfy-Modus), statt des Webhooks:
+
+```text
+ FF Agent --GET /<thema>/trigger--> ntfy.sh --WebSocket--> Integration ntfy (Core)
+                                                              | event.<ntfy-Entität>
+                                                              v  state_changed
+                                         ntfy_source.py: Filterregel 1-6 (ADR 0003, 3.)
+                                                              | async_handle_alarm(ts)
+                                                              v
+                                                     alarm.py: AlarmManager (wie oben)
+```
 
 ## Datenfluss
 
@@ -100,22 +122,45 @@ gibt es nicht.
 
 ## Config-Eintrag
 
-- **`data`** (alles Geheimnisse außer `reply_host` und `cloudhook`): `reply_id`,
-  `reply_host`, `webhook_id`, `cloudhook`, `cloudhook_url`, `header_token`
+- **Version 1.2** (`VERSION = 1`, `MINOR_VERSION = 2`). `async_migrate_entry` ergänzt bei
+  1.1-Einträgen `alarm_source = "webhook"` und die drei ntfy-Schlüssel mit `None`;
+  vorhandene Werte gewinnen. Einträge mit `version > 1` werden abgelehnt.
+- **`data`** (alles Geheimnisse außer `reply_host`, `cloudhook`, `alarm_source` und
+  `ntfy_server`): `reply_id`, `reply_host`, `alarm_source` (`webhook`/`ntfy`),
+  `webhook_id`, `cloudhook`, `cloudhook_url`, `header_token`, `ntfy_entity_uuid`
+  (Registry-UUID), `ntfy_topic`, `ntfy_server`. Webhook-ID und Token bleiben im
+  ntfy-Modus ruhend erhalten, damit ein Wechsel zurück ohne Sonderfall geht.
 - **`options`:** `require_token` (Standard aus), `reset_minutes`, `default_transport`
   (`car`, `feet` oder `bicycle`; an FF Agent gehen `CAR`, `FEET`, `BICYCLE`), `location_entity` (optional, `person` oder `device_tracker`)
 - **Flows:**
   - `user` mit Name und Rückmelde-URL; ohne Online-Test, weil jeder Test eine echte
-    Rückmeldung wäre
-  - `reconfigure`: Rückmelde-URL ändern, Webhook-Zugang (ID und Token) neu erzeugen
-  - Options Flow mit Anzeige der Webhook-URL, des Token-Headers und des Tokens
+    Rückmeldung wäre. Danach die Frage „Nutzt du Home Assistant Cloud?“ (Menü
+    `alarm_source` bzw. `alarm_source_cloud`) und je Pfad ein Einrichtungsdialog
+    (`cloud_setup`/`cloud_setup_retry`/`cloud_not_connected` bzw. `ntfy`, `ntfy_select`).
+    Plan: `docs/plaene/261017-alarmquelle-ntfy.md`.
+  - `reconfigure`: Rückmelde-URL ändern, Alarmweg wechseln, neue geheime Adresse
+    (Webhook-ID und Token bzw. ntfy-Thema) erzeugen
+  - Options Flow mit Anzeige der Webhook-URL, des Token-Headers und des Tokens; im
+    ntfy-Modus Schritt `ntfy` mit Entität und FF-Agent-Adresse, ohne Token-Schalter
+  - Repair-Issue `ntfy_entity_missing`, wenn die ntfy-Entität fehlt, fremd oder
+    deaktiviert ist; das Setup schlägt dann nicht fehl. Selbstheilung: Ein neues Abo
+    desselben Themas erzeugt eine neue Subentry und Entität. Beim Setup und bei jedem
+    Registry-Ereignis `create`, solange die Entität fehlt, sucht die Integration über das
+    gespeicherte Thema, übernimmt die neue Registry-UUID und lädt neu (nicht, wenn ein
+    anderer Eintrag die Entität nutzt)
+  - Reconfigure im ntfy-Modus ohne „Neue geheime Adresse“ und mit gültiger Entität
+    speichert nur die Rückmelde-URL, ohne ntfy-Dialog. Ein unlesbares Thema ergibt keine
+    URL im Abschluss (`ntfy_topic_unknown`); eine unerreichbare Webhook-Adresse im
+    Reconfigure den Abschluss `reconfigure_successful_local`
   - Abschlussdialog, Options-Text und README nennen die empfohlenen Feldwerte für FF Agent
     (ADR 0002, Abschnitt 5a)
   - Reauth erst nach Klärung von Annahme A7
 
 ## Datenschutz
 
-- **Geheimnisse:** Rückmelde-UUID, Webhook-ID bzw. Cloudhook-URL und das Header-Token.
+- **Geheimnisse:** Rückmelde-UUID, Webhook-ID bzw. Cloudhook-URL, das Header-Token, das
+  ntfy-Thema (samt der daraus gebildeten URL), die Registry-UUID und die `entity_id` der
+  ntfy-Entität. Die `entity_id` enthält das Thema, wenn das Abo keinen Anzeigenamen hat.
   Von eingehenden Headern wird nur der Name erfasst, nie der Wert. Die Geheimnisse stehen nie in
   Logs, Entitätsattributen oder `unique_id`s. In Diagnostics werden sie redigiert, ebenso
   Titel und `location_entity`.
@@ -150,6 +195,30 @@ gibt es nicht.
   Jede Options-Änderung und jedes Reconfigure mit Änderung lädt den Eintrag neu (`OptionsFlowWithReload`), damit
   springt „Alarm aktiv“ auf aus und das Dedup-Fenster ist offen. Das ist bewusst so
   (flüchtiger Zustand) und gehört in die Nutzerdoku.
+- **Fremde Event-Entität als Alarmquelle (ntfy, ADR 0003, 3.).** Die ntfy-Entität springt
+  bei Neustart, Reload und jedem Verbindungsabbruch auf `unavailable` und stellt dann den
+  alten Zeitstempel wieder her. `not_from: [unavailable, unknown]` reicht nicht: Er
+  verliert den ersten Alarm nach dem Anlegen des Abos (`unknown` -> Zeitstempel) und
+  Alarme in den bis zu 10 s nach einem Neuaufbau (die Entität geht dann direkt von
+  `unavailable` auf den **neuen** Wert). Die Regel in `ntfy_source.py`: ignorieren, wenn
+  kein Zeitstempel; `old_state` fehlt oder hat `restored: true` -> nur merken; gleich dem
+  zuletzt gesehenen -> ignorieren; älter als 60 s -> merken, ignorieren; sonst Alarm.
+- **Platzhalter-State `restored: true`:** Für Entitäten, die noch nicht geladen sind (beim
+  Start) und beim Entladen einer Integration schreibt HA einen State `unavailable` mit
+  Attribut `restored: true` (`RegistryEntry.write_unavailable_state`). Der Wert danach ist
+  der Restore, kein Alarm.
+- **Registry-Ereignisse der ntfy-Entität:** `update` liefert in `changes` die alten Werte,
+  bei Umbenennung zusätzlich `old_entity_id`. Die ntfy-Entität ändert ihre `capabilities`
+  (`event_types`) mit jeder Meldung; nur `entity_id` und `disabled_by` lösen einen Reload
+  aus.
+- **hassfest verbietet URLs in Übersetzungen**, auch bei Custom-Integrationen. Links
+  (My-Home-Assistant) kommen deshalb als `description_placeholders`.
+- **`async_show_menu` hat keine Vorauswahl.** Die Reihenfolge der Optionen ist die
+  Anzeigereihenfolge; die Empfehlung steht im Optionstext („Ja (empfohlen)“). Menüoptionen
+  sind Step-IDs; eine Step-ID kann mehrere Varianten haben (`alarm_source` und
+  `alarm_source_cloud`), ohne eigene Handler.
+- **HA 2026.10 lehnt selbst** Einträge mit höherer Hauptversion ab, bevor
+  `async_migrate_entry` aufgerufen wird; eine höhere Minor-Version wird geladen.
 - **Dedup und Uhrzeit:** Eine negative Zeitdifferenz (Uhr springt zurück, z. B. durch
   NTP) gilt als neuer Alarm. Der Rücksetz-Timer läuft über die monotone Loop-Uhr.
 

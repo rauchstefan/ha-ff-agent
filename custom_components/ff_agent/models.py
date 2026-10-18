@@ -11,6 +11,7 @@ from homeassistant.config_entries import ConfigEntry
 
 if TYPE_CHECKING:
     from .alarm import AlarmManager
+    from .ntfy_source import NtfyAlarmSource
     from .reply import ReplyClient
 
 type BodyKind = Literal["empty", "json", "form", "text", "binary"]
@@ -98,12 +99,49 @@ class ReplyResult:
         }
 
 
+@dataclass(frozen=True, slots=True)
+class NtfySubscription:
+    """An ntfy subscription as read from the entity registry and the ntfy entry.
+
+    Topic and entity ID are secrets (the entity ID contains the topic if the
+    subscription has no display name): never log them.
+    """
+
+    entity_id: str
+    entity_uuid: str
+    topic: str | None  # None if it cannot be read
+    server: str | None  # None if it cannot be read
+
+
+@dataclass(frozen=True, slots=True)
+class NtfyEventShape:
+    """The shape of an accepted ntfy message, without any value."""
+
+    received_at: datetime
+    age_seconds: float
+    message_length: int | None
+    has_title: bool
+    tags_count: int | None
+
+    def as_diagnostics(self) -> dict[str, Any]:
+        """Return the shape as JSON-serializable data for the diagnostics."""
+        return {
+            "received_at": self.received_at.isoformat(),
+            "age_seconds": self.age_seconds,
+            "message_length": self.message_length,
+            "has_title": self.has_title,
+            "tags_count": self.tags_count,
+        }
+
+
 @dataclass(slots=True)
 class FFAgentData:
     """Runtime data of a config entry."""
 
     alarm: AlarmManager
     reply: ReplyClient
+    # The listener on the ntfy entity; None in webhook mode or without a valid entity.
+    source: NtfyAlarmSource | None = None
 
 
 type FFAgentConfigEntry = ConfigEntry[FFAgentData]

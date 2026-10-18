@@ -19,6 +19,50 @@ CONF_HEADER_TOKEN: Final = "header_token"  # str, secret, always generated
 CONF_REPLY_URL: Final = "reply_url"  # flow field only, never stored
 CONF_REGENERATE_WEBHOOK: Final = "regenerate_webhook"  # flow field only
 
+# Where the alarm comes from (ADR 0003). Exactly one source is active per entry.
+CONF_ALARM_SOURCE: Final = "alarm_source"
+SOURCE_WEBHOOK: Final = "webhook"
+SOURCE_NTFY: Final = "ntfy"
+ALARM_SOURCES: Final = (SOURCE_WEBHOOK, SOURCE_NTFY)  # choice in the reconfigure flow
+
+# Menus of the config flow. The options are step IDs, the order is the display order
+# (menus have no preselection, so the recommended option comes first).
+MENU_ALARM_SOURCE: Final = ["cloud", "no_cloud"]
+MENU_NO_CLOUD: Final = ["ntfy", "cloud", "own_address"]
+MENU_CLOUD_SETUP: Final = ["cloud", "ntfy", "webhook_anyway"]
+MENU_CLOUD_NOT_CONNECTED: Final = ["cloud", "ntfy"]
+MENU_NTFY: Final = ["ntfy_find", "cloud"]
+
+CONF_NTFY_ENTITY_UUID: Final = "ntfy_entity_uuid"  # registry UUID, secret
+CONF_NTFY_TOPIC: Final = "ntfy_topic"  # secret
+CONF_NTFY_SERVER: Final = "ntfy_server"  # only shown, not secret
+CONF_NTFY_ENTITY: Final = "ntfy_entity"  # flow field only (entity ID), never stored
+NTFY_PUBLISH_URL: Final = "ntfy_publish_url"  # placeholder, contains the topic
+
+# Keys of the core integration ntfy. Not imported: homeassistant.components.ntfy
+# imports aiontfy. Guarded by tests/test_ntfy_contract.py.
+NTFY_DOMAIN: Final = "ntfy"
+NTFY_SUBENTRY_TYPE: Final = "topic"
+NTFY_CONF_TOPIC: Final = "topic"
+NTFY_CONF_URL: Final = "url"
+NTFY_DEFAULT_SERVER: Final = "https://ntfy.sh/"
+NTFY_TOPIC_BYTES: Final = 16  # secrets.token_hex -> 32 characters, 128 bits
+# A timestamp of the ntfy entity older than this is a restored value, not an alarm.
+NTFY_MAX_EVENT_AGE_SECONDS: Final = 60
+
+ISSUE_NTFY_ENTITY_MISSING: Final = "ntfy_entity_missing_{entry_id}"
+
+# My Home Assistant links. Translations must not contain URLs (hassfest), so they are
+# passed as description placeholders.
+MY_CLOUD_URL: Final = "https://my.home-assistant.io/redirect/cloud/"
+MY_NETWORK_URL: Final = "https://my.home-assistant.io/redirect/network/"
+MY_NTFY_SETUP_URL: Final = (
+    "https://my.home-assistant.io/redirect/config_flow_start/?domain=ntfy"
+)
+MY_NTFY_INTEGRATION_URL: Final = (
+    "https://my.home-assistant.io/redirect/integration/?domain=ntfy"
+)
+
 CONF_RESET_MINUTES: Final = "reset_minutes"
 CONF_DEFAULT_TRANSPORT: Final = "default_transport"
 CONF_LOCATION_ENTITY: Final = "location_entity"
@@ -95,4 +139,10 @@ TO_REDACT: Final = {
     "unique_id",
     "title",
     CONF_LOCATION_ENTITY,
+    CONF_NTFY_TOPIC,
+    CONF_NTFY_ENTITY_UUID,
+    CONF_NTFY_ENTITY,
+    NTFY_PUBLISH_URL,
+    # The entity ID of the ntfy entity contains the topic if it has no display name.
+    "entity_id",
 }
