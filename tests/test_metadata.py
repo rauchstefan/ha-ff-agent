@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import base64
 import json
 import re
 import struct
@@ -24,6 +25,11 @@ from custom_components.ff_agent.const import (
 
 ROOT = Path(__file__).parent.parent
 INTEGRATION = ROOT / "custom_components" / DOMAIN
+# Firmenname des Herstellers von FF Agent, absichtlich nicht im Klartext
+# (öffentliches Repo). Die Prüfung ist eine case-insensitive Teilstring-Suche.
+_FORBIDDEN_VENDOR_WORDS = tuple(
+    base64.b64decode(word).decode() for word in ("bWFja295", "Y29uc3VsdGluZw==")
+)
 # Menus of the config flow: step ID -> options.
 MENUS = {
     "alarm_source": MENU_ALARM_SOURCE,
@@ -532,7 +538,7 @@ def test_ntfy_issue_names_the_entry(language: str) -> None:
 def test_texts_name_no_vendor_and_no_price(language: str) -> None:
     """No company name of FF Agent and no price in the texts."""
     text = (INTEGRATION / "translations" / f"{language}.json").read_text("utf-8")
-    for forbidden in ("mackoy", "consulting", "€", "eur ", "$"):
+    for forbidden in (*_FORBIDDEN_VENDOR_WORDS, "€", "eur ", "$"):
         assert forbidden not in text.lower()
     assert "Home Assistant Link" in text
 
@@ -552,7 +558,7 @@ def test_no_vendor_name_in_code_and_user_docs() -> None:
     assert len(files) > 10
     for path in files:
         text = path.read_text("utf-8").lower()
-        for forbidden in ("mackoy", "consulting"):
+        for forbidden in _FORBIDDEN_VENDOR_WORDS:
             assert forbidden not in text, f"{forbidden!r} found in {path.name}"
 
 
