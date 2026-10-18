@@ -35,6 +35,44 @@ unter Umständen keinen oder alten Text.
 - **Link „Besuchen“ in der Geräte-Info:** Das Gerät verweist nicht mehr auf eine Website.
   Der Link bestehender Geräte verschwindet nach dem Neustart bzw. Neuladen der Integration.
 
+### Dokumentation
+
+- Die README enthält jetzt die vollständige Anleitung auf Deutsch und auf Englisch in einer
+  Datei (Sprachumschalter am Anfang) und ist redaktionell überarbeitet.
+
+### English
+
+**Update:** After updating, restart Home Assistant **and hard-reload the page in the
+browser** (Ctrl+F5, on a Mac Cmd+Shift+R). In the companion app, restart the app or clear
+the frontend cache in the app settings. Otherwise the dialogs of the integration may show
+no text or old text.
+
+#### Added
+
+- **Reset alarm:** A new button "Reset alarm" and a new action `ff_agent.reset_alarm` turn
+  "Alarm active" off right away and stop the reset time. "Last alarm" stays, and the
+  30-second window against duplicate alarms keeps running. Without an active alarm nothing
+  happens; nothing is sent to FF Agent.
+- **Transport and location during setup:** After the mission reply URL, the setup now asks
+  for the default transport and the optional location entity (a person or device tracker).
+  Both could previously only be set under "Configure" and stay changeable there.
+
+#### Changed
+
+- **Reconfigure:** The choice of the alarm way is now called "How does Home Assistant
+  receive the alarm?" and names the requirements (a cloud subscription or an address
+  reachable from the internet, or free through ntfy without a subscription).
+- **Shorter ntfy ending:** The final dialog only repeats the values for FF Agent if the
+  chosen entity has another address than the dialog before. Otherwise a pointer to the test
+  alarm is enough.
+- The README now contains the complete guide in German and English in one file, with a
+  language switch at the top, and has been edited throughout.
+
+#### Removed
+
+- **"Visit" link in the device info:** The device no longer points to a website. The link
+  on existing devices disappears after a restart or reload of the integration.
+
 ## [0.2.0] – 2026-10-18 (Vorabversion)
 
 Zweite Vorabversion. **Noch nicht gegen ein echtes FF Agent getestet.** Besonders der
