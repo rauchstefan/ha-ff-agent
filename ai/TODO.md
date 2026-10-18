@@ -95,6 +95,19 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
 - **Verweise:** Chat vom 2026-10-18 (Screenshot nicht im Repo, enthält ein geheimes
   Thema); `config_flow.py` (`async_step_ntfy_select`), `translations/*.json`
 
+### 261018-geraet-ohne-link – Kein Link zu FF Agent in der Dienst-Info
+- **Status:** offen (wartet auf Go des Nutzers)
+- **Priorität:** niedrig
+- **Rolle(n):** entwickler, tester, reviewer
+- **Beschreibung:** Wunsch des Nutzers: Die Karte „Dienst-Informationen“ des Geräts zeigt
+  den Button „Besuchen“ mit Link zur Produkt-Website. Der Link soll dort nicht stehen.
+  Ursache: `configuration_url=CONFIGURATION_URL` in `entity.py` (`DeviceInfo`).
+- **Definition of Done:** `DeviceInfo` ohne `configuration_url`. Die Konstante entfällt,
+  wenn sie sonst nicht genutzt wird. Test `tests/test_entities.py` (prüft bisher die URL)
+  angepasst, er verlangt jetzt `configuration_url is None`. CHANGELOG-Eintrag.
+- **Verweise:** Chat vom 2026-10-18; `custom_components/ff_agent/entity.py`,
+  `const.py`, `tests/test_entities.py`
+
 ### 261018-recherche-namen – Namen Dritter in öffentlichen Recherche-Dateien
 - **Status:** offen (Entscheidung des Nutzers)
 - **Priorität:** mittel
