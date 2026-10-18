@@ -55,11 +55,18 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
   die `config`-Übersetzungen von v0.1.0 noch im Speicher hält, weil nach dem HACS-Update
   kein Neustart erfolgte. Neue Schritte haben dann keine Texte, und das Feld
   `alarm_source` erscheint mit seinem Schlüssel statt „Weg für den Alarm“.
-  - Schritt 1: Nutzer startet Home Assistant neu (ggf. Browser-Cache leeren) und prüft
-    erneut.
-  - Bleiben die Texte leer, ist es ein echter Fehler: Übersetzungsschlüssel,
-    `description_placeholders` (`_link_placeholders()`) und `strings.json`/`en.json`
-    prüfen.
+  - **Nachtrag 2026-10-18:** Der Nutzer bestätigt, dass Home Assistant nach dem Update
+    neu gestartet wurde. Die Neustart-Hypothese ist damit verworfen. Geprüft: Der Tag
+    v0.2.0 enthält die neuen Texte (`alarm_source_cloud` vorhanden, „Webhook-Zugang neu
+    erzeugen“ nicht mehr), `manifest.json` steht auf 0.2.0.
+  - Offene Hypothesen für die Analyse:
+    - Browser/Frontend hält alte Übersetzungen (Gegenprobe: harter Reload, anderer
+      Browser oder privates Fenster)
+    - Auf der Instanz liegen andere Dateien als im Tag (Gegenprobe: `translations/de.json`
+      unter `custom_components/ff_agent/` auf der Instanz ansehen)
+    - Echter Fehler in Übersetzungsschlüsseln oder `description_placeholders`
+      (`_link_placeholders()`), etwa ein ungültiger Platzhalter, der das Frontend die
+      ganze Übersetzung verwerfen lässt. Ohne `strings.json`, nur `translations/`.
   - Unabhängig davon prüfen, ob README/Release-Notes nach einem Update auf den nötigen
     Neustart hinweisen; sonst Hinweis ergänzen.
 - **Definition of Done:** Ursache geklärt. Nach Update plus Neustart zeigen alle Menüs
