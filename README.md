@@ -121,7 +121,9 @@ Schritt für Schritt durch den gewählten Weg. Wechseln kannst du später jederz
    - Home Assistant Cloud verbunden: Es entsteht eine Cloudhook-URL, zum Beispiel
      `https://hooks.nabu.casa/<...>`.
    - eigene Internetadresse (unter *Einstellungen → System → Netzwerk*):
-     `https://<deine-externe-url>/api/webhook/<WEBHOOK_ID>`.
+     `https://<deine-externe-url>/api/webhook/<WEBHOOK_ID>`. Ist zugleich ein
+     Home-Assistant-Cloud-Abo aktiv, verwendet die Einrichtung die Cloud-Adresse, auch
+     über die Option „Ich habe eine eigene Internetadresse“.
    - Home Assistant Cloud eingerichtet, aber nicht verbunden: Der Dialog zeigt, was zu
      prüfen ist, mit „Erneut versuchen“ und „Stattdessen ntfy nutzen“.
    - Nichts davon: Der Einrichtungsdialog „Home Assistant Cloud einrichten“ führt in
@@ -170,7 +172,7 @@ Der Einrichtungsdialog „Alarm über ntfy einrichten“ zeigt ein zufälliges, 
 **Thema** (32 Zeichen) und die fertige Adresse für FF Agent. Öffne die Links im Dialog am
 besten in einem neuen Tab und lass den Dialog offen.
 
-1. **Integration ntfy hinzufügen** (Link im Dialog). Die Dienstadresse `https://ntfy.sh`
+1. **Integration ntfy hinzufügen** (Link im Dialog). Die Dienst-URL `https://ntfy.sh`
    lässt du unverändert, Benutzername und Passwort bleiben leer. Ist ntfy schon
    eingerichtet, öffne die Integration ntfy und wähle „Thema hinzufügen“.
 2. **Thema abonnieren:** „Thema eingeben“, das angezeigte Thema einfügen, als Anzeigename
@@ -251,9 +253,11 @@ ist wieder offen). Ändere Optionen deshalb nicht mitten in einem Einsatz.
 - **Weg für den Alarm:** Home Assistant Cloud bzw. eigene Internetadresse oder ntfy. Beim
   Wechsel führt dich derselbe Einrichtungsdialog wie bei der Einrichtung durch die
   Schritte. Danach den alten Webhook in FF Agent löschen. Ein Cloudhook wird beim Wechsel
-  zu ntfy gelöscht.
+  zu ntfy gelöscht. Bleibst du bei ntfy und änderst nur die Rückmelde-URL, speichert der
+  Dialog direkt, ohne den ntfy-Dialog.
 - **Neue geheime Adresse erzeugen:** Beim direkten Weg eine neue Webhook-Adresse und ein
-  neues Token, bei ntfy ein neues Thema. Die alte Adresse funktioniert danach nicht mehr.
+  neues Token, bei ntfy ein neues Thema (die ruhende Webhook-Adresse und das Token werden
+  dabei ebenfalls erneuert). Die alte Adresse funktioniert danach nicht mehr.
   Der Dialog zeigt die neuen Werte; trage sie in FF Agent ein. Ist die Token-Pflicht an,
   lehnt Home Assistant Alarme ab, bis der neue Header in FF Agent steht. Sinnvoll, wenn die
   Adresse bekannt geworden ist.
@@ -491,6 +495,12 @@ zwei Sensoren, zwei Buttons).
 - Bei sehr vielen gleichzeitigen Alarmen ist ein Ratenlimit von ntfy.sh möglich
   (ungeprüft).
 - Kein Zusatz-Token: Wer Tore oder Türen an den Alarm hängt, nimmt Weg A mit Token.
+- Rest-Risiko Doppelalarm: Wird FF Agent in Home Assistant neu geladen (Optionen, Neu
+  konfigurieren), während die ntfy-Verbindung gerade unterbrochen ist, kann ein Alarm aus
+  den letzten 60 Sekunden ein zweites Mal als Alarm zählen.
+- Rest-Risiko Verlust: Kommt eine Meldung genau in dem Moment an, in dem FF Agent startet
+  oder neu lädt (bevor die Integration der ntfy-Entität zuhört), kann ein Alarm verloren
+  gehen. Das Zeitfenster ist sehr klein.
 - Der Weg über ntfy ist noch nicht gegen ein echtes FF Agent getestet.
 
 ## Optional: iCal über Remote Calendar
@@ -546,8 +556,10 @@ der letzten Rückmeldung (ohne Adresse).
 **Alarm über ntfy kommt nicht an**
 
 - Reparatur-Meldung „ntfy-Abo für den Alarm fehlt“: Die ntfy-Entität ist gelöscht oder
-  deaktiviert. Thema in der Integration ntfy erneut abonnieren oder unter *Neu
-  konfigurieren* eine vorhandene ntfy-Entität wählen.
+  deaktiviert. Dasselbe Thema in der Integration ntfy erneut abonnieren; die Einrichtung
+  findet das neue Abo über das Thema selbst, lädt neu, und die Meldung verschwindet. Falls
+  der Hinweis bleibt (etwa bei einem anderen Thema): unter *Neu konfigurieren* die neue
+  Entität wählen.
 - Die ntfy-Entität steht auf „nicht verfügbar“: Die Integration ntfy hat keine Verbindung.
   Das zeigt die Integration ntfy selbst.
 - Diagnose, Block `ntfy`: `entity_found`, `entity_available`, `events_total` und

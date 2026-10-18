@@ -143,7 +143,15 @@ gibt es nicht.
   - Options Flow mit Anzeige der Webhook-URL, des Token-Headers und des Tokens; im
     ntfy-Modus Schritt `ntfy` mit Entität und FF-Agent-Adresse, ohne Token-Schalter
   - Repair-Issue `ntfy_entity_missing`, wenn die ntfy-Entität fehlt, fremd oder
-    deaktiviert ist; das Setup schlägt dann nicht fehl
+    deaktiviert ist; das Setup schlägt dann nicht fehl. Selbstheilung: Ein neues Abo
+    desselben Themas erzeugt eine neue Subentry und Entität. Beim Setup und bei jedem
+    Registry-Ereignis `create`, solange die Entität fehlt, sucht die Integration über das
+    gespeicherte Thema, übernimmt die neue Registry-UUID und lädt neu (nicht, wenn ein
+    anderer Eintrag die Entität nutzt)
+  - Reconfigure im ntfy-Modus ohne „Neue geheime Adresse“ und mit gültiger Entität
+    speichert nur die Rückmelde-URL, ohne ntfy-Dialog. Ein unlesbares Thema ergibt keine
+    URL im Abschluss (`ntfy_topic_unknown`); eine unerreichbare Webhook-Adresse im
+    Reconfigure den Abschluss `reconfigure_successful_local`
   - Abschlussdialog, Options-Text und README nennen die empfohlenen Feldwerte für FF Agent
     (ADR 0002, Abschnitt 5a)
   - Reauth erst nach Klärung von Annahme A7
