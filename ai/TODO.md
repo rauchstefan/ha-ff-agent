@@ -31,6 +31,21 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
 
 ## Offen
 
+### 261018-release-0-2-0 – Release v0.2.0 als Vorabversion
+- **Status:** in Arbeit (lokal-2026-10-16-hacs-recherche, 2026-10-18)
+- **Priorität:** hoch
+- **Rolle(n):** entwickler, tester, reviewer, Projektleiter
+- **Beschreibung:** Auftrag des Nutzers: „Bereite ein Release v0.2.0 als Vorabversion
+  vor.“ Inhalt:
+  - Versionssprung im Manifest auf 0.2.0
+  - CHANGELOG `[0.2.0]`
+  - README-Hinweise auf 0.2.0
+  - neutraler Hersteller (261017-geraeteinfo-hersteller)
+
+  Tag und GitHub-Release erst nach ausdrücklichem Go des Nutzers.
+- **Definition of Done:** Release-PR gemergt (Gate bestanden), Go des Nutzers,
+  Pre-Release v0.2.0 auf grünem Commit.
+
 ### 261016-repo-oeffentlich – Entscheidung: Repo öffentlich machen
 - **Status:** erledigt (2026-10-17: neues öffentliches Repo mit bereinigter Historie, altes als privates Archiv ha-ff-agent-archiv; Beschreibung, Topics, Issues gesetzt)
 - **Priorität:** hoch
@@ -131,7 +146,7 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
 - **Definition of Done:** neue Texte de/en, README, Tests.
 
 ### 261017-geraeteinfo-hersteller – Kein Herstellername in der Geräte-Info
-- **Status:** offen (nach Ende des Tests des Nutzers)
+- **Status:** in Arbeit (2026-10-18, mit Release-Vorbereitung v0.2.0). Entscheidung des Nutzers: neutraler Eintrag „ha-ff-agent (inoffiziell)“
 - **Priorität:** hoch (Rechtliches, sichtbar in der HA-UI)
 - **Rolle(n):** entwickler, tester, reviewer, doku
 - **Beschreibung:** Vorgabe des Nutzers vom 2026-10-17: „Erwähne nicht mackoy consulting
