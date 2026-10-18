@@ -22,6 +22,37 @@ Das Journal ist Verlauf, keine Wissensbasis: Dauerhaftes gehört nach `docs/` od
 
 <!-- Neue Einträge direkt unter dieser Zeile einfügen -->
 
+## 2026-10-18 – claude/readme-update-ha-anker-solix-2ea3b2 – Release v1.0.0 und PR an hacs/default
+- **Nutzer-Auftrag:** „Ich würde den Release 1.0.0 und den PR an hacs/default jetzt schon
+  stellen, selbst ohne die Zusage Absage Tests. Mach das bitte jetzt“. Das ist die
+  ausdrückliche Freigabe für Release und öffentlichen PR.
+- **Vorher geklärt:**
+  - Ein Brands-PR ist nicht möglich, da home-assistant/brands keine Custom-Integrationen
+    mehr annimmt. Das Logo soll mit dem Marketplace ab HA 2026.11 kommen.
+  - Recherche zum Marketplace: docs/recherche/261018-marketplace.md (researcher, Sonnet).
+- **Delegiert:**
+  - tester (Sonnet): PASS, 782 Tests.
+  - reviewer (Opus): freigegeben. Die STATUS-Hinweise sind umgesetzt.
+  - CHANGELOG [1.0.0] und README-Versionen habe ich selbst geschrieben (kleiner Umfang).
+    Der reviewer hat sie geprüft.
+- **Erledigt:**
+  - rauchstefan/ha-ff-agent#15 gemergt (1b22692).
+  - Validate/Tests auf main grün, danach Release v1.0.0 (Latest). So verlangt es die
+    Vorlage von hacs/default.
+  - Fork rauchstefan/default angelegt, Eintrag `rauchstefan/ha-ff-agent` per API
+    eingefügt (alphabetisch zwischen `rany2/…` und `Raznor09/…`).
+  - PR hacs/default#12188 gestellt, mit vollständig ausgefüllter Vorlage.
+- **Offen / Übergabe:**
+  - hacs/default#12188 wartet auf Review. Der Check „Editable PR“ verlangt, dass
+    Maintainer-Edits erlaubt sind.
+  - Kann-Hinweise des reviewers (CHANGELOG-Doku-Zeile, Bekannte Einschränkungen, „neueste
+    Version“ statt v0.4.0 in der Fehlerbehebung) sind nicht umgesetzt.
+- **Für die nächste Session:**
+  - Ein Klon von hacs/default scheitert im Scratchpad an der Windows-Pfadlänge. Änderungen
+    dort per GitHub-Contents-API machen (`gh api -X PUT … --input`).
+  - Ab 1.0.0 gilt SemVer streng: Inkompatible Änderungen an Entitäten, Actions oder
+    Optionen erfordern 2.0.0.
+
 ## 2026-10-18 – claude/readme-update-ha-anker-solix-2ea3b2 – HACS-Update-Dialog: Hash statt Version, Logo fehlt
 - **Nutzer-Auftrag:** Im HACS-Update-Dialog fehlt das Logo, und die Version erscheint als
   Hash (7192103 → 36c857e) statt 0.4.0. Entscheidung des Nutzers: „mach zuerst 0.4.0

@@ -3,9 +3,14 @@
 Was ist der aktuelle Stand der Integration? Diese Datei beantwortet das für jede neue
 Session. Von Hand gepflegt.
 
-- **Version:** 0.4.0. GitHub-Release `v0.4.0` als **reguläres Release** (Latest; 2026-10-18, Tag auf
-  e05621a, rauchstefan/ha-ff-agent#13). Davor `v0.3.0` (619a53e), `v0.2.0` (dabe583) und
-  `v0.1.0`, alle Vorabversionen.
+- **Version:** 1.0.0. GitHub-Release `v1.0.0` (Latest; 2026-10-18, Tag auf 1b22692,
+  rauchstefan/ha-ff-agent#15). Funktionsumfang wie 0.4.0. Der Nutzer hat das Release
+  ausdrücklich freigegeben, obwohl Zusage und Absage nicht real getestet sind. Davor
+  `v0.4.0` (e05621a, regulär), `v0.3.0` (619a53e), `v0.2.0` (dabe583) und `v0.1.0`
+  (Vorabversionen).
+- **HACS-Standardliste:** PR hacs/default#12188 gestellt (2026-10-18). Die Prüfung dort
+  kann Monate dauern. Ab HA 2026.11 heißt HACS „Marketplace“, der Katalog kommt weiter
+  aus hacs/default (docs/recherche/261018-marketplace.md).
 - **Neu in v0.4.0:** Standortquelle wählbar (keine, HA-Zuhause, Koordinaten, Entität;
   rauchstefan/ha-ff-agent#11), neues Symbol (#10), README mit Badges, HACS-Button,
   Hinweisboxen und Community-Abschnitten, CONTRIBUTING.md, Discussions eingeschaltet
@@ -50,7 +55,7 @@ Session. Von Hand gepflegt.
   - `tests.yml`: ruff, pytest mit pytest-homeassistant-custom-component, Python 3.14,
     Abdeckungs-Gate 95 %, aktuell 100 %
   - Dependabot
-- **Letzte Änderung:** 2026-10-18 – Pre-Release v0.4.0
+- **Letzte Änderung:** 2026-10-18 – Release v1.0.0, PR an hacs/default
 
 ## Was funktioniert
 
@@ -61,11 +66,9 @@ Session. Von Hand gepflegt.
 
 ## Bekannte Einschränkungen
 
-- **Nicht real getestet:** Die Integration lief noch nie gegen echtes FF Agent oder eine
-  echte HA-Instanz. Die Annahmen A1–A13 aus ADR 0002 sind offen
-  (TODO 261017-echter-test, braucht die Freigabe des Nutzers).
-- Solange es nur die Vorabversion gibt, müssen Nutzer in HACS Beta-/Vorabversionen
-  aktivieren.
+- **Teilweise real getestet:** Test- und Echtalarm aus FF Agent kamen beim Nutzer über ntfy
+  an. Zusage und Absage sind nicht gegen echtes FF Agent geprüft (u. a. Annahme A7 aus
+  ADR 0002; TODO 261018-test-zusage-absage).
 - Automationen auf die Event-Entität brauchen die Filter `not_from`/`not_to`.
 - Speichern der Optionen oder ein Reconfigure lädt die Integration neu und setzt einen
   laufenden Alarm zurück (bewusst so).

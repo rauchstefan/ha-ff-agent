@@ -32,7 +32,11 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
 ## Offen
 
 ### 261018-release-1-0 – Version 1.0.0 und Aufnahme in den HACS-Standard-Store
-- **Status:** offen (wartet auf 261018-test-zusage-absage)
+- **Status:** teilweise erledigt (2026-10-18). Release v1.0.0 ist da (rauchstefan/ha-ff-agent#15,
+  Tag auf 1b22692). PR hacs/default#12188 ist gestellt und wartet auf das Review der
+  HACS-Betreuer. Regelmäßig nachsehen und Rückfragen im PR beantworten (Freigabe des
+  Nutzers je Antwort). Der Nutzer hat entschieden, nicht auf 261018-test-zusage-absage
+  zu warten.
 - **Priorität:** hoch
 - **Rolle(n):** tester, reviewer, doku, projektleiter
 - **Beschreibung:** Auftrag des Nutzers vom 2026-10-18: Wenn alles abgeschlossen ist,
