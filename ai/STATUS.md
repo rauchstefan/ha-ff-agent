@@ -3,8 +3,12 @@
 Was ist der aktuelle Stand der Integration? Diese Datei beantwortet das für jede neue
 Session. Von Hand gepflegt.
 
-- **Version:** 0.2.0. GitHub-Release `v0.2.0` als **Vorabversion** (2026-10-18, Tag auf
-  dabe583). Davor `v0.1.0` (2026-10-17, ebenfalls Vorabversion).
+- **Version:** 0.3.0. GitHub-Release `v0.3.0` als **Vorabversion** (2026-10-18, Tag auf
+  619a53e, rauchstefan/ha-ff-agent#9). Davor `v0.2.0` (dabe583) und `v0.1.0`, beide
+  Vorabversionen.
+- **Neu in v0.3.0:** README zweisprachig (Deutsch und Englisch in einer Datei),
+  CHANGELOG mit englischer Fassung, dazu alles aus rauchstefan/ha-ff-agent#8 (siehe unten).
+  679 Tests, Abdeckung 100 %. Ein echter Testalarm aus FF Agent kam beim Nutzer an.
 - **Neu in v0.2.0:**
   - neutraler Hersteller „ha-ff-agent (inoffiziell)“ (rauchstefan/ha-ff-agent#7)
   - Fundort der Rückmelde-URL korrigiert; Verkehrsmittel `car`/`feet`/`bicycle`
@@ -13,7 +17,7 @@ Session. Von Hand gepflegt.
     Einrichtungsdialogen; Migration 1.1 → 1.2; Selbstheilung bei neuem ntfy-Abo
     (rauchstefan/ha-ff-agent#6, ADR 0003)
   - 642 Tests, Abdeckung 100 %
-- **Auf `main`, noch nicht released** (CHANGELOG `[Unreleased]`, rauchstefan/ha-ff-agent#8,
+- **Aus #8 in v0.3.0** (rauchstefan/ha-ff-agent#8,
   24d4f43): Einrichtungsschritt Verkehrsmittel/Standort, Button und Action
   `ff_agent.reset_alarm`, verkürzter ntfy-Abschluss, Alarmquelle als Frage in der
   Neukonfiguration, Geräte-Info ohne Link, Update-Hinweis (Browser hart neu laden).
@@ -42,7 +46,7 @@ Session. Von Hand gepflegt.
   - `tests.yml`: ruff, pytest mit pytest-homeassistant-custom-component, Python 3.14,
     Abdeckungs-Gate 95 %, aktuell 100 %
   - Dependabot
-- **Letzte Änderung:** 2026-10-18 – Rückmeldungen zu v0.2.0 umgesetzt (#8)
+- **Letzte Änderung:** 2026-10-18 – Pre-Release v0.3.0
 
 ## Was funktioniert
 

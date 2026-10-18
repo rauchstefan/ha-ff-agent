@@ -22,6 +22,29 @@ Das Journal ist Verlauf, keine Wissensbasis: Dauerhaftes gehört nach `docs/` od
 
 <!-- Neue Einträge direkt unter dieser Zeile einfügen -->
 
+## 2026-10-18 – lokal-2026-10-18-v0-2-feedback – Doku zweisprachig, Release v0.3.0
+- **Nutzer-Auftrag:** „Doku auf GitHub sauber ziehen, Deutsch und Englisch, dann auf 0.3
+  hochziehen und veröffentlichen.“
+- **Nutzerentscheidungen:** README zweisprachig in einer Datei; v0.3.0 als Vorabversion.
+- **Delegiert:**
+  - doku mit `model: sonnet` statt Haiku, weil eine 650-Zeilen-README vollständig zu
+    übersetzen und gegen den Code zu prüfen war; ohne Bash, der Projektleiter hat
+    committet
+  - entwickler (Sonnet) für die Release-Vorbereitung
+  - reviewer (Opus) und tester mit `model: haiku` parallel; der Tester musste nur
+    CI-Ergebnisse und Release-Artefakte prüfen, es gab keine Code-Änderung
+- **Erledigt:**
+  - PR rauchstefan/ha-ff-agent#9 per Squash gemergt (619a53e), Pre-Release v0.3.0:
+    https://github.com/rauchstefan/ha-ff-agent/releases/tag/v0.3.0
+  - Review-Hinweise (volle Menü-Labels, Platzhalter statt `event.ff_agent_alarm` im
+    Recorder-Beispiel, Einleitung im CHANGELOG) hat der Projektleiter selbst eingearbeitet;
+    es waren reine Doku-Kleinigkeiten.
+- **Offen / Übergabe:** Gegenprobe des Nutzers in der echten Instanz. Die
+  `docs-*`-Marker der Quality Scale stehen nur im deutschen Teil der README; das ist
+  unschädlich.
+- **Für die nächste Session:** Release-Notes = Abschnitt `[0.3.0]` aus dem CHANGELOG. Er
+  hat DE oben und EN unter `### English`; neue Einträge in beiden Sprachen pflegen.
+
 ## 2026-10-18 – lokal-2026-10-18-v0-2-feedback – Rückmeldungen des Nutzers zu v0.2.0
 - **Nutzer-Auftrag:** Erst Themen als TODOs sammeln, dann „starte jetzt mit der
   Implementation der ToDos“.
