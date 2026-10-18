@@ -116,7 +116,6 @@ EVENT_TYPE_ALARM: Final = "alarm"
 # unofficial community project and must not name the vendor or operator of FF Agent.
 MANUFACTURER: Final = "ha-ff-agent (inoffiziell)"
 MODEL: Final = "FF Agent"
-CONFIGURATION_URL: Final = "https://www.ff-agent.com"
 
 # Analysis of an incoming webhook call: only the shape is kept, never a value.
 # A body longer than MAX_BODY_ANALYSIS_CHARS is cut before it is parsed, so a large
