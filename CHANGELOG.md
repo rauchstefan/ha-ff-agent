@@ -5,19 +5,43 @@ Alle nennenswerten Änderungen an dieser Integration. Format angelehnt an
 
 ## [Unreleased]
 
+## [1.0.0] – 2026-10-18
+
+Erste stabile Version, Funktionsumfang wie 0.4.0. Test- und Echtalarm aus FF Agent sind beim
+Entwickler über ntfy erfolgreich angekommen. Zusagen und Absagen sind noch nicht gegen ein
+echtes FF Agent geprüft. Rückmeldungen dazu bitte als Issue.
+
+**Update:** Nach dem Update Home Assistant neu starten.
+
 ### Geändert
 
 - HACS soll den Branch `main` nicht zur Installation anbieten (`hide_default_branch`). Der
   Update-Dialog zeigt Versionsnummern statt Commit-Kennungen, seit 0.4.0 ein reguläres
   Release ist.
 
+### Dokumentation
+
+- Fehlerbehebung: neuer Eintrag für den Fall, dass HACS statt einer Versionsnummer eine
+  Zeichenfolge wie `7192103` zeigt.
+
 ### English
+
+First stable release, same features as 0.4.0. A test alarm and a real alarm from FF Agent
+have arrived successfully through ntfy on the developer's system. Accepting and declining
+have not yet been checked against a real FF Agent. Please report your results as an issue.
+
+**Update:** After updating, restart Home Assistant.
 
 #### Changed
 
 - HACS should not offer the branch `main` for installation (`hide_default_branch`). The
   update dialog shows version numbers instead of commit identifiers since 0.4.0 became a
   regular release.
+
+#### Documentation
+
+- Troubleshooting: new entry for when HACS shows a string such as `7192103` instead of a
+  version number.
 
 ## [0.4.0] – 2026-10-18
 
@@ -252,7 +276,8 @@ Siehe README, Abschnitt „Bekannte Einschränkungen“. Die wichtigsten:
 - Belegt ist nur das Verkehrsmittel „Auto“.
 - Eine Antwort mit Status 2xx heißt nur „gesendet“, nicht sicher „verbucht“.
 
-[Unreleased]: https://github.com/rauchstefan/ha-ff-agent/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/rauchstefan/ha-ff-agent/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/rauchstefan/ha-ff-agent/releases/tag/v1.0.0
 [0.4.0]: https://github.com/rauchstefan/ha-ff-agent/releases/tag/v0.4.0
 [0.3.0]: https://github.com/rauchstefan/ha-ff-agent/releases/tag/v0.3.0
 [0.2.0]: https://github.com/rauchstefan/ha-ff-agent/releases/tag/v0.2.0
