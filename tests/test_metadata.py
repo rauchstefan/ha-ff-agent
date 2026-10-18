@@ -90,9 +90,12 @@ def test_manifest_describes_a_push_service() -> None:
     assert "single_config_entry" not in manifest
 
 
-def test_manifest_version_is_unchanged() -> None:
-    """The version only changes together with a release."""
-    assert _load(INTEGRATION / "manifest.json")["version"] == "0.1.0"
+def test_manifest_version_matches_the_latest_changelog_release() -> None:
+    """The manifest version is the newest released version in the CHANGELOG."""
+    changelog = (ROOT / "CHANGELOG.md").read_text("utf-8")
+    latest = re.search(r"^## \[(\d+\.\d+\.\d+)\]", changelog, re.MULTILINE)
+    assert latest is not None
+    assert _load(INTEGRATION / "manifest.json")["version"] == latest.group(1)
 
 
 def test_manifest_key_order() -> None:
@@ -464,6 +467,25 @@ def test_texts_name_no_vendor_and_no_price(language: str) -> None:
     for forbidden in ("mackoy", "consulting", "€", "eur ", "$"):
         assert forbidden not in text.lower()
     assert "Home Assistant Link" in text
+
+
+def test_no_vendor_name_in_code_and_user_docs() -> None:
+    """No company name of FF Agent in the code, README or CHANGELOG.
+
+    This is an unofficial community project; the device info shows a neutral
+    manufacturer and no text names the vendor or operator of FF Agent.
+    """
+    files = [
+        path
+        for path in INTEGRATION.rglob("*")
+        if path.is_file() and path.suffix in {".py", ".json", ".yaml", ".yml"}
+    ]
+    files += [ROOT / "README.md", ROOT / "CHANGELOG.md"]
+    assert len(files) > 10
+    for path in files:
+        text = path.read_text("utf-8").lower()
+        for forbidden in ("mackoy", "consulting"):
+            assert forbidden not in text, f"{forbidden!r} found in {path.name}"
 
 
 def test_manifest_does_not_depend_on_ntfy() -> None:

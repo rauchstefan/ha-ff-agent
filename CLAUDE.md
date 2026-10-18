@@ -122,3 +122,8 @@ PRs nach bestandenem Qualitäts-Gate mergen, `ai/`-Dateien pflegen, GitHub-Issue
   schreibender Agent läuft, nichts direkt committen.
 - **Lokal gibt es kein Python** (nur den Store-Platzhalter `python3`). Tests, ruff und
   hassfest laufen ausschließlich in GitHub Actions.
+- **Kein Hersteller- oder Firmenname von FF Agent in Texten, die Nutzer sehen** (UI,
+  Geräte-Info, README, CHANGELOG, Release-Notes). Das hier ist ein inoffizielles
+  Community-Projekt; die Geräte-Info zeigt den Hersteller „ha-ff-agent (inoffiziell)“.
+  Der Produktname „FF Agent“ und die Produkt-Website sind erlaubt. Ein Test in
+  `tests/test_metadata.py` prüft Code, README und CHANGELOG.

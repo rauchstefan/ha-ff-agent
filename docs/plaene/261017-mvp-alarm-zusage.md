@@ -530,7 +530,7 @@ vorhanden: Funktion direkt aufrufen):
    `_attr_translation_key = key`. `_attr_device_info` ist eine `DeviceInfo` mit:
    - `identifiers={(DOMAIN, entry.entry_id)}`
    - `name=entry.title`
-   - `manufacturer="mackoy consulting"`
+   - `manufacturer="ha-ff-agent (inoffiziell)"`
    - `model="FF Agent"`
    - `entry_type=DeviceEntryType.SERVICE`
    - `configuration_url="https://www.ff-agent.com"`
