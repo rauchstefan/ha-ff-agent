@@ -26,11 +26,10 @@ mission software for fire brigades and emergency services) available in Home Ass
 > **Inoffizielles Community-Projekt, nicht mit dem Hersteller von FF Agent verbunden.**
 > **Unofficial community project, not affiliated with the vendor of FF Agent.**
 >
-> **Vorabversion 0.4.0 / Pre-release 0.4.0:** Test- und Echtalarm aus FF Agent
-> kommen an; Zusage und Absage sind noch nicht gegen ein echtes FF Agent getestet. In HACS bei „FF Agent“ die Anzeige von Beta-/Vorabversionen aktivieren, um sie
-> zu installieren. / Test and real alarms from FF Agent arrive; accepting and declining
-> have not yet been tested against a real FF Agent. In HACS, enable showing
-> beta/pre-releases for "FF Agent" to install it.
+> **Version 0.4.0:** Test- und Echtalarm aus FF Agent kommen an; Zusage und Absage sind
+> noch nicht gegen ein echtes FF Agent getestet. / **Version 0.4.0:** Test and real alarms
+> from FF Agent arrive; accepting and declining have not yet been tested against a real
+> FF Agent.
 
 **Sprache / Language:** [Deutsch](#deutsch) · [English](#english)
 
@@ -119,9 +118,8 @@ starten.
 1. In HACS oben rechts das Menü (⋮) öffnen, *Benutzerdefinierte Repositories* wählen, die
    URL `https://github.com/rauchstefan/ha-ff-agent` eintragen und als Typ „Integration“
    hinzufügen.
-2. „FF Agent“ öffnen. Solange es nur Vorabversionen gibt (aktuell 0.4.0): im Menü (⋮) bzw.
-   in den Einstellungen des Repositorys Beta-/Vorabversionen aktivieren. Dann herunterladen
-   und Home Assistant neu starten.
+2. „FF Agent“ öffnen, die neueste Version (aktuell 0.4.0) wählen, herunterladen und
+   Home Assistant neu starten.
 3. Unter *Einstellungen → Geräte & Dienste → Integration hinzufügen* „FF Agent“ wählen.
 
 **Manuell:**
@@ -642,6 +640,11 @@ Neustart von Home Assistant allein reicht nicht: Lade die Seite hart neu (Strg+F
 Cmd+Umschalt+R). In der Companion-App die App neu starten bzw. den Frontend-Cache in den
 App-Einstellungen leeren.
 
+**HACS zeigt statt einer Versionsnummer eine Zeichenfolge wie `7192103`:** Die Installation
+stammt vom Branch `main` (aus der Zeit, als es nur Vorabversionen gab). Lösung: In HACS bei
+„FF Agent“ das Menü (⋮) → *Erneut herunterladen* wählen, Version v0.4.0 (oder neuer) auswählen
+und Home Assistant neu starten.
+
 **„Alarm kommt nicht an“**
 
 - Art der Adresse (`url_kind`): `internal` oder `path_only` erreicht FF Agent nicht. Home
@@ -810,9 +813,8 @@ HACS. Then install "FF Agent" there and restart Home Assistant.
 
 1. In HACS open the menu (⋮) at the top right, choose *Custom repositories*, enter the URL
    `https://github.com/rauchstefan/ha-ff-agent` and add it with type "Integration".
-2. Open "FF Agent". As long as there are only pre-releases (currently 0.4.0): enable
-   beta/pre-releases in the menu (⋮) or in the settings of the repository. Then download
-   and restart Home Assistant.
+2. Open "FF Agent", choose the latest version (currently 0.4.0), download it and restart
+   Home Assistant.
 3. Under *Settings → Devices & services → Add integration* choose "FF Agent".
 
 **Manually:**
@@ -1305,6 +1307,11 @@ of Home Assistant alone is not enough: hard-reload the page (Ctrl+F5, on a Mac
 Cmd+Shift+R). In the companion app, restart the app or clear the frontend cache in the app
 settings.
 
+**HACS shows a string such as `7192103` instead of a version number:** The installation comes
+from the branch `main` (from the time when there were only pre-releases). Solution: in HACS,
+open "FF Agent", choose the menu (⋮) → *Redownload*, select version v0.4.0 (or newer) and
+restart Home Assistant.
+
 **"The alarm does not arrive"**
 
 - Kind of address (`url_kind`): FF Agent cannot reach `internal` or `path_only`. Set up Home
@@ -1409,7 +1416,7 @@ German.
 
 **Lizenz / License:** MIT, siehe / see [LICENSE](LICENSE).
 
-[releases-shield]: https://img.shields.io/github/v/release/rauchstefan/ha-ff-agent?include_prereleases&style=for-the-badge
+[releases-shield]: https://img.shields.io/github/v/release/rauchstefan/ha-ff-agent?style=for-the-badge
 [releases-url]: https://github.com/rauchstefan/ha-ff-agent/releases
 [contributors-shield]: https://img.shields.io/github/contributors/rauchstefan/ha-ff-agent?style=for-the-badge
 [contributors-url]: https://github.com/rauchstefan/ha-ff-agent/graphs/contributors

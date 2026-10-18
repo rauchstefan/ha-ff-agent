@@ -65,11 +65,16 @@ def _png_size(path: Path) -> tuple[int, int]:
     return struct.unpack(">II", data[16:24])
 
 
-def test_hacs_json_has_only_name_and_homeassistant() -> None:
-    """hacs.json holds exactly the agreed keys."""
+def test_hacs_json_has_agreed_keys() -> None:
+    """hacs.json holds exactly the agreed keys.
+
+    ``hide_default_branch`` asks HACS not to offer the default branch. HACS 2.x
+    does not evaluate it yet; version numbers come from regular releases.
+    """
     assert _load(ROOT / "hacs.json") == {
         "name": "FF Agent",
         "homeassistant": "2026.3.0",
+        "hide_default_branch": True,
     }
 
 
