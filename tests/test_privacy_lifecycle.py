@@ -215,6 +215,10 @@ async def test_whole_life_cycle_leaks_no_secret(
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"], {CONF_NAME: "Test Person", CONF_REPLY_URL: REPLY_URL}
         )
+        assert result["step_id"] == "reply_settings"
+        result = await hass.config_entries.flow.async_configure(
+            result["flow_id"], {CONF_DEFAULT_TRANSPORT: "car"}
+        )
         assert result["type"] is FlowResultType.MENU
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"], {"next_step_id": "cloud"}
@@ -457,6 +461,10 @@ async def test_ntfy_life_cycle_leaks_no_topic(
     )
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"], {CONF_NAME: "Test Person", CONF_REPLY_URL: REPLY_URL}
+    )
+    assert result["step_id"] == "reply_settings"
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], {CONF_DEFAULT_TRANSPORT: "car"}
     )
     for option in ("no_cloud", "ntfy"):
         result = await hass.config_entries.flow.async_configure(

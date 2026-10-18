@@ -3,7 +3,7 @@
     "step": {
       "user": {
         "title": "Set up FF Agent",
-        "description": "One entry belongs to exactly one person. Nothing is sent to FF Agent. In the next step you choose how the alarm reaches Home Assistant.",
+        "description": "One entry belongs to exactly one person. Nothing is sent to FF Agent. Next you choose what is sent with an acceptance and how the alarm reaches Home Assistant.",
         "data": {
           "name": "Name",
           "reply_url": "Mission reply URL (accept)"
@@ -11,6 +11,18 @@
         "data_description": {
           "name": "Label for this entry, for example your name.",
           "reply_url": "Open the FF Agent web UI, go to Persons > your name > section \"Übung/Einsatz\" (exercise/operation) > \"Weblinks für Einsatzmeldung\" (web links for mission reply) and copy the accept URL here. The URL only applies to you and to the currently active mission. It is a secret: anyone who has it can accept or decline on your behalf. Do not share it."
+        }
+      },
+      "reply_settings": {
+        "title": "Accepting: transport and location",
+        "description": "Home Assistant sends these values to FF Agent with every acceptance, through the button and the action. The mission reply URL from the previous step stays as it is; the values are added to each acceptance. Nothing is sent now. You can change both later under \"Configure\".",
+        "data": {
+          "default_transport": "Default transport",
+          "location_entity": "Location entity"
+        },
+        "data_description": {
+          "default_transport": "Sent with every acceptance if the action does not name a transport.",
+          "location_entity": "Optional: a person or device tracker whose current location is sent with every acceptance. Leave empty to send no location."
         }
       },
       "alarm_source": {

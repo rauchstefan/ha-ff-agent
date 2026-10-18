@@ -110,7 +110,16 @@ Schritt für Schritt durch den gewählten Weg. Wechseln kannst du später jederz
 
    Die Integration sendet dabei **nichts** an FF Agent, denn jeder Test wäre eine echte
    Zusage.
-3. **Alarmweg wählen.** Auf die Frage „Nutzt du Home Assistant Cloud?“ antwortest du mit
+3. **Zusage-Einstellungen wählen.** Der Schritt „Zusage: Verkehrsmittel und Standort“ fragt:
+   - **Standard-Verkehrsmittel:** „Auto“, „Zu Fuß“ oder „Fahrrad“. Es wird bei jeder
+     Zusage mitgesendet, wenn die Action keines angibt.
+   - **Standort-Entität (optional):** eine Person oder ein Gerät-Tracker. Sein aktueller
+     Standort wird bei jeder Zusage mitgesendet. Leer lassen, um keinen Standort zu senden.
+
+   Die Rückmelde-URL aus Schritt 2 bleibt dabei unverändert und wird nicht gespeichert.
+   Die Integration hängt Verkehrsmittel und Standort bei jeder Zusage an. Jetzt wird nichts
+   gesendet. Beide Angaben änderst du später unter *Konfigurieren*.
+4. **Alarmweg wählen.** Auf die Frage „Nutzt du Home Assistant Cloud?“ antwortest du mit
    „Ja (empfohlen)“ (weiter mit [Weg A](#weg-a-home-assistant-cloud-oder-eigene-adresse))
    oder „Nein“ (Hinweis auf ntfy, weiter mit [Weg B](#weg-b-ntfy-kostenlos)). Ist Home
    Assistant Cloud schon aktiv, sagt die Frage das, entscheidet aber nicht für dich.

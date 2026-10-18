@@ -3,7 +3,7 @@
     "step": {
       "user": {
         "title": "FF Agent einrichten",
-        "description": "Eine Einrichtung gehört zu genau einer Person. Es wird nichts an FF Agent gesendet. Im nächsten Schritt wählst du, wie der Alarm bei Home Assistant ankommt.",
+        "description": "Eine Einrichtung gehört zu genau einer Person. Es wird nichts an FF Agent gesendet. Danach legst du fest, was beim Zusagen mitgesendet wird, und wählst, wie der Alarm bei Home Assistant ankommt.",
         "data": {
           "name": "Name",
           "reply_url": "Rückmelde-URL (Zusage)"
@@ -11,6 +11,18 @@
         "data_description": {
           "name": "Bezeichnung dieser Einrichtung, zum Beispiel dein Name.",
           "reply_url": "Öffne die FF-Agent-Web-UI, gehe zu Personen > dein Name > Bereich „Übung/Einsatz“ > „Weblinks für Einsatzmeldung“ und kopiere die Zusage-URL hierher. Die URL gilt nur für dich und für den jeweils aktiven Einsatz. Sie ist ein Geheimnis: Mit ihr kann jemand in deinem Namen zu- oder absagen. Gib sie niemandem weiter."
+        }
+      },
+      "reply_settings": {
+        "title": "Zusage: Verkehrsmittel und Standort",
+        "description": "Diese Angaben schickt Home Assistant bei jeder Zusage an FF Agent mit, über den Button und über die Action. Die Rückmelde-URL aus dem vorigen Schritt bleibt dabei unverändert; die Werte werden bei jeder Zusage angehängt. Jetzt wird nichts gesendet. Du kannst beides später unter „Konfigurieren“ ändern.",
+        "data": {
+          "default_transport": "Standard-Verkehrsmittel",
+          "location_entity": "Standort-Entität"
+        },
+        "data_description": {
+          "default_transport": "Wird bei jeder Zusage mitgesendet, wenn die Action kein Verkehrsmittel angibt.",
+          "location_entity": "Optional: eine Person oder ein Gerät-Tracker, dessen aktueller Standort bei jeder Zusage mitgesendet wird. Leer lassen, um keinen Standort zu senden."
         }
       },
       "alarm_source": {
