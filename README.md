@@ -119,11 +119,11 @@ Schritt für Schritt durch den gewählten Weg. Wechseln kannst du später jederz
 3. **Zusage-Einstellungen wählen.** Der Schritt „Zusage: Verkehrsmittel und Standort“ fragt:
    - **Standard-Verkehrsmittel:** „Auto“, „Zu Fuß“ oder „Fahrrad“. Es wird bei jeder
      Zusage mitgesendet, wenn die Action keines angibt.
-   - **Standort-Entität (optional):** eine Person oder ein Gerät-Tracker. Sein aktueller
+   - **Standort-Entität (optional):** eine Person oder ein Geräte-Tracker. Sein aktueller
      Standort wird bei jeder Zusage mitgesendet. Leer lassen, um keinen Standort zu senden.
 
-   Die Rückmelde-URL aus Schritt 2 bleibt dabei unverändert und wird nicht gespeichert.
-   Die Integration hängt Verkehrsmittel und Standort bei jeder Zusage an. Jetzt wird nichts
+   Die Rückmelde-URL bleibt dabei unverändert; gespeichert werden wie bisher nur UUID und Host.
+   Verkehrsmittel und Standort hängt die Integration bei jeder Zusage an. Jetzt wird nichts
    gesendet. Beide Angaben änderst du später unter *Konfigurieren*.
 4. **Alarmweg wählen.** Auf die Frage „Nutzt du Home Assistant Cloud?“ antwortest du mit
    „Ja (empfohlen)“ (weiter mit [Weg A](#weg-a-home-assistant-cloud-oder-eigene-adresse))
@@ -249,7 +249,7 @@ zurück erhalten).
 | Zusatz-Token verlangen | Wie oben. Standard: aus. |
 | Rücksetzzeit „Alarm aktiv“ | Minuten ohne neuen Alarm, nach denen „Alarm aktiv“ ausgeht (1 bis 1440, Standard 30). Ein neuer Alarm startet die Zeit neu. |
 | Standard-Verkehrsmittel | Wird beim Zusagen gesendet, wenn die Action keines angibt. Zur Auswahl stehen „Auto“, „Zu Fuß“ und „Fahrrad“. |
-| Standort-Entität | Optional: eine Person oder ein Gerät-Tracker. Sein Standort wird beim Zusagen mitgesendet. Leer lassen, um keinen Standort zu senden. |
+| Standort-Entität | Optional: eine Person oder ein Geräte-Tracker. Sein Standort wird beim Zusagen mitgesendet. Leer lassen, um keinen Standort zu senden. |
 
 **Wichtig:** Das Speichern der Optionen lädt die Integration neu. Ein gerade aktiver Alarm
 wird dabei **zurückgesetzt** („Alarm aktiv“ geht aus, das Zeitfenster gegen Doppelalarme
@@ -300,7 +300,7 @@ Alle Entitäten gehören zu einem Gerät je Eintrag (Typ Dienst).
 | Letzte Rückmeldung | Sensor | `Zugesagt`, `Abgesagt` oder `Fehlgeschlagen` |
 | Zusagen | Button | Sagt mit Standard-Verkehrsmittel und optional Standort zu |
 | Absagen | Button | Sagt ab |
-| Alarm zurücksetzen | Button | Schaltet „Alarm aktiv“ sofort aus und beendet die Rücksetzzeit. „Letzter Alarm“ bleibt, und das 30-Sekunden-Fenster gegen Doppelalarme bleibt offen: Eine Wiederholung desselben Alarms schaltet „Alarm aktiv“ nicht wieder ein, ein neuer Alarm danach schon. Ohne aktiven Alarm passiert nichts, an FF Agent wird nichts gesendet. |
+| Alarm zurücksetzen | Button | Schaltet „Alarm aktiv“ sofort aus und beendet die Rücksetzzeit. „Letzter Alarm“ bleibt, und das 30-Sekunden-Fenster gegen Doppelalarme läuft weiter: Eine Wiederholung desselben Alarms schaltet „Alarm aktiv“ nicht wieder ein, ein neuer Alarm danach schon. Ohne aktiven Alarm passiert nichts, an FF Agent wird nichts gesendet. |
 
 Die Entity-IDs beginnen mit dem Namen des Eintrags, zum Beispiel
 `event.ff_agent_alarm` und `binary_sensor.ff_agent_alarm_aktiv`. Der Rest hängt von Name

@@ -115,7 +115,7 @@ Zweiter Eingang (ntfy-Modus), statt des Webhooks:
 | Sensor „Letzte Rückmeldung“ | `last_reply` | `ENUM`: `accepted`, `rejected`, `failed` | Zustand |
 | Button „Zusagen“ | `accept` | Rückmeldung mit Standard-Verkehrsmittel und optional Standort | Zeitstempel |
 | Button „Absagen“ | `reject` | Rückmeldung | Zeitstempel |
-| Button „Alarm zurücksetzen“ | `reset_alarm` | schaltet „Alarm aktiv“ sofort aus, stoppt den Timer; `last_alarm` und das Dedup-Fenster bleiben; ohne aktiven Alarm passiert nichts; kein Aufruf an FF Agent | Zeitstempel |
+| Button „Alarm zurücksetzen“ | `reset_alarm` | schaltet „Alarm aktiv“ sofort aus, stoppt den Timer; `last_alarm` bleibt, das Dedup-Fenster läuft weiter; ohne aktiven Alarm passiert nichts; kein Aufruf an FF Agent | Zeitstempel |
 
 Dazu kommen die Actions `ff_agent.accept` (Felder `config_entry_id`, `transport`,
 `latitude`, `longitude`), `ff_agent.reject` und `ff_agent.reset_alarm` (je
@@ -139,7 +139,7 @@ nicht zurück.
   - `user` mit Name und Rückmelde-URL; ohne Online-Test, weil jeder Test eine echte
     Rückmeldung wäre. Danach der Schritt `reply_settings` (Standard-Verkehrsmittel,
     optional Standort-Entität; ohne Zonen, die Werte hängt `reply.py` bei jeder Zusage
-    an, die Rückmelde-URL wird nicht gespeichert) und die Frage „Nutzt du Home Assistant Cloud?“ (Menü
+    an; an der gespeicherten Rückmelde-UUID ändert sich nichts) und die Frage „Nutzt du Home Assistant Cloud?“ (Menü
     `alarm_source` bzw. `alarm_source_cloud`) und je Pfad ein Einrichtungsdialog
     (`cloud_setup`/`cloud_setup_retry`/`cloud_not_connected` bzw. `ntfy`, `ntfy_select`).
     Plan: `docs/plaene/261017-alarmquelle-ntfy.md`.

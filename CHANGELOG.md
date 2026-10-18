@@ -14,11 +14,11 @@ unter Umständen keinen oder alten Text.
 
 - **Alarm zurücksetzen:** Neuer Button „Alarm zurücksetzen“ und neue Action
   `ff_agent.reset_alarm` schalten „Alarm aktiv“ sofort aus und beenden die Rücksetzzeit.
-  „Letzter Alarm“ und das 30-Sekunden-Fenster gegen Doppelalarme bleiben unverändert.
+  „Letzter Alarm“ bleibt, und das 30-Sekunden-Fenster gegen Doppelalarme läuft weiter.
   Ohne aktiven Alarm passiert nichts; an FF Agent wird nichts gesendet.
 - **Verkehrsmittel und Standort bei der Einrichtung:** Die Einrichtung fragt jetzt nach der
   Rückmelde-URL das Standard-Verkehrsmittel und die optionale Standort-Entität ab (Person
-  oder Gerät-Tracker). Beides war bisher nur unter „Konfigurieren“ einstellbar und bleibt
+  oder Geräte-Tracker). Beides war bisher nur unter „Konfigurieren“ einstellbar und bleibt
   dort änderbar.
 
 ### Geändert
@@ -33,7 +33,7 @@ unter Umständen keinen oder alten Text.
 ### Entfernt
 
 - **Link „Besuchen“ in der Geräte-Info:** Das Gerät verweist nicht mehr auf eine Website.
-  Der Link bestehender Geräte verschwindet nach dem Neustart.
+  Der Link bestehender Geräte verschwindet nach dem Neustart bzw. Neuladen der Integration.
 
 ## [0.2.0] – 2026-10-18 (Vorabversion)
 

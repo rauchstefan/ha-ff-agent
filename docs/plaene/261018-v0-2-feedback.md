@@ -239,7 +239,7 @@ Text verweist deshalb auf „Konfigurieren“, wo die Optionen die URL zeigen.
 | `data.default_transport` | `Standard-Verkehrsmittel` | `Default transport` |
 | `data.location_entity` | `Standort-Entität` | `Location entity` |
 | `data_description.default_transport` | `Wird bei jeder Zusage mitgesendet, wenn die Action kein Verkehrsmittel angibt.` | `Sent with every acceptance if the action does not name a transport.` |
-| `data_description.location_entity` | `Optional: eine Person oder ein Gerät-Tracker, dessen aktueller Standort bei jeder Zusage mitgesendet wird. Leer lassen, um keinen Standort zu senden.` | `Optional: a person or device tracker whose current location is sent with every acceptance. Leave empty to send no location.` |
+| `data_description.location_entity` | `Optional: eine Person oder ein Geräte-Tracker, dessen aktueller Standort bei jeder Zusage mitgesendet wird. Leer lassen, um keinen Standort zu senden.` | `Optional: a person or device tracker whose current location is sent with every acceptance. Leave empty to send no location.` |
 
 Außerdem `config.step.user.description` anpassen:
 - de: `Eine Einrichtung gehört zu genau einer Person. Es wird nichts an FF Agent gesendet. Danach legst du fest, was beim Zusagen mitgesendet wird, und wählst, wie der Alarm bei Home Assistant ankommt.`
@@ -530,8 +530,8 @@ Ursprüngliche Fragen:
 1. **Button-Namen:** Einverstanden mit „Komme“/„Komme nicht“? Alternativen:
    „Ich komme“/„Ich komme nicht“ oder „Zusage: ja“/„Zusage: nein“. Ohne Antwort setzt der
    Entwickler „Komme“/„Komme nicht“ um.
-2. **Feste Adresse:** Reicht die Standort-Entität (Person/Gerät-Tracker)? Mit wenig Aufwand
+2. **Feste Adresse:** Reicht die Standort-Entität (Person/Geräte-Tracker)? Mit wenig Aufwand
    ließe sich zusätzlich eine **Zone** (z. B. „Zuhause“) wählen; dann ginge immer deren
-   feste Position mit. Ohne Antwort bleibt es bei Person/Gerät-Tracker.
+   feste Position mit. Ohne Antwort bleibt es bei Person/Geräte-Tracker.
 3. **Position des Reset-Buttons:** Auf Deutsch steht „Alarm zurücksetzen“ alphabetisch vor
    „Komme“. Passt das, oder soll er ans Ende (dann etwa „Zurücksetzen: Alarm aktiv“)?
