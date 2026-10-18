@@ -303,6 +303,102 @@ async def test_reply_settings_reach_the_accept_button(
     assert dict(aioclient_mock.mock_calls[0][1].query) == {"transport": "FEET"}
 
 
+async def _end_of_path(
+    hass: HomeAssistant, path: str, settings: dict[str, Any]
+) -> FlowResult:
+    """Run the flow to one of the remaining ends and return the last result."""
+    result = await _start_flow(hass)
+    result = await _submit(hass, result["flow_id"], settings=settings)
+    flow_id = result["flow_id"]
+    if path == "cloud":
+        with patch_cloud(hass):
+            return await _choose(hass, flow_id, "cloud")
+    if path in ("internal", "path_only"):
+        result = await _choose(hass, flow_id, "cloud")
+        assert result["step_id"] == "cloud_setup"
+        if path == "internal":
+            await async_process_ha_core_config(hass, {"internal_url": INTERNAL_URL})
+            return await _choose(hass, flow_id, "webhook_anyway")
+        with patch(
+            "custom_components.ff_agent.config_flow.async_local_webhook_url",
+            return_value=(PATH, UrlKind.PATH_ONLY),
+        ):
+            return await _choose(hass, flow_id, "webhook_anyway")
+    # ntfy with an entity whose topic cannot be read, or with another topic
+    result = await _choose(hass, flow_id, "no_cloud")
+    result = await _choose(hass, flow_id, "ntfy")
+    result = await _choose(hass, flow_id, "ntfy_find")
+    if path == "ntfy_topic_unknown":
+        orphan = er.async_get(hass).async_get_or_create(
+            "event", "ntfy", "orphan", suggested_object_id="ff_agent_alarm_orphan"
+        )
+        return await _configure(hass, flow_id, {CONF_NTFY_ENTITY: orphan.entity_id})
+    ntfy_entry = add_ntfy_entry(
+        hass, {OTHER_NTFY_SUBENTRY_ID: OTHER_NTFY_TOPIC}, url=OWN_NTFY_SERVER
+    )
+    add_ntfy_entity(hass, ntfy_entry, OTHER_NTFY_SUBENTRY_ID, OTHER_NTFY_ENTITY_ID)
+    return await _configure(hass, flow_id, {CONF_NTFY_ENTITY: OTHER_NTFY_ENTITY_ID})
+
+
+@pytest.mark.parametrize(
+    ("path", "description"),
+    [
+        ("cloud", "cloud"),
+        ("internal", "internal"),
+        ("path_only", "path_only"),
+        ("ntfy_topic_unknown", "ntfy_topic_unknown"),
+        ("ntfy_other_address", "ntfy_other_address"),
+    ],
+)
+async def test_reply_settings_land_in_the_options_on_every_other_end(
+    hass: HomeAssistant, path: str, description: str
+) -> None:
+    """The remaining ends of the flow store the answers as well."""
+    result = await _end_of_path(hass, path, SETTINGS)
+
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    assert result["description"] == description
+    assert dict(result["result"].options) == {
+        CONF_RESET_MINUTES: 30,
+        CONF_DEFAULT_TRANSPORT: "bicycle",
+        CONF_REQUIRE_TOKEN: False,
+        CONF_LOCATION_ENTITY: LOCATION_ENTITY,
+    }
+
+
+async def test_reply_settings_can_be_changed_afterwards(hass: HomeAssistant) -> None:
+    """The options flow shows the values of the setup and saves new ones."""
+    result = await _create_via(hass, "external", SETTINGS)
+    entry: ConfigEntry = result["result"]
+
+    flow = await hass.config_entries.options.async_init(entry.entry_id)
+    assert flow["type"] is FlowResultType.FORM
+    saved = await hass.config_entries.options.async_configure(
+        flow["flow_id"],
+        {
+            CONF_REQUIRE_TOKEN: False,
+            CONF_RESET_MINUTES: 30,
+            CONF_DEFAULT_TRANSPORT: "feet",
+        },
+    )
+    await hass.async_block_till_done()
+
+    assert saved["type"] is FlowResultType.CREATE_ENTRY
+    assert entry.options[CONF_DEFAULT_TRANSPORT] == "feet"
+    assert CONF_LOCATION_ENTITY not in entry.options
+
+
+async def test_reply_settings_location_is_not_logged(
+    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+) -> None:
+    """The location entity is personal data and never reaches the log."""
+    caplog.set_level(logging.DEBUG, logger="custom_components.ff_agent")
+
+    await _create_via(hass, "external", SETTINGS)
+
+    assert LOCATION_ENTITY not in caplog.text
+
+
 # --- The cloud path -----------------------
 
 
