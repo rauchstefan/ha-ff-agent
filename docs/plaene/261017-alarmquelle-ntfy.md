@@ -1189,7 +1189,7 @@ durchlaufen: Setup, Meldung, Reload, Reconfigure, Diagnose, Remove. Prüfen:
   mit `1.`, `2.` bzw. `**1.`)
 - Platzhalter-Vollständigkeit als Tabelle im Test: Step-ID → erwartete Platzhalter. Jeder
   `{name}` im Text muss in der Liste stehen, die der Flow liefert.
-- Kein Text enthält „mackoy“ oder „consulting“ (case-insensitive).
+- Kein Text enthält den Firmennamen des Herstellers (Prüfung in `tests/test_metadata.py`).
 
 **`test_alarm.py`:** Für `async_handle_alarm` direkt: Rückgabewert, Verhalten nach
 `async_shutdown`. Die bestehenden Webhook-Tests unverändert.

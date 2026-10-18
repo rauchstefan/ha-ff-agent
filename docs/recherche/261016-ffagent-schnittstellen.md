@@ -17,7 +17,7 @@ einer Implementierung mit PDF-Werkzeug oder von einem Menschen gelesen werden.
 Der Projektleiter hat beide PDFs nach der Recherche im Volltext gelesen. Die Einschränkung
 oben ist damit aufgehoben. Ergebnis, alles **[G]** aus den PDFs:
 
-**Dokumentation_WebAPI.pdf, v1.6 vom 28.11.2019** (mackoy consulting)
+**Dokumentation_WebAPI.pdf, v1.6 vom 28.11.2019** (Hersteller von FF Agent)
 
 - **Richtung:** Die WebAPI ist nur **eingehend**, also extern → FF Agent, etwa für
   Organisationen mit fremdem Alarmierungssystem. Sie bietet genau vier Endpunkte, alle als
@@ -83,7 +83,7 @@ welchen Daten, und welcher Weg eignet sich für eine HA-Integration (`ff_agent`)
 
 ## 2. Kurzfazit
 
-- Hersteller ist **mackoy consulting** (Seefeld, GF André Koppany); Produkt „FF-Agent“, Domain ff-agent.com [G]. „FF Agent GmbH“ ist nicht belegt.
+- Hersteller ist ein Unternehmen, dessen Name und Anschrift im Impressum der Produkt-Website stehen; Produkt „FF-Agent“, Domain ff-agent.com [G]. „FF Agent GmbH“ ist nicht belegt.
 - Die offizielle **WebAPI geht in Richtung extern → FF Agent** (Alarm auslösen, Push-Nachricht, Chat) [G für Existenz, A für Richtung]. Auth: Token + HMAC-SHA256, im Live-Betrieb zusätzlich Client-Zertifikat (mTLS) [G aus Drittcode]. Sie liefert Alarme **nicht** an HA.
 - Für **FF Agent → HA** gibt es öffentlich nur einen Hinweis: Eine Homey-App wird von einem „Webhook der Feuerwehr“ ohne Nutzdaten getriggert [G]. Wie dieser Webhook in FF Agent eingerichtet wird (Rolle, Lizenz, Format), ist **öffentlich nicht dokumentiert** [U].
 - Es gibt **keine** bestehende HA-Integration, keinen Node-RED-Flow und keinen Forenbeitrag für FF Agent in HA [G: nichts gefunden].
@@ -96,7 +96,7 @@ welchen Daten, und welcher Weg eignet sich für eine HA-Integration (`ff_agent`)
 
 ### 3.1 Produktüberblick (Frage 1)
 
-- Betreiber: mackoy consulting, Marienplatz 3b, 82229 Seefeld; GF André Koppany [G] https://www.ff-agent.com/kontakt.html , https://www.ff-agent.com/datenschutz.html . Die WebAPI-PDF nennt als Autor Alexander Uherek, mackoy consulting [G, Titel der PDF] https://helpcenter.ff-agent.com/webui/uebersicht/touren/pdfs/Dokumentation_WebAPI.pdf .
+- Betreiber: der Hersteller von FF Agent; Name, Anschrift und Ansprechpartner stehen im Impressum [G] https://www.ff-agent.com/kontakt.html , https://www.ff-agent.com/datenschutz.html . Die WebAPI-PDF nennt einen Autor beim Hersteller [G, Titel der PDF] https://helpcenter.ff-agent.com/webui/uebersicht/touren/pdfs/Dokumentation_WebAPI.pdf .
 - Produktteile [G] https://www.ff-agent.com : Alarmierung (Push, E-Mail, SMS, Anruf), FF-Agent Mobile App (iOS/Android), Commander App, BOS-Chat, Status-Monitor (Widgets, Browser oder Raspberry Pi), Lageboard, Verwaltung (Übungen, Einsatzobjekte, Fahrtenbuch, Sirenenüberwachung, Gerätehaus-Automatisierung), Web-UI, **FF-Agent Gateway** (Hardware vor Ort: 5-Ton, POCSAG, Fax), Gateway PLUS (mit Node-RED), verbundene Produkte FF-Inventory, FF-Agent Teams, Accounting.
 - Lizenzmodelle [G] https://www.ff-agent.com/kosten.html (netto): FREE (0 €, 10 Einsätze/Monat, 1 Alarmregel, 1 Gerät je Nutzer), STARTER (ab 49 €/Jahr), BASE (ab 7,90 €/Monat), BASE PLUS (ab 15,90 €/Monat), PRO (ab 31,90 €/Monat). Schnittstellen wie SMS-Eingang, Gateway, Eurofunk eMID/MQTT, EDP4, TETRA, WDX3, LARDIS, Leitstelle Tirol sind kostenpflichtige Optionen. **Alarmweiterleitung/Gebäudeautomatisierung über Gateway PLUS inkl. Node-RED: kostenpflichtige Option ab BASE PLUS.** Ein API-Zugang wird dort nicht als Lizenzmerkmal beschrieben.
 - Rechte: Berechtigungsgruppen mit sechs Bereichen (Personen, Übungen, Einsätze, Mobile App & Alarminhalt, Kommunikation, Admin); Standardnutzer starten ohne Rechte [G] https://helpcenter.ff-agent.com/webui/erste-schritte/berechtigungen/ . Wer Schnittstellen/Instant Commands konfigurieren darf, steht dort nicht. Instant Commands liegen unter „Admin / Einstellungen“ [G] https://helpcenter.ff-agent.com/technik/gateway/tor-und-lichtsteuerung/ , also Admin-Bereich [A].
@@ -147,7 +147,7 @@ Ein öffentlich dokumentiertes Format der **ausgehenden** Daten an HA gibt es ni
 - Polling: nur über die inoffizielle Widget-API (Webapp pollt alle 15 s, [G] README) belegt; offizielle Polling-API [U].
 - Rate-Limits: öffentlich **nicht dokumentiert** [U]. (DiveraControl nennt zum Vergleich ein Minimum von 5 s als Selbstbeschränkung [G].)
 - AGB/Bedingungen für Drittanbieter-Integrationen: Auf der Startseite ist keine AGB-Seite verlinkt, `/agb.html` liefert 404 [G]. Aussagen zu Drittintegrationen: nichts gefunden [U]. Die WebAPI wird als „für eigene Lösungen oder Drittanbietersoftware“ beworben [G] https://www.ff-agent.com/alarmierung.html ; ihre PDFs sind öffentlich abrufbar [G].
-- Datenschutz: Verantwortlicher mackoy consulting, Datenschutz-Kontakt genannt [G] https://www.ff-agent.com/datenschutz.html . Der Abschnitt zu „Alarmdaten und Schnittstellen“ ist inhaltsleer [G]. Alarmdaten enthalten Adressen, ggf. Patientendaten und Personenstatus, also personenbezogene, teils besonders schützenswerte Daten [A]. Folgerungen [A]: Daten minimal halten (Webhook ohne Payload ist datensparsam), keine Alarminhalte in Logs/Diagnostics, Hinweis an Nutzer, dass der HA-Recorder Alarmtexte speichert, Weitergabe von Einsatzdaten nur mit Zustimmung der Einheit (Wehrführung/Datenschutzbeauftragter).
+- Datenschutz: Verantwortlicher ist der Hersteller, Datenschutz-Kontakt genannt [G] https://www.ff-agent.com/datenschutz.html . Der Abschnitt zu „Alarmdaten und Schnittstellen“ ist inhaltsleer [G]. Alarmdaten enthalten Adressen, ggf. Patientendaten und Personenstatus, also personenbezogene, teils besonders schützenswerte Daten [A]. Folgerungen [A]: Daten minimal halten (Webhook ohne Payload ist datensparsam), keine Alarminhalte in Logs/Diagnostics, Hinweis an Nutzer, dass der HA-Recorder Alarmtexte speichert, Weitergabe von Einsatzdaten nur mit Zustimmung der Einheit (Wehrführung/Datenschutzbeauftragter).
 
 ### 3.5 Community-Lösungen und Vergleich (Frage 5)
 
@@ -195,7 +195,7 @@ Definitionen laut HA: `cloud_push` = Verbindung über die Cloud, die Cloud melde
 6. Gibt es in der Web-UI des Nutzers einen Eintrag wie „Webhook“ bzw. Instant Commands mit HTTP-Aktion? Screenshots ohne Tokens wären hilfreich. (Der Researcher meldet sich nicht bei FF Agent an.)
 7. Kann der Nutzer die beiden PDFs (WebAPI v1.6, Instant Commands) im Klartext liefern?
 
-### 4.2 Fragen an den Hersteller (mackoy consulting)
+### 4.2 Fragen an den Hersteller
 
 1. Wie wird der „Webhook der Feuerwehr“ (Homey-Trigger) eingerichtet; welche Rolle/Lizenz? Methode, Header, Wiederholungen bei Fehler, Signatur?
 2. Gibt es einen Webhook mit Payload (Stichwort, Ort, Koordinaten, Alarm-ID) oder ist er geplant?

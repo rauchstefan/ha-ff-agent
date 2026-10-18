@@ -31,6 +31,27 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
 
 ## Offen
 
+### 261018-test-zusage-absage – Zusage und Absage gegen echtes FF Agent prüfen
+- **Status:** offen (Test durch den Nutzer)
+- **Priorität:** hoch
+- **Rolle(n):** Nutzer, Projektleiter, doku
+- **Beschreibung:** Test- und Echtalarm sind laut Nutzer am 2026-10-18 angekommen
+  (v0.3.0). Zusage und Absage über Button bzw. Action sind noch nicht gegen ein echtes
+  FF Agent geprüft (Annahme A7 im README: Verhalten bei inaktivem Einsatz,
+  Statuscodes). Zu prüfen sind:
+  - Zusage mit Verkehrsmittel und ggf. Standort
+  - Absage
+  - Rückmeldung ohne aktiven Einsatz
+  - Sensor „Letzte Rückmeldung“
+  - Ankunft in FF Agent
+  - Annahmen aus ADR 0002, die dabei geklärt werden: A6 (Redirects, siehe
+    261017-reply-redirects), A7, A12 (Zusatz-Token, siehe 261017-token-default), A13
+    (Einsatzdetails). Anleitung: docs/plaene/261017-echter-test-anleitung.md.
+- **Definition of Done:** Ergebnis des Nutzers dokumentiert; Hinweise „noch nicht
+  getestet“ in README (Kopf, Einschränkungen) und CHANGELOG angepasst; Abweichungen als
+  Bug-TODO.
+- **Verweise:** Chat vom 2026-10-18; README „Bekannte Einschränkungen“
+
 ### 261018-release-1-0 – Version 1.0.0 und Aufnahme in den HACS-Standard-Store
 - **Status:** teilweise erledigt (2026-10-18). Release v1.0.0 ist da (rauchstefan/ha-ff-agent#15,
   Tag auf 1b22692). PR hacs/default#12188 ist gestellt und wartet auf das Review der
@@ -54,6 +75,46 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
   gestellt (Freigabe des Nutzers, da öffentlicher Beitrag unter seinem Konto).
 - **Verweise:** docs/recherche/261018-hacs-update-dialog.md
 
+### 261017-zusage-standort-transport – Verkehrsmittel beim Zusagen wählen
+- **Status:** offen (Teil 1 „HA-Standort“ erledigt mit 261018-standort-quelle, rauchstefan/ha-ff-agent#11; Teil 2 offen)
+- **Priorität:** mittel
+- **Rolle(n):** architekt, entwickler, tester, reviewer
+- **Beschreibung:** Wunsch des Nutzers vom 2026-10-17:
+  1. Die Koordinaten der Zusage-URL sollen auf den **Home-Assistant-Standort** gesetzt
+     werden können.
+     - Heute gibt es nur die Option „Standort-Entität“ (`person`/`device_tracker`).
+     - Neu wäre die Quelle `zone.home` bzw. der in HA konfigurierte Standort, als
+       Auswahl „kein Standort / HA-Standort / Entität“.
+  2. Das **Verkehrsmittel soll beim Zusagen wählbar** sein, nicht nur als Standard in den
+     Optionen. Mögliche Umsetzungen:
+     - eine Select-Entität „Verkehrsmittel“, die der Button „Zusagen“ verwendet
+     - je ein Button pro Verkehrsmittel
+     - Feld der Action (gibt es bereits)
+
+     Der architekt bewertet die Varianten; der Nutzer entscheidet.
+
+  Baut auf PR rauchstefan/ha-ff-agent#4 auf (drei Verkehrsmittel). Datenschutz beachten:
+  Der HA-Standort ist die Wohnadresse und geht nur auf ausdrückliche Wahl an FF Agent.
+- **Definition of Done:** Entscheidung des Nutzers, ADR-Ergänzung, umgesetzt und getestet.
+
+### 261017-reply-redirects – Redirect-Verhalten der Rückmelde-URL härten
+- **Status:** offen (nach erstem echten Test, A6)
+- **Priorität:** mittel
+- **Rolle(n):** entwickler, reviewer
+- **Beschreibung:** `reply.py` folgt Redirects heute zu jedem Host und auch zu http
+  (`allow_redirects=True`). Nach dem echten Test entscheiden:
+  - Leitet FF Agent nicht um, `allow_redirects=False` setzen; ein 3xx gilt dann als
+    Fehler.
+  - Leitet es um, Redirects selbst folgen (höchstens 3) und nur `https` auf
+    `*.ff-agent.com` zulassen.
+- **Definition of Done:** Verhalten entschieden, umgesetzt und getestet.
+
+### 261017-einsatzdetails – Quelle für Einsatzdetails
+- **Status:** offen (wartet auf Hersteller und Antwort zu A13)
+- **Priorität:** mittel
+- **Beschreibung:** Platzhalter im Webhook, Hersteller-API oder iCal-Feed (Remote
+  Calendar). Siehe ADR 0002, Abschnitt 7.
+
 ### 261018-hacs-icon – Logo im HACS-Update-Dialog fehlt
 - **Status:** offen (wartet auf HA 2026.11; danach beim Nutzer prüfen)
 - **Priorität:** niedrig
@@ -71,44 +132,101 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
   Symbol. Sonst ein Issue bei home-assistant/core mit Label `integration: marketplace`.
 - **Verweise:** docs/recherche/261018-hacs-update-dialog.md
 
-### 261018-test-zusage-absage – Zusage und Absage gegen echtes FF Agent prüfen
-- **Status:** offen (Test durch den Nutzer)
-- **Priorität:** hoch
-- **Rolle(n):** Nutzer, Projektleiter, doku
-- **Beschreibung:** Test- und Echtalarm sind laut Nutzer am 2026-10-18 angekommen
-  (v0.3.0). Zusage und Absage über Button bzw. Action sind noch nicht gegen ein echtes
-  FF Agent geprüft (Annahme A7 im README: Verhalten bei inaktivem Einsatz,
-  Statuscodes). Zu prüfen sind:
-  - Zusage mit Verkehrsmittel und ggf. Standort
-  - Absage
-  - Rückmeldung ohne aktiven Einsatz
-  - Sensor „Letzte Rückmeldung“
-  - Ankunft in FF Agent
-- **Definition of Done:** Ergebnis des Nutzers dokumentiert; Hinweise „noch nicht
-  getestet“ in README (Kopf, Einschränkungen) und CHANGELOG angepasst; Abweichungen als
-  Bug-TODO.
-- **Verweise:** Chat vom 2026-10-18; README „Bekannte Einschränkungen“
+### 261018-ntfy-feinschliff – Kleine Verbesserungen am ntfy-Weg (aus Review zu #6)
+- **Status:** offen
+- **Priorität:** niedrig
+- **Rolle(n):** entwickler, tester, reviewer
+- **Beschreibung:**
+  1. Der Watcher für neue ntfy-Abos meldet sich nach der ersten erfolgreichen Übernahme
+     selbst ab. Sonst gibt es mehrere Reloads hintereinander, aber keine Schleife.
+  2. Ein zweites Abo mit gleichem Thema nicht übernehmen, solange die gespeicherte
+     Entität nur deaktiviert ist.
+  3. Reconfigure im ntfy-Modus: Option „andere Entität wählen“ ohne neue geheime Adresse,
+     oder zumindest den Options-Text präzisieren.
+  4. Folge-TODOs aus ADR 0003:
+     - Diagnose-Sensor „Alarmweg verbunden“
+     - echter ntfy-Test der Annahmen N1–N3, N6, N7, N9, N10
+     - nach dem 2. Dezember 2026 prüfen, ob `redirect/cloud/` nach der Umbenennung in
+       „Home Assistant Link“ noch stimmt
+
+### 261018-configflow-aufteilen – config_flow.py aufteilen
+- **Status:** offen
+- **Priorität:** niedrig
+- **Rolle(n):** entwickler, reviewer
+- **Beschreibung:** Hinweis des reviewers zu #6: `config_flow.py` hat rund 820 Zeilen.
+  - Vorschlag: `options_flow.py` (FFAgentOptionsFlow) abtrennen und ein ntfy-Mixin
+    (`_ntfy_*`, `async_step_ntfy*`, `_async_finish_ntfy`) bilden.
+  - Den gemeinsamen Reconfigure-Abschluss von `_async_finish_webhook` und
+    `_async_finish_ntfy` in eine Hilfsfunktion legen.
+  - Reines Refactoring, Tests bleiben unverändert grün.
+- **Zusätzlich (optional):** CI-Matrix auch gegen die Mindestversion HA 2026.3.0
+  (heute nur 2026.10.1).
+
+### 261017-quality-todos – Offene Quality-Scale-Regeln
+- **Status:** offen
+- **Priorität:** niedrig
+- **Rolle(n):** architekt, entwickler
+- **Beschreibung:**
+  - `entity-category`: „Letzte Rückmeldung“ als `diagnostic`?
+  - `strict-typing`: mypy-Gate
+  - `reauthentication-flow`: nach A7
+  - Siehe docs/quality-scale.md.
+
+### 261017-token-default – Zusatz-Token standardmäßig an?
+- **Status:** offen (nach erstem echten Test)
+- **Priorität:** niedrig
+- **Beschreibung:** Nach dem Test von A12 entscheiden, ob neue Einträge die Token-Prüfung
+  standardmäßig eingeschaltet bekommen.
+
+### 261017-ha-zugriff – Lesezugriff auf die HA-Instanz des Nutzers (MCP/SSH)
+- **Status:** zurückgestellt (Nutzer, 2026-10-17)
+- **Priorität:** niedrig
+- **Rolle(n):** Nutzer, Projektleiter
+- **Beschreibung:** Der Nutzer hat HA (lokal im Heimnetz, SSH auf Port 22) und den
+  HA-MCP-Server. Beides ist in Claude Code noch nicht angebunden. Bei Bedarf:
+  - MCP: langlebiges Token in HA anlegen, mit
+    `claude mcp add --transport http --scope user homeassistant http://<HA>:8123/api/mcp`
+    plus Authorization-Header vom Nutzer selbst eintragen lassen (Token nie ins Repo oder
+    in den OneDrive-Projektordner). Nur FF-Agent-Entitäten für Assist freigeben.
+  - SSH: nur mit Schlüssel, der auf dem PC hinterlegt ist; Benutzername vom Nutzer.
+  - Zugriff nur lesend (Dateien, Log, Diagnose); jede Änderung braucht die Freigabe im
+    Einzelfall.
+- **Definition of Done:** Zugriff eingerichtet und dokumentiert, oder bewusst verworfen.
+
+## Erledigt
 
 ### 261018-recherche-namen – Namen Dritter in öffentlichen Recherche-Dateien
-- **Status:** offen (Entscheidung des Nutzers)
+- **Status:** erledigt (2026-10-18, Branch fix/261018-recherche-namen; Entscheidung des Nutzers: neutralisieren)
 - **Priorität:** mittel
-- **Rolle(n):** Nutzer, Projektleiter, doku
-- **Beschreibung:** Hinweis des reviewers zu #7: `docs/recherche/261016-ffagent-schnittstellen.md`
-  nennt im öffentlichen Repo:
-  - den Firmennamen des Herstellers
-  - Personennamen (Geschäftsführer, PDF-Autor)
-  - die Geschäftsadresse
+- **Rolle(n):** Projektleiter, entwickler
+- **Beschreibung:** Firmenname des Herstellers, Personennamen und Geschäftsadresse aus
+  `docs/recherche/261016-ffagent-schnittstellen.md`, `docs/plaene/261017-alarmquelle-ntfy.md`
+  und dieser Datei entfernt. `tests/test_metadata.py` hält die verbotenen Wörter nicht mehr
+  im Klartext. Die Git-Historie enthält die Angaben weiter; sie zu entfernen hieße, die
+  Historie umzuschreiben (nur mit Freigabe des Nutzers).
 
-  Weitere Treffer: `docs/plaene/261017-alarmquelle-ntfy.md` (Prüfpunkt) und dieses TODO.
-  Die Angaben stammen aus dem öffentlichen Impressum; ein Sicherheitsproblem ist das
-  nicht, es geht um den Auftritt und um Datenschutz.
+### 261017-hacs-default – Aufnahme in den HACS-Default-Store
+- **Status:** erledigt (2026-10-18, aufgegangen in 261018-release-1-0; PR hacs/default#12188)
+- **Priorität:** niedrig
+- **Rolle(n):** Nutzer, Projektleiter
+- **Beschreibung:** PR an `hacs/default` gemäß docs/recherche/261016-hacs-anforderungen.md
+  (Checkliste 5.2). Dazu braucht es ein vollständiges Release, kein Pre-Release, und die
+  Klärung der Markenrechte am Namen „FF Agent“ mit dem Hersteller.
 
-  Optionen:
-  - neutralisieren, etwa „Hersteller von FF Agent“, ohne Personennamen und Adresse
-  - so lassen
-
-  Achtung: Neutralisieren wirkt nur ab jetzt, die Git-Historie behält die Angaben. Sie
-  ganz zu entfernen hieße, die Historie erneut umzuschreiben.
+### 261017-echter-test – Erster echter Test mit FF Agent und HA-Instanz
+- **Status:** erledigt (2026-10-18, Alarmempfang real getestet; der offene Rest – Zusage, Absage, Annahmen A6/A7/A12/A13 – läuft in 261018-test-zusage-absage weiter)
+- **Priorität:** hoch
+- **Rolle(n):** Nutzer, Projektleiter, tester
+- **Beschreibung:**
+  - Integration in die echte HA-Instanz installieren (Repo privat, daher manuell kopieren).
+  - Persönlichen Webhook in FF Agent nach README anlegen und einen Testalarm auslösen.
+  - Während des Testalarms Absagen und Zusagen.
+  - Diagnose auswerten: Annahmen A1–A9, A12, A13 aus ADR 0002, dazu das Redirect-Verhalten
+    (261017-reply-redirects).
+  - Ergebnisse in docs/architektur.md bzw. ADR 0002 eintragen.
+- **Definition of Done:** alle Annahmen bestätigt oder widerlegt und dokumentiert,
+  Folge-TODOs angelegt.
+- **Verweise:** README (Einrichtung, Fehlerbehebung), ADR 0002 (Annahmen)
 
 ### 261018-release-0-2-0 – Release v0.2.0 als Vorabversion
 - **Status:** erledigt (2026-10-18, Pre-Release v0.2.0 auf dabe583: https://github.com/rauchstefan/ha-ff-agent/releases/tag/v0.2.0; Go des Nutzers im Chat)
@@ -125,84 +243,27 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
 - **Definition of Done:** Release-PR gemergt (Gate bestanden), Go des Nutzers,
   Pre-Release v0.2.0 auf grünem Commit.
 
-### 261016-repo-oeffentlich – Entscheidung: Repo öffentlich machen
-- **Status:** erledigt (2026-10-17: neues öffentliches Repo mit bereinigter Historie, altes als privates Archiv ha-ff-agent-archiv; Beschreibung, Topics, Issues gesetzt)
-- **Priorität:** hoch
-- **Rolle(n):** Nutzer, Projektleiter
-- **Beschreibung:** HACS funktioniert nur mit öffentlichen GitHub-Repos, auch als Custom
-  Repository. Die Sichtbarkeit zu ändern braucht die Freigabe des Nutzers. Danach
-  Beschreibung, Topics und Issues setzen. Außerdem klären, ob Name und Logo von FF Agent
-  verwendet werden dürfen.
-- **Definition of Done:** Entscheidung dokumentiert. Bei Zustimmung ist das Repo öffentlich
-  und hat Beschreibung und Topics.
-- **Verweise:** docs/recherche/261016-hacs-anforderungen.md, Abschnitt 3.6
-
-### 261016-hacs-oeffentlich-pruefen – HACS-Job nach Veröffentlichung prüfen
-- **Status:** erledigt (2026-10-17: HACS-Validierung 9/9 Checks ohne ignore, Cron täglich per PR rauchstefan/ha-ff-agent#2)
-- **Priorität:** mittel
-- **Rolle(n):** tester, entwickler
-- **Beschreibung:** Solange das Repo privat ist, überspringt validate.yml den HACS-Job.
-  Nach der Veröffentlichung prüfen, ob er ohne `ignore` grün läuft (Brands-Check,
-  Beschreibung, Topics). Dann den Cron in validate.yml wieder auf täglich stellen.
-  `hacs/action` ist auf eine SHA von `main` gepinnt, weil das letzte Release von 2022
-  ist. Dependabot aktualisiert solche Branch-Pins nicht, also gelegentlich von Hand
-  nachziehen. Dasselbe gilt für hassfest@master.
-- **Definition of Done:** HACS-Job grün, Cron täglich.
-- **Verweise:** PR rauchstefan/ha-ff-agent-archiv#1
-
-### 261017-echter-test – Erster echter Test mit FF Agent und HA-Instanz
-- **Status:** in Arbeit (Freigabe des Nutzers 2026-10-17; Anleitung docs/plaene/261017-echter-test-anleitung.md; wartet auf Rückmeldeliste)
-- **Priorität:** hoch
-- **Rolle(n):** Nutzer, Projektleiter, tester
-- **Beschreibung:**
-  - Integration in die echte HA-Instanz installieren (Repo privat, daher manuell kopieren).
-  - Persönlichen Webhook in FF Agent nach README anlegen und einen Testalarm auslösen.
-  - Während des Testalarms Absagen und Zusagen.
-  - Diagnose auswerten: Annahmen A1–A9, A12, A13 aus ADR 0002, dazu das Redirect-Verhalten
-    (261017-reply-redirects).
-  - Ergebnisse in docs/architektur.md bzw. ADR 0002 eintragen.
-- **Definition of Done:** alle Annahmen bestätigt oder widerlegt und dokumentiert,
-  Folge-TODOs angelegt.
-- **Verweise:** README (Einrichtung, Fehlerbehebung), ADR 0002 (Annahmen)
-
-### 261017-dependabot-hassfest – Dependabot-PR für den hassfest-Pin prüfen
-- **Status:** erledigt (2026-10-17, per Ersatz-PR rauchstefan/ha-ff-agent#3; #1 geschlossen. Hinweis: Das gh-Token dieses Rechners hat keinen `workflow`-Scope, deshalb lassen sich Dependabot-PRs auf Workflow-Dateien nicht per gh mergen. Ausweg: Ersatz-PR oder Merge im Browser)
-- **Priorität:** niedrig
-- **Rolle(n):** reviewer
-- **Beschreibung:** Dependabot hat PR rauchstefan/ha-ff-agent#1 geöffnet: Bump des Pins von
-  `home-assistant/actions/hassfest`. Prüfen, ob die CI grün ist, dann mergen.
-  Grundsätzlich: Dependabot-PRs nur bei grüner CI mergen. Ändert sich mit einem Update von
-  pytest-homeassistant-custom-component die Python-Version, `PYTHON_VERSION` in tests.yml
-  anpassen.
-
-### 261017-hacs-default – Aufnahme in den HACS-Default-Store
-- **Status:** offen (nach bestandenem echten Test und stabilem Release)
-- **Priorität:** niedrig
-- **Rolle(n):** Nutzer, Projektleiter
-- **Beschreibung:** PR an `hacs/default` gemäß docs/recherche/261016-hacs-anforderungen.md
-  (Checkliste 5.2). Dazu braucht es ein vollständiges Release, kein Pre-Release, und die
-  Klärung der Markenrechte am Namen „FF Agent“ mit dem Hersteller.
-
-### 261017-fundort-transport – Fundort der Rückmelde-URL korrigieren, Verkehrsmittel erweitern
-- **Status:** erledigt (2026-10-18, PR rauchstefan/ha-ff-agent#4, 5696f51; tester PASS,
-  reviewer freigegeben)
-- **Priorität:** hoch (Finding des Nutzers aus dem echten Test)
-- **Rolle(n):** entwickler, tester, reviewer
-- **Beschreibung:**
-  - Fundort der Rückmelde-URL in Config Flow (de/en), README, Testanleitung und Plan
-    korrigieren.
-  - Verkehrsmittel `feet` und `bicycle` ergänzen (FF Agent: `FEET`, `BICYCLE`).
-  - Annahmen A8 und A9 in ADR 0002 und architektur.md als geklärt eintragen.
-- **Verweise:** docs/recherche/261016-ffagent-webhook-zusage.md, Abschnitt 3.7
-
-### 261017-erreichbarkeit-recherche – Wege, HA für FF Agent erreichbar zu machen
-- **Status:** erledigt (2026-10-17, docs/recherche/261017-erreichbarkeit.md; My-Link und ntfy-Integration vom Projektleiter geprüft)
-- **Priorität:** hoch (Hürde für normale Nutzer)
-- **Rolle(n):** researcher, danach architekt
-- **Beschreibung:** Nabu Casa (Link zur Einrichtung), Alternativen wie Tunnel-Add-ons
-  und kostenlose Webhook-Relays, sowie Wege ohne eingehende Verbindung, bewertet nach
-  Aufwand für normale Nutzer, Kosten, Zuverlässigkeit, Latenz und Datenschutz.
-- **Definition of Done:** docs/recherche/261017-erreichbarkeit.md mit Empfehlung.
+### 261017-geraeteinfo-hersteller – Kein Herstellername in der Geräte-Info
+- **Status:** erledigt (2026-10-18, PR rauchstefan/ha-ff-agent#7, dabe583; neutraler Eintrag „ha-ff-agent (inoffiziell)“, Test und Regel in CLAUDE.md)
+- **Priorität:** hoch (Rechtliches, sichtbar in der HA-UI)
+- **Rolle(n):** entwickler, tester, reviewer, doku
+- **Beschreibung:** Vorgabe des Nutzers vom 2026-10-17: „Erwähne nicht [Firmenname]
+  hier, ich besitze nicht die Rechte daran. Es ist eine inoffizielle Integration.“
+  - Heute zeigt die Geräte-Info in HA unter dem Gerätenamen den Hersteller
+    [Firmenname]: `const.py` `MANUFACTURER`, genutzt in `entity.py`
+    (`DeviceInfo`); Test `tests/test_entities.py` Zeile 163.
+  - Vorschlag:
+    - `manufacturer` ganz weglassen oder einen neutralen Eintrag wählen, etwa
+      „ha-ff-agent (inoffiziell)“; der Nutzer entscheidet.
+    - `model` „FF Agent“ und `configuration_url` prüfen. Nur der Produktname als
+      Beschreibung, kein Hinweis auf eine offizielle Herkunft.
+  - Auch Plan (docs/plaene/261017-mvp-alarm-zusage.md, Schritt Gerät) und die Doku
+    anpassen. Recherche-Fakten in docs/recherche/ bleiben unverändert.
+  - Grundsatz für alle Texte, die Nutzer sehen (UI, README, Release-Notes): keine Namen
+    des Herstellers bzw. Betreibers; Hinweis „inoffizielles Community-Projekt“.
+- **Definition of Done:** Die Geräte-Info zeigt keinen Herstellernamen mehr, die Tests
+  sind angepasst, und eine Regel im CLAUDE.md-Abschnitt „Fallstricke“ bzw. im Plan legt
+  den Grundsatz fest.
 
 ### 261017-ux-erreichbarkeit – Alarmquelle wählbar (Webhook/Nabu Casa oder ntfy), verständlicher Hinweis
 - **Status:** erledigt (2026-10-18, PR rauchstefan/ha-ff-agent#6, dddc3f9)
@@ -224,104 +285,57 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
   - README entsprechend.
 - **Definition of Done:** neue Texte de/en, README, Tests.
 
-### 261017-geraeteinfo-hersteller – Kein Herstellername in der Geräte-Info
-- **Status:** erledigt (2026-10-18, PR rauchstefan/ha-ff-agent#7, dabe583; neutraler Eintrag „ha-ff-agent (inoffiziell)“, Test und Regel in CLAUDE.md)
-- **Priorität:** hoch (Rechtliches, sichtbar in der HA-UI)
-- **Rolle(n):** entwickler, tester, reviewer, doku
-- **Beschreibung:** Vorgabe des Nutzers vom 2026-10-17: „Erwähne nicht mackoy consulting
-  hier, ich besitze nicht die Rechte daran. Es ist eine inoffizielle Integration.“
-  - Heute zeigt die Geräte-Info in HA unter dem Gerätenamen den Hersteller
-    „mackoy consulting“: `const.py` `MANUFACTURER`, genutzt in `entity.py`
-    (`DeviceInfo`); Test `tests/test_entities.py` Zeile 163.
-  - Vorschlag:
-    - `manufacturer` ganz weglassen oder einen neutralen Eintrag wählen, etwa
-      „ha-ff-agent (inoffiziell)“; der Nutzer entscheidet.
-    - `model` „FF Agent“ und `configuration_url` prüfen. Nur der Produktname als
-      Beschreibung, kein Hinweis auf eine offizielle Herkunft.
-  - Auch Plan (docs/plaene/261017-mvp-alarm-zusage.md, Schritt Gerät) und die Doku
-    anpassen. Recherche-Fakten in docs/recherche/ bleiben unverändert.
-  - Grundsatz für alle Texte, die Nutzer sehen (UI, README, Release-Notes): keine Namen
-    des Herstellers bzw. Betreibers; Hinweis „inoffizielles Community-Projekt“.
-- **Definition of Done:** Die Geräte-Info zeigt keinen Herstellernamen mehr, die Tests
-  sind angepasst, und eine Regel im CLAUDE.md-Abschnitt „Fallstricke“ bzw. im Plan legt
-  den Grundsatz fest.
-
-### 261017-zusage-standort-transport – Standort aus HA und Verkehrsmittel beim Zusagen wählen
-- **Status:** offen (Feature-Wunsch des Nutzers; erst nach Ende seines Tests planen)
-- **Priorität:** mittel
-- **Rolle(n):** architekt, entwickler, tester, reviewer
-- **Beschreibung:** Wunsch des Nutzers vom 2026-10-17:
-  1. Die Koordinaten der Zusage-URL sollen auf den **Home-Assistant-Standort** gesetzt
-     werden können.
-     - Heute gibt es nur die Option „Standort-Entität“ (`person`/`device_tracker`).
-     - Neu wäre die Quelle `zone.home` bzw. der in HA konfigurierte Standort, als
-       Auswahl „kein Standort / HA-Standort / Entität“.
-  2. Das **Verkehrsmittel soll beim Zusagen wählbar** sein, nicht nur als Standard in den
-     Optionen. Mögliche Umsetzungen:
-     - eine Select-Entität „Verkehrsmittel“, die der Button „Zusagen“ verwendet
-     - je ein Button pro Verkehrsmittel
-     - Feld der Action (gibt es bereits)
-
-     Der architekt bewertet die Varianten; der Nutzer entscheidet.
-
-  Baut auf PR rauchstefan/ha-ff-agent#4 auf (drei Verkehrsmittel). Datenschutz beachten:
-  Der HA-Standort ist die Wohnadresse und geht nur auf ausdrückliche Wahl an FF Agent.
-- **Definition of Done:** Entscheidung des Nutzers, ADR-Ergänzung, umgesetzt und getestet.
-
-### 261017-ha-zugriff – Lesezugriff auf die HA-Instanz des Nutzers (MCP/SSH)
-- **Status:** zurückgestellt (Nutzer, 2026-10-17)
-- **Priorität:** niedrig
-- **Rolle(n):** Nutzer, Projektleiter
-- **Beschreibung:** Der Nutzer hat HA (lokal im Heimnetz, SSH auf Port 22) und den
-  HA-MCP-Server. Beides ist in Claude Code noch nicht angebunden. Bei Bedarf:
-  - MCP: langlebiges Token in HA anlegen, mit
-    `claude mcp add --transport http --scope user homeassistant http://<HA>:8123/api/mcp`
-    plus Authorization-Header vom Nutzer selbst eintragen lassen (Token nie ins Repo oder
-    in den OneDrive-Projektordner). Nur FF-Agent-Entitäten für Assist freigeben.
-  - SSH: nur mit Schlüssel, der auf dem PC hinterlegt ist; Benutzername vom Nutzer.
-  - Zugriff nur lesend (Dateien, Log, Diagnose); jede Änderung braucht die Freigabe im
-    Einzelfall.
-- **Definition of Done:** Zugriff eingerichtet und dokumentiert, oder bewusst verworfen.
-
-### 261018-ntfy-feinschliff – Kleine Verbesserungen am ntfy-Weg (aus Review zu #6)
-- **Status:** offen (nach Merge von PR rauchstefan/ha-ff-agent#6)
-- **Priorität:** niedrig
+### 261017-fundort-transport – Fundort der Rückmelde-URL korrigieren, Verkehrsmittel erweitern
+- **Status:** erledigt (2026-10-18, PR rauchstefan/ha-ff-agent#4, 5696f51; tester PASS,
+  reviewer freigegeben)
+- **Priorität:** hoch (Finding des Nutzers aus dem echten Test)
 - **Rolle(n):** entwickler, tester, reviewer
 - **Beschreibung:**
-  1. Der Watcher für neue ntfy-Abos meldet sich nach der ersten erfolgreichen Übernahme
-     selbst ab. Sonst gibt es mehrere Reloads hintereinander, aber keine Schleife.
-  2. Ein zweites Abo mit gleichem Thema nicht übernehmen, solange die gespeicherte
-     Entität nur deaktiviert ist.
-  3. Reconfigure im ntfy-Modus: Option „andere Entität wählen“ ohne neue geheime Adresse,
-     oder zumindest den Options-Text präzisieren.
-  4. Folge-TODOs aus ADR 0003:
-     - Diagnose-Sensor „Alarmweg verbunden“
-     - echter ntfy-Test der Annahmen N1–N3, N6, N7, N9, N10
-     - nach dem 2. Dezember 2026 prüfen, ob `redirect/cloud/` nach der Umbenennung in
-       „Home Assistant Link“ noch stimmt
+  - Fundort der Rückmelde-URL in Config Flow (de/en), README, Testanleitung und Plan
+    korrigieren.
+  - Verkehrsmittel `feet` und `bicycle` ergänzen (FF Agent: `FEET`, `BICYCLE`).
+  - Annahmen A8 und A9 in ADR 0002 und architektur.md als geklärt eintragen.
+- **Verweise:** docs/recherche/261016-ffagent-webhook-zusage.md, Abschnitt 3.7
 
-### 261018-configflow-aufteilen – config_flow.py aufteilen
-- **Status:** offen (nach Merge von PR rauchstefan/ha-ff-agent#6)
+### 261017-dependabot-hassfest – Dependabot-PR für den hassfest-Pin prüfen
+- **Status:** erledigt (2026-10-17, per Ersatz-PR rauchstefan/ha-ff-agent#3; #1 geschlossen. Hinweis: Das gh-Token dieses Rechners hat keinen `workflow`-Scope, deshalb lassen sich Dependabot-PRs auf Workflow-Dateien nicht per gh mergen. Ausweg: Ersatz-PR oder Merge im Browser)
 - **Priorität:** niedrig
-- **Rolle(n):** entwickler, reviewer
-- **Beschreibung:** Hinweis des reviewers zu #6: `config_flow.py` hat rund 820 Zeilen.
-  - Vorschlag: `options_flow.py` (FFAgentOptionsFlow) abtrennen und ein ntfy-Mixin
-    (`_ntfy_*`, `async_step_ntfy*`, `_async_finish_ntfy`) bilden.
-  - Den gemeinsamen Reconfigure-Abschluss von `_async_finish_webhook` und
-    `_async_finish_ntfy` in eine Hilfsfunktion legen.
-  - Reines Refactoring, Tests bleiben unverändert grün.
-- **Zusätzlich (optional):** CI-Matrix auch gegen die Mindestversion HA 2026.3.0
-  (heute nur 2026.10.1).
+- **Rolle(n):** reviewer
+- **Beschreibung:** Dependabot hat PR rauchstefan/ha-ff-agent#1 geöffnet: Bump des Pins von
+  `home-assistant/actions/hassfest`. Prüfen, ob die CI grün ist, dann mergen.
+  Grundsätzlich: Dependabot-PRs nur bei grüner CI mergen. Ändert sich mit einem Update von
+  pytest-homeassistant-custom-component die Python-Version, `PYTHON_VERSION` in tests.yml
+  anpassen.
 
-### 261017-quality-todos – Offene Quality-Scale-Regeln
-- **Status:** offen
-- **Priorität:** niedrig
-- **Rolle(n):** architekt, entwickler
+### 261017-erreichbarkeit-recherche – Wege, HA für FF Agent erreichbar zu machen
+- **Status:** erledigt (2026-10-17, docs/recherche/261017-erreichbarkeit.md; My-Link und ntfy-Integration vom Projektleiter geprüft)
+- **Priorität:** hoch (Hürde für normale Nutzer)
+- **Rolle(n):** researcher, danach architekt
+- **Beschreibung:** Nabu Casa (Link zur Einrichtung), Alternativen wie Tunnel-Add-ons
+  und kostenlose Webhook-Relays, sowie Wege ohne eingehende Verbindung, bewertet nach
+  Aufwand für normale Nutzer, Kosten, Zuverlässigkeit, Latenz und Datenschutz.
+- **Definition of Done:** docs/recherche/261017-erreichbarkeit.md mit Empfehlung.
+
+### 261017-python-target – Python-Mindestversion vs. ruff-Ziel prüfen
+- **Status:** erledigt (2026-10-17, ohne Codeänderung: HA 2026.3.0 verlangt Python ≥ 3.14.2, passt zu ruff py314; siehe docs/architektur.md)
+- **Priorität:** mittel
+- **Rolle(n):** entwickler
 - **Beschreibung:**
-  - `entity-category`: „Letzte Rückmeldung“ als `diagnostic`?
-  - `strict-typing`: mypy-Gate
-  - `reauthentication-flow`: nach A7
-  - Siehe docs/quality-scale.md.
+  - Problem: In `pyproject.toml` ist ruff auf `py314` eingestellt und formatiert z. B.
+    `except A, B:` (Syntax ab Python 3.14). `hacs.json` erlaubt aber HA ab 2026.3.0.
+  - Zu prüfen: welche Python-Version HA 2026.3 voraussetzt.
+  - Ist sie kleiner als 3.14, entweder ruff `target-version` darauf senken oder die
+    HA-Mindestversion anheben.
+  - Bis dahin weichen PRs mit einer Tupel-Variable aus (Hinweis aus PR 2).
+- **Definition of Done:** ruff-Ziel und HA-Mindestversion passen zusammen.
+
+### 261017-reply-test-k5 – Test „Erfolg, Fehler, gleiche Aktion“ ergänzen
+- **Status:** erledigt (2026-10-17, in PR rauchstefan/ha-ff-agent-archiv#6)
+- **Priorität:** niedrig
+- **Rolle(n):** tester
+- **Beschreibung:** Zu testender Ablauf: Zusagen klappt, Absagen schlägt fehl, eine erneute
+  Zusage innerhalb von 10 s wird übersprungen. Das Verhalten ist korrekt, aber nicht
+  festgeschrieben. Kann mit PR 5 erledigt werden.
 
 ### MVP Alarm + Zusage (Plan: docs/plaene/261017-mvp-alarm-zusage.md, ADR 0002) – fertig 2026-10-17
 
@@ -370,52 +384,30 @@ Gemeinsame Angaben für alle sechs Schritte:
   - Hinweis: Debug-Logs von `websocket_api` können Geheimnisse aus Dialogen enthalten; nicht teilen
   - Hinweis: Eine Antwort 200 von FF Agent heißt nur „gesendet“, nicht sicher „verbucht“ (A7)
 
-### 261017-python-target – Python-Mindestversion vs. ruff-Ziel prüfen
-- **Status:** erledigt (2026-10-17, ohne Codeänderung: HA 2026.3.0 verlangt Python ≥ 3.14.2, passt zu ruff py314; siehe docs/architektur.md)
+### 261016-hacs-oeffentlich-pruefen – HACS-Job nach Veröffentlichung prüfen
+- **Status:** erledigt (2026-10-17: HACS-Validierung 9/9 Checks ohne ignore, Cron täglich per PR rauchstefan/ha-ff-agent#2)
 - **Priorität:** mittel
-- **Rolle(n):** entwickler
-- **Beschreibung:**
-  - Problem: In `pyproject.toml` ist ruff auf `py314` eingestellt und formatiert z. B.
-    `except A, B:` (Syntax ab Python 3.14). `hacs.json` erlaubt aber HA ab 2026.3.0.
-  - Zu prüfen: welche Python-Version HA 2026.3 voraussetzt.
-  - Ist sie kleiner als 3.14, entweder ruff `target-version` darauf senken oder die
-    HA-Mindestversion anheben.
-  - Bis dahin weichen PRs mit einer Tupel-Variable aus (Hinweis aus PR 2).
-- **Definition of Done:** ruff-Ziel und HA-Mindestversion passen zusammen.
+- **Rolle(n):** tester, entwickler
+- **Beschreibung:** Solange das Repo privat ist, überspringt validate.yml den HACS-Job.
+  Nach der Veröffentlichung prüfen, ob er ohne `ignore` grün läuft (Brands-Check,
+  Beschreibung, Topics). Dann den Cron in validate.yml wieder auf täglich stellen.
+  `hacs/action` ist auf eine SHA von `main` gepinnt, weil das letzte Release von 2022
+  ist. Dependabot aktualisiert solche Branch-Pins nicht, also gelegentlich von Hand
+  nachziehen. Dasselbe gilt für hassfest@master.
+- **Definition of Done:** HACS-Job grün, Cron täglich.
+- **Verweise:** PR rauchstefan/ha-ff-agent-archiv#1
 
-### 261017-reply-redirects – Redirect-Verhalten der Rückmelde-URL härten
-- **Status:** offen (nach erstem echten Test, A6)
-- **Priorität:** mittel
-- **Rolle(n):** entwickler, reviewer
-- **Beschreibung:** `reply.py` folgt Redirects heute zu jedem Host und auch zu http
-  (`allow_redirects=True`). Nach dem echten Test entscheiden:
-  - Leitet FF Agent nicht um, `allow_redirects=False` setzen; ein 3xx gilt dann als
-    Fehler.
-  - Leitet es um, Redirects selbst folgen (höchstens 3) und nur `https` auf
-    `*.ff-agent.com` zulassen.
-- **Definition of Done:** Verhalten entschieden, umgesetzt und getestet.
-
-### 261017-reply-test-k5 – Test „Erfolg, Fehler, gleiche Aktion“ ergänzen
-- **Status:** erledigt (2026-10-17, in PR rauchstefan/ha-ff-agent-archiv#6)
-- **Priorität:** niedrig
-- **Rolle(n):** tester
-- **Beschreibung:** Zu testender Ablauf: Zusagen klappt, Absagen schlägt fehl, eine erneute
-  Zusage innerhalb von 10 s wird übersprungen. Das Verhalten ist korrekt, aber nicht
-  festgeschrieben. Kann mit PR 5 erledigt werden.
-
-### 261017-token-default – Zusatz-Token standardmäßig an?
-- **Status:** offen (nach erstem echten Test)
-- **Priorität:** niedrig
-- **Beschreibung:** Nach dem Test von A12 entscheiden, ob neue Einträge die Token-Prüfung
-  standardmäßig eingeschaltet bekommen.
-
-### 261017-einsatzdetails – Quelle für Einsatzdetails
-- **Status:** offen (wartet auf Hersteller und Antwort zu A13)
-- **Priorität:** mittel
-- **Beschreibung:** Platzhalter im Webhook, Hersteller-API oder iCal-Feed (Remote
-  Calendar). Siehe ADR 0002, Abschnitt 7.
-
-## Erledigt
+### 261016-repo-oeffentlich – Entscheidung: Repo öffentlich machen
+- **Status:** erledigt (2026-10-17: neues öffentliches Repo mit bereinigter Historie, altes als privates Archiv ha-ff-agent-archiv; Beschreibung, Topics, Issues gesetzt)
+- **Priorität:** hoch
+- **Rolle(n):** Nutzer, Projektleiter
+- **Beschreibung:** HACS funktioniert nur mit öffentlichen GitHub-Repos, auch als Custom
+  Repository. Die Sichtbarkeit zu ändern braucht die Freigabe des Nutzers. Danach
+  Beschreibung, Topics und Issues setzen. Außerdem klären, ob Name und Logo von FF Agent
+  verwendet werden dürfen.
+- **Definition of Done:** Entscheidung dokumentiert. Bei Zustimmung ist das Repo öffentlich
+  und hat Beschreibung und Topics.
+- **Verweise:** docs/recherche/261016-hacs-anforderungen.md, Abschnitt 3.6
 
 ### 261018-readme-badges – README: Badges, HACS-Button, Hinweisboxen, Community-Abschnitte
 - **Status:** erledigt (2026-10-18, PR von Branch claude/readme-update-ha-anker-solix-2ea3b2)
