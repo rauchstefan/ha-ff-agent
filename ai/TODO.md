@@ -90,9 +90,11 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
   Klärung der Markenrechte am Namen „FF Agent“ mit dem Hersteller.
 
 ### 261017-fundort-transport – Fundort der Rückmelde-URL korrigieren, Verkehrsmittel erweitern
-- **Status:** geparkt. PR rauchstefan/ha-ff-agent#4 ist offen, die CI grün. tester und
-  reviewer stehen noch aus. Der Nutzer will Implementierungen erst nach Ende seines Tests
-  (2026-10-17), deshalb nicht mergen, bis er das Signal gibt.
+- **Status:** Gate bestanden, wartet auf Merge-Okay des Nutzers (2026-10-18).
+  PR rauchstefan/ha-ff-agent#4: CI grün, tester PASS, reviewer freigegeben.
+  - Nicht mergen, bis der Nutzer sein Okay gibt; er testet noch.
+  - Reihenfolge: zuerst #4 nach main, dann die Base von #6 auf main umstellen und #6
+    mergen.
 - **Priorität:** hoch (Finding des Nutzers aus dem echten Test)
 - **Rolle(n):** entwickler, tester, reviewer
 - **Beschreibung:**
@@ -112,11 +114,14 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
 - **Definition of Done:** docs/recherche/261017-erreichbarkeit.md mit Empfehlung.
 
 ### 261017-ux-erreichbarkeit – Alarmquelle wählbar (Webhook/Nabu Casa oder ntfy), verständlicher Hinweis
-- **Status:** in Arbeit (lokal-2026-10-16-hacs-recherche, 2026-10-17). Auftrag des Nutzers:
-  „bitte 1 und 2 umsetzen, und dem Nutzer die Wahl geben“. Gemeint sind (1) Nabu Casa
-  mit Einrichtungslink und verständlichem Text, (2) ntfy.sh als kostenlose Alternative.
-  Der Nutzer hält den Alarmeingang nicht für kritisch. Merge erst nach seinem Okay
-  (der Test läuft noch).
+- **Status:** Gate bestanden, wartet auf Merge-Okay des Nutzers (2026-10-18).
+  - PR rauchstefan/ha-ff-agent#6 (Base #4), Stand f3fa723: CI grün, 642 Tests,
+    Abdeckung 100 %, tester PASS, reviewer freigegeben inklusive Nachprüfung.
+  - Auftrag des Nutzers: „bitte 1 und 2 umsetzen, und dem Nutzer die Wahl geben“.
+    Gemeint sind (1) Nabu Casa mit Einrichtungslink und verständlichem Text, (2) ntfy.sh
+    als kostenlose Alternative.
+  - Der Nutzer hält den Alarmeingang nicht für kritisch.
+  - Folgepunkte: 261018-ntfy-feinschliff.
 - **Priorität:** hoch
 - **Rolle(n):** architekt, entwickler, doku
 - **Beschreibung:** Finding des Nutzers vom 2026-10-17: Der Abschlussdialog bei interner
@@ -186,6 +191,36 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
   - Zugriff nur lesend (Dateien, Log, Diagnose); jede Änderung braucht die Freigabe im
     Einzelfall.
 - **Definition of Done:** Zugriff eingerichtet und dokumentiert, oder bewusst verworfen.
+
+### 261018-ntfy-feinschliff – Kleine Verbesserungen am ntfy-Weg (aus Review zu #6)
+- **Status:** offen (nach Merge von PR rauchstefan/ha-ff-agent#6)
+- **Priorität:** niedrig
+- **Rolle(n):** entwickler, tester, reviewer
+- **Beschreibung:**
+  1. Der Watcher für neue ntfy-Abos meldet sich nach der ersten erfolgreichen Übernahme
+     selbst ab. Sonst gibt es mehrere Reloads hintereinander, aber keine Schleife.
+  2. Ein zweites Abo mit gleichem Thema nicht übernehmen, solange die gespeicherte
+     Entität nur deaktiviert ist.
+  3. Reconfigure im ntfy-Modus: Option „andere Entität wählen“ ohne neue geheime Adresse,
+     oder zumindest den Options-Text präzisieren.
+  4. Folge-TODOs aus ADR 0003:
+     - Diagnose-Sensor „Alarmweg verbunden“
+     - echter ntfy-Test der Annahmen N1–N3, N6, N7, N9, N10
+     - nach dem 2. Dezember 2026 prüfen, ob `redirect/cloud/` nach der Umbenennung in
+       „Home Assistant Link“ noch stimmt
+
+### 261018-configflow-aufteilen – config_flow.py aufteilen
+- **Status:** offen (nach Merge von PR rauchstefan/ha-ff-agent#6)
+- **Priorität:** niedrig
+- **Rolle(n):** entwickler, reviewer
+- **Beschreibung:** Hinweis des reviewers zu #6: `config_flow.py` hat rund 820 Zeilen.
+  - Vorschlag: `options_flow.py` (FFAgentOptionsFlow) abtrennen und ein ntfy-Mixin
+    (`_ntfy_*`, `async_step_ntfy*`, `_async_finish_ntfy`) bilden.
+  - Den gemeinsamen Reconfigure-Abschluss von `_async_finish_webhook` und
+    `_async_finish_ntfy` in eine Hilfsfunktion legen.
+  - Reines Refactoring, Tests bleiben unverändert grün.
+- **Zusätzlich (optional):** CI-Matrix auch gegen die Mindestversion HA 2026.3.0
+  (heute nur 2026.10.1).
 
 ### 261017-quality-todos – Offene Quality-Scale-Regeln
 - **Status:** offen
