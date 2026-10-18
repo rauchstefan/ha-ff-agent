@@ -3,7 +3,9 @@
 Alle nennenswerten Änderungen an dieser Integration. Format angelehnt an
 [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionen nach SemVer.
 
-## [Unreleased]
+## [0.3.0] – 2026-10-18 (Vorabversion)
+
+Dritte Vorabversion. Ein Testalarm aus FF Agent ist beim Entwickler erfolgreich angekommen; andere Teile, etwa Zusagen und Absagen, sind noch nicht gegen ein echtes FF Agent geprüft.
 
 **Update:** Nach dem Update Home Assistant neu starten **und die Seite im Browser hart neu
 laden** (Strg+F5, am Mac Cmd+Umschalt+R). In der Companion-App die App neu starten bzw.
@@ -34,6 +36,49 @@ unter Umständen keinen oder alten Text.
 
 - **Link „Besuchen“ in der Geräte-Info:** Das Gerät verweist nicht mehr auf eine Website.
   Der Link bestehender Geräte verschwindet nach dem Neustart bzw. Neuladen der Integration.
+
+### Dokumentation
+
+- Die README enthält jetzt die vollständige Anleitung auf Deutsch und auf Englisch in einer
+  Datei (Sprachumschalter am Anfang) und ist redaktionell überarbeitet.
+
+### English
+
+Third pre-release. A test alarm from FF Agent has arrived successfully on the developer's system; other parts, such as accepting and declining, have not yet been checked against a real FF Agent.
+
+**Update:** After updating, restart Home Assistant **and hard-reload the page in the
+browser** (Ctrl+F5, on a Mac Cmd+Shift+R). In the companion app, restart the app or clear
+the frontend cache in the app settings. Otherwise the dialogs of the integration may show
+no text or old text.
+
+#### Added
+
+- **Reset alarm:** A new button "Reset alarm" and a new action `ff_agent.reset_alarm` turn
+  "Alarm active" off right away and stop the reset time. "Last alarm" stays, and the
+  30-second window against duplicate alarms keeps running. Without an active alarm nothing
+  happens; nothing is sent to FF Agent.
+- **Transport and location during setup:** After the mission reply URL, the setup now asks
+  for the default transport and the optional location entity (a person or device tracker).
+  Both could previously only be set under "Configure" and stay changeable there.
+
+#### Changed
+
+- **Reconfigure:** The choice of the alarm way is now called "How does Home Assistant
+  receive the alarm?" and names the requirements (a cloud subscription or an address
+  reachable from the internet, or free through ntfy without a subscription).
+- **Shorter ntfy ending:** The final dialog only repeats the values for FF Agent if the
+  chosen entity has another address than the dialog before. Otherwise a pointer to the test
+  alarm is enough.
+
+#### Documentation
+
+- The README now contains the complete guide in German and English in one file, with a
+  language switch at the top, and has been edited throughout.
+
+#### Removed
+
+- **"Visit" link in the device info:** The device no longer points to a website. The link
+  on existing devices disappears after a restart or reload of the integration.
 
 ## [0.2.0] – 2026-10-18 (Vorabversion)
 
@@ -123,5 +168,6 @@ Siehe README, Abschnitt „Bekannte Einschränkungen“. Die wichtigsten:
 - Belegt ist nur das Verkehrsmittel „Auto“.
 - Eine Antwort mit Status 2xx heißt nur „gesendet“, nicht sicher „verbucht“.
 
+[0.3.0]: https://github.com/rauchstefan/ha-ff-agent/releases/tag/v0.3.0
 [0.2.0]: https://github.com/rauchstefan/ha-ff-agent/releases/tag/v0.2.0
 [0.1.0]: https://github.com/rauchstefan/ha-ff-agent/releases/tag/v0.1.0
