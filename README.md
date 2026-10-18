@@ -164,13 +164,13 @@ Schritt für Schritt durch den gewählten Weg. Wechseln kannst du später jederz
      Home-Assistant-Cloud-Abo aktiv, verwendet die Einrichtung die Cloud-Adresse, auch
      über die Option „Ich habe eine eigene Internetadresse“.
    - Home Assistant Cloud eingerichtet, aber nicht verbunden: Der Dialog zeigt, was zu
-     prüfen ist, mit „Erneut versuchen“ und „Stattdessen ntfy nutzen“.
+     prüfen ist, mit „Erneut versuchen“ und „Stattdessen ntfy nutzen (kostenlos)“.
    - Nichts davon: Der Einrichtungsdialog „Home Assistant Cloud einrichten“ führt in
      nummerierten Schritten zur Cloud-Seite deines Home Assistant (Link im Dialog), zur
      Anmeldung und zurück zu „Erneut prüfen“. Die Cloud ist ein kostenpflichtiges Abo, das
      du zunächst kostenlos testen kannst. Ab Dezember 2026 heißt sie „Home Assistant
      Link“. Statt der Cloud kannst du auch eine eigene Internetadresse eintragen.
-   - Keine Sackgasse: „Stattdessen ntfy nutzen“ wechselt zu Weg B. „Trotzdem fortfahren“
+   - Keine Sackgasse: „Stattdessen ntfy nutzen (kostenlos)“ wechselt zu Weg B. „Trotzdem fortfahren (nur Zusagen und Absagen, Alarm später nachrüsten)“
      speichert die Einrichtung ohne Alarm; Zusagen und Absagen funktionieren, den Alarm
      rüstest du später unter *Neu konfigurieren* nach.
 
@@ -488,7 +488,7 @@ vom Recorder aus:
 recorder:
   exclude:
     entities:
-      - event.ff_agent_alarm  # die Event-Entität deines ntfy-Abos
+      - event.<deine_ntfy_entität>  # Event-Entität deines ntfy-Abos, ID unter Einstellungen > Entitäten nachsehen
 ```
 
 Die Integration FF Agent selbst nennt Thema und Entität nie in Logs, Entitätsattributen oder
@@ -608,7 +608,7 @@ App-Einstellungen leeren.
 
 **Alarm über ntfy kommt nicht an**
 
-- Reparatur-Meldung „ntfy-Abo für den Alarm fehlt“: Die ntfy-Entität ist gelöscht oder
+- Reparatur-Meldung „FF Agent: ntfy-Abo für den Alarm fehlt“: Die ntfy-Entität ist gelöscht oder
   deaktiviert. Dasselbe Thema in der Integration ntfy erneut abonnieren; die Einrichtung
   findet das neue Abo über das Thema selbst, lädt neu, und die Meldung verschwindet. Falls
   der Hinweis bleibt (etwa bei einem anderen Thema): unter *Neu konfigurieren* die neue
@@ -1085,7 +1085,7 @@ backups. If you do not want that, exclude its entity from the recorder:
 recorder:
   exclude:
     entities:
-      - event.ff_agent_alarm  # the event entity of your ntfy subscription
+      - event.<your_ntfy_entity>  # event entity of your ntfy subscription, look up its ID under Settings > Entities
 ```
 
 The FF Agent integration itself never names the topic or the entity in logs, entity

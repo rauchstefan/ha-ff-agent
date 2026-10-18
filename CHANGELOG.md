@@ -5,6 +5,8 @@ Alle nennenswerten Änderungen an dieser Integration. Format angelehnt an
 
 ## [0.3.0] – 2026-10-18 (Vorabversion)
 
+Dritte Vorabversion. Ein Testalarm aus FF Agent ist beim Entwickler erfolgreich angekommen; andere Teile, etwa Zusagen und Absagen, sind noch nicht gegen ein echtes FF Agent geprüft.
+
 **Update:** Nach dem Update Home Assistant neu starten **und die Seite im Browser hart neu
 laden** (Strg+F5, am Mac Cmd+Umschalt+R). In der Companion-App die App neu starten bzw.
 den Frontend-Cache in den App-Einstellungen leeren. Sonst zeigen Dialoge der Integration
@@ -42,6 +44,8 @@ unter Umständen keinen oder alten Text.
 
 ### English
 
+Third pre-release. A test alarm from FF Agent has arrived successfully on the developer's system; other parts, such as accepting and declining, have not yet been checked against a real FF Agent.
+
 **Update:** After updating, restart Home Assistant **and hard-reload the page in the
 browser** (Ctrl+F5, on a Mac Cmd+Shift+R). In the companion app, restart the app or clear
 the frontend cache in the app settings. Otherwise the dialogs of the integration may show
@@ -65,6 +69,9 @@ no text or old text.
 - **Shorter ntfy ending:** The final dialog only repeats the values for FF Agent if the
   chosen entity has another address than the dialog before. Otherwise a pointer to the test
   alarm is enough.
+
+#### Documentation
+
 - The README now contains the complete guide in German and English in one file, with a
   language switch at the top, and has been edited throughout.
 
