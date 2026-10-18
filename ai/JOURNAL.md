@@ -22,6 +22,31 @@ Das Journal ist Verlauf, keine Wissensbasis: Dauerhaftes gehört nach `docs/` od
 
 <!-- Neue Einträge direkt unter dieser Zeile einfügen -->
 
+## 2026-10-18 – claude/readme-update-ha-anker-solix-2ea3b2 – Namen Dritter entfernt, TODO aufgeräumt
+- **Nutzer-Auftrag:** „Entferne Firmenname, Personennamen und Adresse aus den öffentlichen
+  Recherche-Dateien und räum die TODO-Liste auf.“
+- **Delegiert:**
+  - entwickler (Sonnet, zweimal): Herstellerwörter im Test base64-kodiert; der Test prüft
+    jetzt auch docs/, ai/, CLAUDE.md, CONTRIBUTING.md und .claude/agents/.
+  - reviewer (Opus): freigegeben.
+  - Die Doku-Ersetzungen (wenige Zeilen) und das Umsortieren der TODO-Liste per
+    Node-Skript habe ich selbst gemacht. Die Zahl der Einträge ist geprüft: 46 vorher und
+    nachher.
+- **Erledigt:** rauchstefan/ha-ff-agent#16 gemergt (14b32ba). Im aktuellen Stand gibt es
+  keine Treffer mehr für Firma, Personen oder Adresse.
+- **TODO-Liste:**
+  - 11 offene Einträge, nach Priorität sortiert.
+  - 261017-echter-test und 261017-hacs-default sind erledigt bzw. aufgegangen in
+    261018-test-zusage-absage und 261018-release-1-0.
+  - 261017-zusage-standort-transport: Teil 1 erledigt (#11), offen ist nur noch
+    „Verkehrsmittel beim Zusagen wählen“.
+- **Offen / Übergabe:** Die Git-Historie enthält die Angaben weiter, in den Commits bis
+  dabe583. Sie zu entfernen hieße, die Historie umzuschreiben und force-zu-pushen. Das
+  geht nur mit ausdrücklicher Freigabe des Nutzers, und Tags und Releases wären
+  betroffen.
+- **Für die nächste Session:** Neue Texte in docs/ und ai/ dürfen keine Namen Dritter
+  enthalten, der Test `test_no_vendor_name_in_code_and_user_docs` schlägt sonst an.
+
 ## 2026-10-18 – claude/readme-update-ha-anker-solix-2ea3b2 – Release v1.0.0 und PR an hacs/default
 - **Nutzer-Auftrag:** „Ich würde den Release 1.0.0 und den PR an hacs/default jetzt schon
   stellen, selbst ohne die Zusage Absage Tests. Mach das bitte jetzt“. Das ist die
