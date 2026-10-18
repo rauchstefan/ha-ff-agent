@@ -861,21 +861,74 @@ async def test_ntfy_to_unreachable_webhook_shows_the_cloud_guide(
 async def test_ntfy_unchanged_does_not_reload(
     hass: HomeAssistant, ntfy_entry: MockConfigEntry
 ) -> None:
-    """Same source, same entity, same topic: no reload."""
+    """Same source, valid entity, nothing else: no ntfy dialog and no reload."""
     await async_setup_entry(hass, ntfy_entry)
     alarm = ntfy_entry.runtime_data.alarm
+    data = dict(ntfy_entry.data)
     result = await _start(hass, ntfy_entry)
 
     result = await _submit(hass, result["flow_id"], {})
-    assert result["step_id"] == "ntfy"
-    placeholders = result["description_placeholders"]
-    assert placeholders["ntfy_topic"] == NTFY_TOPIC
-    assert placeholders["ntfy_publish_url"] == NTFY_PUBLISH_URL
-    result = await _choose(hass, result["flow_id"], "ntfy_find")
 
     assert result["type"] is FlowResultType.ABORT
     assert result["reason"] == "reconfigure_successful"
     assert ntfy_entry.runtime_data.alarm is alarm
+    assert dict(ntfy_entry.data) == data
+
+
+async def test_ntfy_only_a_new_reply_url(
+    hass: HomeAssistant, ntfy_entry: MockConfigEntry
+) -> None:
+    """Only the reply URL changes: saved and reloaded without the ntfy dialog."""
+    await async_setup_entry(hass, ntfy_entry)
+    alarm = ntfy_entry.runtime_data.alarm
+    data = dict(ntfy_entry.data)
+    result = await _start(hass, ntfy_entry)
+
+    result = await _submit(hass, result["flow_id"], {CONF_REPLY_URL: OTHER_REPLY_URL})
+
+    assert result["type"] is FlowResultType.ABORT
+    assert result["reason"] == "reconfigure_successful"
+    assert ntfy_entry.unique_id == reply_unique_id(OTHER_REPLY_ID)
+    assert dict(ntfy_entry.data) == {**data, CONF_REPLY_ID: OTHER_REPLY_ID}
+    assert ntfy_entry.runtime_data.alarm is not alarm
+    assert ntfy_entry.runtime_data.source is not None
+
+
+async def test_ntfy_with_a_missing_entity_shows_the_dialog(
+    hass: HomeAssistant, ntfy_entry: MockConfigEntry
+) -> None:
+    """Without a valid entity the ntfy dialog opens, with the stored topic."""
+    await async_setup_entry(hass, ntfy_entry)
+    er.async_get(hass).async_remove(NTFY_ENTITY_ID)
+    await hass.async_block_till_done()
+    result = await _start(hass, ntfy_entry)
+
+    result = await _submit(hass, result["flow_id"], {})
+
+    assert result["step_id"] == "ntfy"
+    placeholders = result["description_placeholders"]
+    assert placeholders["ntfy_topic"] == NTFY_TOPIC
+    assert placeholders["ntfy_publish_url"] == NTFY_PUBLISH_URL
+
+
+async def test_ntfy_new_secret_address_renews_the_dormant_webhook(
+    hass: HomeAssistant, ntfy_entry: MockConfigEntry
+) -> None:
+    """A new topic, and also a new dormant webhook ID and token."""
+    await async_setup_entry(hass, ntfy_entry)
+    result = await _start(hass, ntfy_entry)
+    result = await _submit(hass, result["flow_id"], {CONF_REGENERATE_WEBHOOK: True})
+    topic = result["description_placeholders"]["ntfy_topic"]
+    _subscribe(hass, topic)
+
+    result = await _choose(hass, result["flow_id"], "ntfy_find")
+
+    assert result["reason"] == "reconfigure_successful_ntfy"
+    data = ntfy_entry.data
+    assert data[CONF_NTFY_TOPIC] == topic
+    assert data[CONF_WEBHOOK_ID] != WEBHOOK_ID
+    assert data[CONF_HEADER_TOKEN] != HEADER_TOKEN
+    assert len(data[CONF_HEADER_TOKEN]) >= 40
 
 
 async def test_ntfy_new_topic_and_the_current_entity_as_suggestion(
@@ -915,10 +968,55 @@ async def test_ntfy_own_entity_is_not_in_use(
 
     result = await _submit(hass, result["flow_id"], {"ntfy_entity": NTFY_ENTITY_ID})
 
-    # The topic is read from the entity, so nothing changed.
+    # The topic is read from the entity, so it stays; the webhook values are new.
     assert result["type"] is FlowResultType.ABORT
-    assert result["reason"] == "reconfigure_successful"
+    assert result["reason"] == "reconfigure_successful_ntfy"
+    assert result["description_placeholders"]["ntfy_publish_url"] == NTFY_PUBLISH_URL
     assert ntfy_entry.data[CONF_NTFY_TOPIC] == NTFY_TOPIC
+    assert ntfy_entry.data[CONF_WEBHOOK_ID] != WEBHOOK_ID
+
+
+async def test_ntfy_entity_with_an_unreadable_topic(
+    hass: HomeAssistant, ntfy_entry: MockConfigEntry
+) -> None:
+    """No URL with a wrong topic: the text explains how to build it."""
+    await async_setup_entry(hass, ntfy_entry)
+    orphan = er.async_get(hass).async_get_or_create(
+        "event", "ntfy", "orphan", suggested_object_id="ff_agent_alarm_orphan"
+    )
+    result = await _start(hass, ntfy_entry)
+    result = await _submit(hass, result["flow_id"], {CONF_REGENERATE_WEBHOOK: True})
+    result = await _choose(hass, result["flow_id"], "ntfy_find")
+
+    result = await _submit(hass, result["flow_id"], {"ntfy_entity": orphan.entity_id})
+
+    assert result["reason"] == "reconfigure_successful_ntfy_topic_unknown"
+    assert "ntfy_publish_url" not in result["description_placeholders"]
+    assert ntfy_entry.data[CONF_NTFY_TOPIC] is None
+    assert ntfy_entry.data[CONF_NTFY_ENTITY_UUID] == orphan.id
+
+
+async def test_ntfy_to_unreachable_webhook_with_continue_anyway(
+    hass: HomeAssistant, ntfy_entry: MockConfigEntry
+) -> None:
+    """Saved with a local address: the closing text says that alarms do not arrive."""
+    await async_process_ha_core_config(hass, {"internal_url": INTERNAL_URL})
+    await async_setup_entry(hass, ntfy_entry)
+    result = await _start(hass, ntfy_entry)
+    result = await _submit(hass, result["flow_id"], {CONF_ALARM_SOURCE: "webhook"})
+    assert result["step_id"] == "cloud_setup"
+
+    result = await _choose(hass, result["flow_id"], "webhook_anyway")
+
+    assert result["type"] is FlowResultType.ABORT
+    assert result["reason"] == "reconfigure_successful_local"
+    assert result["description_placeholders"]["webhook_url"].startswith(INTERNAL_URL)
+    assert ntfy_entry.data[CONF_ALARM_SOURCE] == "webhook"
+    for language in ("en", "de"):
+        texts = json.loads((TRANSLATIONS / f"{language}.json").read_text("utf-8"))
+        text = texts["config"]["abort"]["reconfigure_successful_local"]
+        assert "{webhook_url}" in text
+        assert "{cloud_url}" in text
 
 
 async def test_internal_webhook_gets_a_cloudhook_for_the_same_id(

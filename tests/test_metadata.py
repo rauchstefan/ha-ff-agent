@@ -128,6 +128,9 @@ def test_translations_cover_the_config_flow(language: str) -> None:
         "config.abort.already_configured",
         "config.abort.unknown",
         "config.abort.reconfigure_successful_ntfy",
+        "config.abort.reconfigure_successful_ntfy_topic_unknown",
+        "config.abort.reconfigure_successful_local",
+        "config.create_entry.ntfy_topic_unknown",
         "config.create_entry.cloud",
         "config.create_entry.external",
         "config.create_entry.internal",
@@ -468,3 +471,21 @@ def test_manifest_does_not_depend_on_ntfy() -> None:
     manifest = _load(INTEGRATION / "manifest.json")
     assert "ntfy" not in manifest.get("dependencies", [])
     assert "ntfy" not in manifest.get("after_dependencies", [])
+
+
+@pytest.mark.parametrize(
+    ("language", "reconfigure", "service_url"),
+    [("en", "Reconfigure", "service URL"), ("de", "Neu konfigurieren", "Dienst-URL")],
+)
+def test_ntfy_texts_use_the_terms_of_the_ui(
+    language: str, reconfigure: str, service_url: str
+) -> None:
+    """The issue names the fallback; the guide uses the field name of ntfy."""
+    texts = _load(INTEGRATION / "translations" / f"{language}.json")
+    issue = texts["issues"]["ntfy_entity_missing"]["description"]
+    assert reconfigure in issue.split("\n\n")[-1]
+    assert service_url in texts["config"]["step"]["ntfy"]["description"]
+    assert "Dienstadresse" not in json.dumps(texts, ensure_ascii=False)
+    aborts = texts["config"]["abort"]
+    assert "{webhook_url}" in aborts["reconfigure_successful_local"]
+    assert "GET" in aborts["reconfigure_successful_ntfy_topic_unknown"]

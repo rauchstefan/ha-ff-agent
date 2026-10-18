@@ -946,3 +946,24 @@ def test_every_step_text_has_its_placeholders_in_the_flow() -> None:
         texts = json.loads((TRANSLATIONS / f"{language}.json").read_text("utf-8"))
         config = json.dumps(texts["config"])
         assert set(re.findall(r"\{(\w+)\}", config)) <= delivered
+
+
+async def test_ntfy_entity_with_an_unreadable_topic(hass: HomeAssistant) -> None:
+    """Without a readable topic no (wrong) URL is shown; the text explains it."""
+    orphan = er.async_get(hass).async_get_or_create(
+        "event", "ntfy", "orphan", suggested_object_id="ff_agent_alarm_orphan"
+    )
+    result = await _to_ntfy_guide(hass)
+    result = await _choose(hass, result["flow_id"], "ntfy_find")
+
+    result = await _configure(
+        hass, result["flow_id"], {CONF_NTFY_ENTITY: orphan.entity_id}
+    )
+
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    assert result["description"] == "ntfy_topic_unknown"
+    assert "ntfy_publish_url" not in result["description_placeholders"]
+    _assert_placeholders(result)
+    assert result["result"].data[CONF_NTFY_TOPIC] is None
+    assert result["result"].data[CONF_NTFY_ENTITY_UUID] == orphan.id
+    assert result["result"].runtime_data.source is not None

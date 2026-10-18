@@ -400,9 +400,13 @@ class FFAgentConfigFlow(ConfigFlow, domain=DOMAIN):
         if had_cloudhook and (old_webhook_id != self._webhook_id or not cloudhook):
             await self._async_delete_old_cloudhook(old_webhook_id)
 
-        # This dialog is the only place that shows the new access.
+        # This dialog is the only place that shows the new access. An address that
+        # FF Agent cannot reach gets the text of "continue anyway".
+        reason = "reconfigure_successful_new_webhook"
+        if kind in UNREACHABLE_KINDS:
+            reason = "reconfigure_successful_local"
         return self.async_abort(
-            reason="reconfigure_successful_new_webhook",
+            reason=reason,
             description_placeholders={
                 **_link_placeholders(),
                 "webhook_url": url,
@@ -489,32 +493,34 @@ class FFAgentConfigFlow(ConfigFlow, domain=DOMAIN):
         """Create the entry, or update it in the reconfigure flow.
 
         The chosen entity is the source of truth: its topic and server win over the
-        generated topic.
+        generated topic. If its topic cannot be read, no URL is shown at all, because
+        the generated topic would be a wrong one.
         """
-        topic = subscription.topic or self._topic
+        topic = subscription.topic
         server = subscription.server or NTFY_DEFAULT_SERVER
-        publish_url = ntfy_publish_url(server, topic)
         ntfy_data = {
             CONF_ALARM_SOURCE: SOURCE_NTFY,
             CONF_NTFY_ENTITY_UUID: subscription.entity_uuid,
             CONF_NTFY_TOPIC: topic,
             CONF_NTFY_SERVER: server,
+            # Dormant in ntfy mode, kept for a later switch back to the webhook.
+            CONF_WEBHOOK_ID: self._webhook_id,
+            CONF_HEADER_TOKEN: self._header_token,
             # No cloudhook in ntfy mode: an entry has exactly one open entrance.
             CONF_CLOUDHOOK: False,
             CONF_CLOUDHOOK_URL: None,
         }
-        placeholders = {**_link_placeholders(), NTFY_PUBLISH_URL: publish_url}
+        placeholders = _link_placeholders()
+        text = "ntfy_topic_unknown"
+        if topic:
+            placeholders[NTFY_PUBLISH_URL] = ntfy_publish_url(server, topic)
+            text = SOURCE_NTFY
         if not self._reconfiguring:
             return self.async_create_entry(
                 title=self._name,
-                data={
-                    **self._reply_data,
-                    CONF_WEBHOOK_ID: self._webhook_id,
-                    CONF_HEADER_TOKEN: self._header_token,
-                    **ntfy_data,
-                },
+                data={**self._reply_data, **ntfy_data},
                 options=_default_options(),
-                description=SOURCE_NTFY,
+                description=text,
                 description_placeholders=placeholders,
             )
 
@@ -532,7 +538,7 @@ class FFAgentConfigFlow(ConfigFlow, domain=DOMAIN):
         if had_cloudhook:
             await self._async_delete_old_cloudhook(old_webhook_id)
         return self.async_abort(
-            reason="reconfigure_successful_ntfy",
+            reason=f"reconfigure_successful_{text}",
             description_placeholders=placeholders,
         )
 
@@ -698,14 +704,20 @@ class FFAgentConfigFlow(ConfigFlow, domain=DOMAIN):
         self._webhook_id = entry.data[CONF_WEBHOOK_ID]
         self._header_token = entry.data[CONF_HEADER_TOKEN]
 
-        if target_source == SOURCE_NTFY:
-            # With "regenerate" the guide shows a new topic.
-            return await self.async_step_ntfy()
-
         if regenerate:
+            # A new secret address renews the webhook values, also the dormant ones
+            # of an ntfy entry.
             self._webhook_id = webhook.async_generate_id()
             self._header_token = secrets.token_urlsafe(32)
-        if (
+
+        if target_source == SOURCE_NTFY:
+            uuid = entry.data.get(CONF_NTFY_ENTITY_UUID)
+            valid = uuid is not None and async_describe_entity(self.hass, uuid)
+            if current_source != SOURCE_NTFY or regenerate or not valid:
+                # With "regenerate" the guide shows a new topic.
+                return await self.async_step_ntfy()
+            # ntfy stays as it is: only the reply URL may have changed.
+        elif (
             current_source == SOURCE_NTFY
             or regenerate
             or async_get_webhook_url(self.hass, entry)[1] in UNREACHABLE_KINDS
