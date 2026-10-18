@@ -35,7 +35,7 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
      seinem Go. Screenshots liegen nur im Chat, nicht im Repo. -->
 
 ### 261018-leere-dialogtexte – Hinweis auf Browser-Cache nach Update (leere Menütexte in v0.2.0)
-- **Status:** offen (wartet auf Go des Nutzers); Ursache geklärt, kein Code-Fehler
+- **Status:** in Arbeit (lokal-2026-10-18-v0-2-feedback, 2026-10-18); Ursache geklärt, kein Code-Fehler
 - **Priorität:** niedrig
 - **Rolle(n):** doku
 - **Beschreibung:** Rückmeldung des Nutzers nach Installation von v0.2.0 über HACS
@@ -55,7 +55,7 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
 - **Verweise:** Nutzerpunkte 2–4 im Chat vom 2026-10-18
 
 ### 261018-reconfig-alarmquelle-text – Feld „Alarmquelle“ in der Neukonfiguration als Frage mit Hinweis
-- **Status:** offen (wartet auf Go des Nutzers)
+- **Status:** in Arbeit (lokal-2026-10-18-v0-2-feedback, 2026-10-18)
 - **Priorität:** mittel
 - **Rolle(n):** entwickler, tester, reviewer
 - **Beschreibung:** Nutzerpunkt 1. In der Neukonfiguration steht über der Auswahl der
@@ -74,7 +74,7 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
   `selector.alarm_source`)
 
 ### 261018-ntfy-abschluss-redundant – Abschlussdialog ntfy wiederholt die Webhook-Werte
-- **Status:** offen (wartet auf Go des Nutzers)
+- **Status:** in Arbeit (lokal-2026-10-18-v0-2-feedback, 2026-10-18)
 - **Priorität:** niedrig
 - **Rolle(n):** entwickler, tester, reviewer
 - **Beschreibung:** Rückmeldung des Nutzers zur Einrichtung über ntfy. Der Dialog `ntfy`
@@ -96,7 +96,7 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
   Thema); `config_flow.py` (`async_step_ntfy_select`), `translations/*.json`
 
 ### 261018-geraet-ohne-link – Kein Link zu FF Agent in der Dienst-Info
-- **Status:** offen (wartet auf Go des Nutzers)
+- **Status:** in Arbeit (lokal-2026-10-18-v0-2-feedback, 2026-10-18)
 - **Priorität:** niedrig
 - **Rolle(n):** entwickler, tester, reviewer
 - **Beschreibung:** Wunsch des Nutzers: Die Karte „Dienst-Informationen“ des Geräts zeigt
@@ -109,7 +109,7 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
   `const.py`, `tests/test_entities.py`
 
 ### 261018-einrichtung-zusage-optionen – Verkehrsmittel und Standort schon bei der Einrichtung abfragen
-- **Status:** offen (wartet auf Go des Nutzers; Rückfrage zur „Adresse“ offen)
+- **Status:** in Arbeit (lokal-2026-10-18-v0-2-feedback, 2026-10-18)
 - **Priorität:** mittel
 - **Rolle(n):** architekt (kurzes Design), entwickler, tester, reviewer, doku
 - **Beschreibung:** Wunsch des Nutzers: Bei der Einrichtung soll man das Verkehrsmittel
@@ -134,7 +134,7 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
   (`CONF_DEFAULT_TRANSPORT`, `CONF_LOCATION_ENTITY`)
 
 ### 261018-reihenfolge-zusage – „Zusagen“ vor „Absagen“ anzeigen
-- **Status:** offen (wartet auf Go des Nutzers)
+- **Status:** in Arbeit (lokal-2026-10-18-v0-2-feedback, 2026-10-18)
 - **Priorität:** niedrig
 - **Rolle(n):** researcher (kurz), entwickler, tester, reviewer
 - **Beschreibung:** Wunsch des Nutzers: In der Integration (Geräteseite, Bereich
@@ -149,6 +149,20 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
   mit Alternativvorschlag.
 - **Verweise:** Chat vom 2026-10-18; `custom_components/ff_agent/button.py`,
   `translations/*.json` (`entity.button`)
+
+### 261018-alarm-reset – „Alarm aktiv“ von Hand zurücksetzen
+- **Status:** in Arbeit (lokal-2026-10-18-v0-2-feedback, 2026-10-18)
+- **Priorität:** mittel
+- **Rolle(n):** architekt, entwickler, tester, reviewer, doku
+- **Beschreibung:** „Alarm aktiv“ geht nur nach Ablauf der Rücksetzzeit oder bei
+  Neustart/Reload aus. Der Nutzer stimmt im Chat einem manuellen Zurücksetzen zu
+  („Das klingt gut“). Annahme des Projektleiters: ein Button „Alarm zurücksetzen“ und
+  eine Aktion `ff_agent.reset_alarm`. Eine Absage setzt den Alarm **nicht** automatisch
+  zurück, sonst gingen Automationen anderer Hausbewohner aus.
+- **Definition of Done:** Button und Aktion schalten „Alarm aktiv“ sofort aus und stoppen
+  den Timer. „Letzter Alarm“ bleibt. Ohne aktiven Alarm passiert nichts. de und en,
+  Tests, README.
+- **Verweise:** Chat vom 2026-10-18; `alarm.py`, `button.py`, `services.py`
 
 ### 261018-recherche-namen – Namen Dritter in öffentlichen Recherche-Dateien
 - **Status:** offen (Entscheidung des Nutzers)
