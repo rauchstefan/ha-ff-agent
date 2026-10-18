@@ -40,9 +40,12 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
   Zusage und Absage sind gegen ein echtes FF Agent getestet. Für hacs/default prüfen:
   Anforderungen (Brands-Eintrag bzw. lokaler brand-Ordner, Releases, Topics,
   Beschreibung), siehe docs/recherche/261016-hacs-anforderungen.md.
-  **Achtung:** HACS zieht ab HA 2026.11 als „Marketplace“ in Home Assistant
-  (hacs/integration#5590). Vor dem Store-Eintrag recherchieren, ob die Aufnahme dann
-  noch über hacs/default läuft oder einen neuen Weg hat (researcher).
+  **Marketplace (ab HA 2026.11):** Laut docs/recherche/261018-marketplace.md läuft die
+  Aufnahme weiter per PR an hacs/default. Die Voraussetzungen sind am 2026-10-18 erfüllt:
+  Release, `brand/` im Tag, Topics, Beschreibung, HACS-Action ohne `ignore`. Custom Repos
+  bleiben möglich, und bestehende HACS-Installationen werden automatisch migriert. Vor dem
+  PR die Seiten zu repository-structure und releases sowie das Format von `categories`
+  nachlesen.
 - **Definition of Done:** Release v1.0.0 (Freigabe des Nutzers), PR an hacs/default
   gestellt (Freigabe des Nutzers, da öffentlicher Beitrag unter seinem Konto).
 - **Verweise:** docs/recherche/261018-hacs-update-dialog.md
