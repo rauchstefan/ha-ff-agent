@@ -134,7 +134,7 @@
     "error": {
       "invalid_latitude": "The latitude must be between -90 and 90.",
       "invalid_longitude": "The longitude must be between -180 and 180.",
-      "invalid_reply_url":"This is not a valid mission reply URL. It contains /app2/missionreplies/ and ends with /accept or /reject.",
+      "invalid_reply_url": "This is not a valid mission reply URL. It contains /app2/missionreplies/ and ends with /accept or /reject.",
       "ntfy_not_set_up": "The ntfy integration is not set up yet. Set it up first (step 1 of the previous dialog) and then try again.",
       "ntfy_entity_not_found": "No ntfy subscription with this topic found. Check step 2 and try again after a few seconds, or choose the entity yourself.",
       "ntfy_entity_invalid": "This entity is not an enabled event entity of the ntfy integration. Choose the entity of an ntfy topic.",
