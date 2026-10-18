@@ -131,6 +131,7 @@ def test_translations_cover_the_config_flow(language: str) -> None:
         "config.abort.already_configured",
         "config.abort.unknown",
         "config.abort.reconfigure_successful_ntfy",
+        "config.abort.reconfigure_successful_ntfy_other_address",
         "config.abort.reconfigure_successful_ntfy_topic_unknown",
         "config.abort.reconfigure_successful_local",
         "config.create_entry.ntfy_topic_unknown",
@@ -139,6 +140,7 @@ def test_translations_cover_the_config_flow(language: str) -> None:
         "config.create_entry.internal",
         "config.create_entry.path_only",
         "config.create_entry.ntfy",
+        "config.create_entry.ntfy_other_address",
         "config.step.ntfy_select.title",
         "config.step.ntfy_select.description",
         "config.step.ntfy_select.data.ntfy_entity",
@@ -436,8 +438,8 @@ def test_ntfy_texts_show_the_url_for_ff_agent(language: str) -> None:
     config = texts["config"]
     for text in (
         config["step"]["ntfy"]["description"],
-        config["create_entry"]["ntfy"],
-        config["abort"]["reconfigure_successful_ntfy"],
+        config["create_entry"]["ntfy_other_address"],
+        config["abort"]["reconfigure_successful_ntfy_other_address"],
         texts["options"]["step"]["ntfy"]["description"],
     ):
         assert "{ntfy_publish_url}" in text
@@ -449,6 +451,23 @@ def test_ntfy_texts_show_the_url_for_ff_agent(language: str) -> None:
     assert "{cloud_url}" in cloud_guide
     assert "{network_url}" in cloud_guide
     assert "{cloud_url}" in texts["options"]["step"]["init"]["description"]
+
+
+@pytest.mark.parametrize("language", ["en", "de"])
+def test_short_ntfy_closing_texts_repeat_no_values(language: str) -> None:
+    """If the guide showed the URL, the closing text only points to a test alarm."""
+    texts = _load(INTEGRATION / "translations" / f"{language}.json")
+    config = texts["config"]
+    test_alarm = {"en": "test alarm", "de": "Testalarm"}[language]
+    good_to_know = {"en": "Good to know", "de": "Gut zu wissen"}[language]
+    for text in (
+        config["create_entry"]["ntfy"],
+        config["abort"]["reconfigure_successful_ntfy"],
+    ):
+        assert not re.findall(r"\{\w+\}", text)
+        assert "GET" not in text
+        assert test_alarm in text
+    assert good_to_know in config["create_entry"]["ntfy"]
 
 
 @pytest.mark.parametrize("language", ["en", "de"])

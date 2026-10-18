@@ -584,11 +584,8 @@ async def test_ntfy_find_creates_the_entry(
 
     assert result["type"] is FlowResultType.CREATE_ENTRY
     assert result["description"] == "ntfy"
-    publish_url = f"https://ntfy.sh/{topic}/trigger"
-    assert result["description_placeholders"] == {
-        **LINKS,
-        "ntfy_publish_url": publish_url,
-    }
+    # The guide showed exactly this URL, so the closing text does not repeat it.
+    assert result["description_placeholders"] == LINKS
     _assert_placeholders(result)
     entry: ConfigEntry = result["result"]
     assert entry.data == {
@@ -672,6 +669,8 @@ async def test_ntfy_select_takes_an_existing_subscription(
     )
 
     assert result["type"] is FlowResultType.CREATE_ENTRY
+    # The topic differs from the one in the guide, so the full values are shown.
+    assert result["description"] == "ntfy_other_address"
     data = result["result"].data
     assert data[CONF_NTFY_ENTITY_UUID] == registry_entry.id
     assert data[CONF_NTFY_TOPIC] == OTHER_NTFY_TOPIC
@@ -679,6 +678,30 @@ async def test_ntfy_select_takes_an_existing_subscription(
     assert result["description_placeholders"]["ntfy_publish_url"] == (
         f"https://ntfy.example.com/{OTHER_NTFY_TOPIC}/trigger"
     )
+    _assert_placeholders(result)
+
+
+async def test_ntfy_other_server_with_the_same_topic_shows_the_full_values(
+    hass: HomeAssistant,
+) -> None:
+    """The guide named ntfy.sh, the subscription uses an own server: other URL."""
+    result = await _to_ntfy_guide(hass)
+    topic = result["description_placeholders"]["ntfy_topic"]
+    assert result["description_placeholders"]["ntfy_publish_url"].startswith(
+        "https://ntfy.sh/"
+    )
+    ntfy_entry = add_ntfy_entry(hass, {"subentry-flow": topic}, url=OWN_NTFY_SERVER)
+    add_ntfy_entity(hass, ntfy_entry, "subentry-flow")
+
+    result = await _choose(hass, result["flow_id"], "ntfy_find")
+
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    assert result["description"] == "ntfy_other_address"
+    assert result["description_placeholders"]["ntfy_publish_url"] == (
+        f"https://ntfy.example.com/{topic}/trigger"
+    )
+    assert result["result"].data[CONF_NTFY_SERVER] == OWN_NTFY_SERVER
+    _assert_placeholders(result)
 
 
 async def test_ntfy_select_refuses_foreign_entities(hass: HomeAssistant) -> None:

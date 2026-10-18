@@ -184,8 +184,8 @@ besten in einem neuen Tab und lass den Dialog offen.
    Header, Inhalt und Query-Parameter bleiben **leer**.
 4. **In der FF-Agent-Einrichtung „Erledigt“ wählen.** Die Integration sucht die Entität des
    Themas selbst. Nur wenn sie nichts findet, wählst du sie aus (oder ein Thema, das du
-   schon abonniert hast). Der Abschlussdialog zeigt die Werte für FF Agent noch einmal mit
-   der Adresse des tatsächlichen Abos.
+   schon abonniert hast). Der Abschlussdialog wiederholt die Werte nur, wenn die gewählte
+   Entität eine andere Adresse hat als angezeigt.
 5. **Mit einem Testalarm prüfen:** „Alarm aktiv“ springt an.
 
 Die Reihenfolge ist wichtig: Erst abonnieren, dann in FF Agent eintragen. ntfy liefert

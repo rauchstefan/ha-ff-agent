@@ -153,6 +153,9 @@ UNREACHABLE_KINDS = (UrlKind.INTERNAL, UrlKind.PATH_ONLY)
 # Shown instead of the ntfy entity when the entry has none.
 NO_VALUE = "–"
 
+# Closing text when the chosen ntfy entity differs from the address the guide showed.
+NTFY_OTHER_ADDRESS = "ntfy_other_address"
+
 
 def _link_placeholders() -> dict[str, str]:
     """Return the My Home Assistant links that the texts use as placeholders."""
@@ -214,6 +217,8 @@ class FFAgentConfigFlow(ConfigFlow, domain=DOMAIN):
         self._header_token = ""
         self._regenerate = False
         self._ntfy_topic: str | None = None
+        # The URL for FF Agent that the ntfy guide showed last (a secret, never logged).
+        self._shown_ntfy_url: str | None = None
         self._cloud_attempts = 0  # unsuccessful checks in the cloud path
 
     @staticmethod
@@ -511,10 +516,14 @@ class FFAgentConfigFlow(ConfigFlow, domain=DOMAIN):
             CONF_CLOUDHOOK_URL: None,
         }
         placeholders = _link_placeholders()
-        text = "ntfy_topic_unknown"
-        if topic:
-            placeholders[NTFY_PUBLISH_URL] = ntfy_publish_url(server, topic)
+        if not topic:
+            text = "ntfy_topic_unknown"
+        elif (url := ntfy_publish_url(server, topic)) == self._shown_ntfy_url:
+            # Short text: the guide showed exactly this URL, so it is not repeated.
             text = SOURCE_NTFY
+        else:
+            text = NTFY_OTHER_ADDRESS
+            placeholders[NTFY_PUBLISH_URL] = url
         if not self._reconfiguring:
             return self.async_create_entry(
                 title=self._name,
@@ -575,7 +584,11 @@ class FFAgentConfigFlow(ConfigFlow, domain=DOMAIN):
 
     @callback
     def _ntfy_placeholders(self) -> dict[str, str]:
-        """Return topic, URL for FF Agent and links for the ntfy texts."""
+        """Return topic, URL for FF Agent and links for the ntfy texts.
+
+        Only the steps "ntfy" and "ntfy_select" call this, and both show the URL. It is
+        remembered, so the closing dialog can tell whether the chosen entity changes it.
+        """
         topic = self._topic
         ntfy_entries = self.hass.config_entries.async_entries(NTFY_DOMAIN)
         server = NTFY_DEFAULT_SERVER
@@ -583,10 +596,11 @@ class FFAgentConfigFlow(ConfigFlow, domain=DOMAIN):
             url = ntfy_entries[0].data.get(NTFY_CONF_URL)
             if isinstance(url, str) and url:
                 server = url
+        self._shown_ntfy_url = ntfy_publish_url(server, topic)
         return {
             **_link_placeholders(),
             "ntfy_topic": topic,
-            NTFY_PUBLISH_URL: ntfy_publish_url(server, topic),
+            NTFY_PUBLISH_URL: self._shown_ntfy_url,
         }
 
     @callback
