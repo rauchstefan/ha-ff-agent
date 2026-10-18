@@ -511,3 +511,20 @@ def test_ntfy_texts_use_the_terms_of_the_ui(
     aborts = texts["config"]["abort"]
     assert "{webhook_url}" in aborts["reconfigure_successful_local"]
     assert "GET" in aborts["reconfigure_successful_ntfy_topic_unknown"]
+
+
+@pytest.mark.parametrize(
+    ("language", "subscription", "domain", "free"),
+    [("en", "subscription", "domain", "free"), ("de", "Abo", "Domain", "kostenlos")],
+)
+def test_reconfigure_asks_how_the_alarm_arrives(
+    language: str, subscription: str, domain: str, free: str
+) -> None:
+    """The field is a question and each option names what it requires."""
+    texts = _load(INTEGRATION / "translations" / f"{language}.json")
+    label = texts["config"]["step"]["reconfigure"]["data"]["alarm_source"]
+    assert label.endswith("?")
+    options = texts["selector"]["alarm_source"]["options"]
+    assert subscription in options["webhook"]
+    assert domain in options["webhook"]
+    assert free in options["ntfy"]

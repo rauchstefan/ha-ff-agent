@@ -87,12 +87,12 @@
         "description": "Hier kannst du die Rückmelde-URL ersetzen (zum Beispiel nach dem Neuerzeugen in FF Agent), den Weg für den Alarm wechseln oder eine neue geheime Adresse erzeugen. Lässt du alles unverändert, passiert nichts. Es wird nichts an FF Agent gesendet.\n\nSpeichern lädt die Integration neu; ein gerade aktiver Alarm wird dabei zurückgesetzt.",
         "data": {
           "reply_url": "Neue Rückmelde-URL (Zusage)",
-          "alarm_source": "Weg für den Alarm",
+          "alarm_source": "Wie bekommt Home Assistant den Alarm?",
           "regenerate_webhook": "Neue geheime Adresse erzeugen"
         },
         "data_description": {
           "reply_url": "Nur ausfüllen, wenn sich die URL geändert hat. Leer bedeutet: unverändert. Die bisherige URL wird nicht angezeigt, denn sie ist ein Geheimnis.",
-          "alarm_source": "Home Assistant Cloud bzw. eigene Internetadresse (empfohlen) oder der kostenlose Dienst ntfy. Beim Wechsel führt dich die Einrichtung Schritt für Schritt durch alles Nötige.",
+          "alarm_source": "Wechselst du den Weg, führt dich die Einrichtung Schritt für Schritt durch alles Nötige. Den alten Webhook in FF Agent löschst du danach.",
           "regenerate_webhook": "Erzeugt eine neue Adresse für FF Agent: beim direkten Weg eine neue Webhook-Adresse und ein neues Token, bei ntfy ein neues Thema. Die alte Adresse funktioniert danach nicht mehr; die neue musst du in FF Agent eintragen. Sinnvoll, wenn die Adresse bekannt geworden ist."
         }
       }
@@ -211,8 +211,8 @@
   "selector": {
     "alarm_source": {
       "options": {
-        "webhook": "Home Assistant Cloud oder eigene Internetadresse (empfohlen)",
-        "ntfy": "Kostenloser Dienst ntfy"
+        "webhook": "Über Home Assistant Cloud oder eine eigene Internetadresse (empfohlen). Voraussetzung: ein Abo für Home Assistant Cloud oder eine aus dem Internet erreichbare Adresse deines Home Assistant (IP-Adresse oder Domain).",
+        "ntfy": "Über den kostenlosen Dienst ntfy. Kein Abo nötig, Home Assistant muss nicht aus dem Internet erreichbar sein."
       }
     },
     "transport": {

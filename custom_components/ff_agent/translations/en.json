@@ -87,12 +87,12 @@
         "description": "Here you can replace the mission reply URL (for example after you regenerated it in FF Agent), switch the way the alarm comes in or create a new secret address. If you leave everything unchanged, nothing happens. Nothing is sent to FF Agent.\n\nSaving reloads the integration; an alarm that is active at that moment is reset.",
         "data": {
           "reply_url": "New mission reply URL (accept)",
-          "alarm_source": "Way of the alarm",
+          "alarm_source": "How does Home Assistant receive the alarm?",
           "regenerate_webhook": "Create a new secret address"
         },
         "data_description": {
           "reply_url": "Only fill this in if the URL has changed. Empty means unchanged. The current URL is not shown because it is a secret.",
-          "alarm_source": "Home Assistant Cloud or your own internet address (recommended), or the free service ntfy. When you switch, the setup guides you step by step.",
+          "alarm_source": "If you switch, the setup guides you step by step. Afterwards delete the old webhook in FF Agent.",
           "regenerate_webhook": "Creates a new address for FF Agent: a new webhook address and a new token for the direct way, a new topic for ntfy. The old address stops working; you have to enter the new one in FF Agent. Useful if the address has become known."
         }
       }
@@ -211,8 +211,8 @@
   "selector": {
     "alarm_source": {
       "options": {
-        "webhook": "Home Assistant Cloud or your own internet address (recommended)",
-        "ntfy": "Free service ntfy"
+        "webhook": "Through Home Assistant Cloud or your own internet address (recommended). Requires a Home Assistant Cloud subscription or an address of your Home Assistant that is reachable from the internet (IP address or domain).",
+        "ntfy": "Through the free service ntfy. No subscription needed, Home Assistant does not have to be reachable from the internet."
       }
     },
     "transport": {

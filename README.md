@@ -250,7 +250,10 @@ ist wieder offen). Ändere Optionen deshalb nicht mitten in einem Einsatz.
   Beispiel nach dem Neuerzeugen der UUID in FF Agent. Leer bedeutet unverändert. Die
   bisherige URL wird nicht angezeigt. Gehört die neue URL zu einer anderen vorhandenen
   Einrichtung, bricht der Dialog ab.
-- **Weg für den Alarm:** Home Assistant Cloud bzw. eigene Internetadresse oder ntfy. Beim
+- **Wie bekommt Home Assistant den Alarm?** Über Home Assistant Cloud oder eine eigene
+  Internetadresse (empfohlen; Voraussetzung: ein Cloud-Abo oder eine aus dem Internet
+  erreichbare Adresse, also IP-Adresse oder Domain) oder kostenlos über ntfy (kein Abo,
+  Home Assistant muss nicht aus dem Internet erreichbar sein). Beim
   Wechsel führt dich derselbe Einrichtungsdialog wie bei der Einrichtung durch die
   Schritte. Danach den alten Webhook in FF Agent löschen. Ein Cloudhook wird beim Wechsel
   zu ntfy gelöscht. Bleibst du bei ntfy und änderst nur die Rückmelde-URL, speichert der
