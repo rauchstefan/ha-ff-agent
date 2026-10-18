@@ -112,8 +112,9 @@ SIGNAL_REPLY: Final = "ff_agent_reply_{entry_id}"  # payload ReplyResult
 # The event type of the event entity "alarm".
 EVENT_TYPE_ALARM: Final = "alarm"
 
-# Device of a config entry.
-MANUFACTURER: Final = "mackoy consulting"
+# Device of a config entry. The manufacturer is neutral on purpose: this is an
+# unofficial community project and must not name the vendor or operator of FF Agent.
+MANUFACTURER: Final = "ha-ff-agent (inoffiziell)"
 MODEL: Final = "FF Agent"
 CONFIGURATION_URL: Final = "https://www.ff-agent.com"
 

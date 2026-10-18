@@ -160,7 +160,7 @@ async def test_entities_belong_to_one_service_device(
     assert device is not None
     assert device.entry_type is dr.DeviceEntryType.SERVICE
     assert device.name == mock_config_entry.title
-    assert device.manufacturer == "mackoy consulting"
+    assert device.manufacturer == "ha-ff-agent (inoffiziell)"
     assert device.model == "FF Agent"
     assert device.configuration_url == "https://www.ff-agent.com"
 

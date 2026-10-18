@@ -466,6 +466,25 @@ def test_texts_name_no_vendor_and_no_price(language: str) -> None:
     assert "Home Assistant Link" in text
 
 
+def test_no_vendor_name_in_code_and_user_docs() -> None:
+    """No company name of FF Agent in the code, README or CHANGELOG.
+
+    This is an unofficial community project; the device info shows a neutral
+    manufacturer and no text names the vendor or operator of FF Agent.
+    """
+    files = [
+        path
+        for path in INTEGRATION.rglob("*")
+        if path.is_file() and path.suffix in {".py", ".json", ".yaml", ".yml"}
+    ]
+    files += [ROOT / "README.md", ROOT / "CHANGELOG.md"]
+    assert len(files) > 10
+    for path in files:
+        text = path.read_text("utf-8").lower()
+        for forbidden in ("mackoy", "consulting"):
+            assert forbidden not in text, f"{forbidden!r} found in {path.name}"
+
+
 def test_manifest_does_not_depend_on_ntfy() -> None:
     """ntfy stays optional: no dependency, no after_dependency (ADR 0003, 1.)."""
     manifest = _load(INTEGRATION / "manifest.json")
