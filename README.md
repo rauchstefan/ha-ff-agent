@@ -26,8 +26,8 @@ mission software for fire brigades and emergency services) available in Home Ass
 > **Inoffizielles Community-Projekt, nicht mit dem Hersteller von FF Agent verbunden.**
 > **Unofficial community project, not affiliated with the vendor of FF Agent.**
 >
-> **Version 0.4.0:** Test- und Echtalarm aus FF Agent kommen an; Zusage und Absage sind
-> noch nicht gegen ein echtes FF Agent getestet. / **Version 0.4.0:** Test and real alarms
+> **Version 1.0.0:** Test- und Echtalarm aus FF Agent kommen an; Zusage und Absage sind
+> noch nicht gegen ein echtes FF Agent getestet. / **Version 1.0.0:** Test and real alarms
 > from FF Agent arrive; accepting and declining have not yet been tested against a real
 > FF Agent.
 
@@ -118,7 +118,7 @@ starten.
 1. In HACS oben rechts das Menü (⋮) öffnen, *Benutzerdefinierte Repositories* wählen, die
    URL `https://github.com/rauchstefan/ha-ff-agent` eintragen und als Typ „Integration“
    hinzufügen.
-2. „FF Agent“ öffnen, die neueste Version (aktuell 0.4.0) wählen, herunterladen und
+2. „FF Agent“ öffnen, die neueste Version (aktuell 1.0.0) wählen, herunterladen und
    Home Assistant neu starten.
 3. Unter *Einstellungen → Geräte & Dienste → Integration hinzufügen* „FF Agent“ wählen.
 
@@ -813,7 +813,7 @@ HACS. Then install "FF Agent" there and restart Home Assistant.
 
 1. In HACS open the menu (⋮) at the top right, choose *Custom repositories*, enter the URL
    `https://github.com/rauchstefan/ha-ff-agent` and add it with type "Integration".
-2. Open "FF Agent", choose the latest version (currently 0.4.0), download it and restart
+2. Open "FF Agent", choose the latest version (currently 1.0.0), download it and restart
    Home Assistant.
 3. Under *Settings → Devices & services → Add integration* choose "FF Agent".
 
