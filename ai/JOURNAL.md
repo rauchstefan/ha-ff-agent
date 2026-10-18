@@ -22,6 +22,25 @@ Das Journal ist Verlauf, keine Wissensbasis: Dauerhaftes gehört nach `docs/` od
 
 <!-- Neue Einträge direkt unter dieser Zeile einfügen -->
 
+## 2026-10-18 – claude/readme-update-ha-anker-solix-2ea3b2 – README nach Vorbild ha-anker-solix
+- **Nutzer-Auftrag:** README-Update nach `thomluther/ha-anker-solix`: Badge-Leiste mit
+  aktuellen Werten, Button zur direkten Installation in HACS; weitere Elemente nur nach
+  Rückfrage. Der Nutzer hat alle Vorschläge gewählt (zusätzliche Badges, Hinweisboxen,
+  Haftungsausschluss, Referenz-Links, Probleme melden, Mitmachen, Unterstützen mit
+  Buy-me-a-coffee `https://buymeacoffee.com/rauchstefan`, Weiterführende Links).
+- **Freigabe:** GitHub Discussions eingeschaltet (Repo-Einstellung), ausdrücklich vom
+  Nutzer bestätigt.
+- **Delegiert:** doku mit **Sonnet** statt Haiku (README mit 1200+ Zeilen, zweisprachig,
+  viele Anker und Referenzen: zu fehleranfällig für Haiku/low). Kein reviewer, da reine
+  Doku und kein Release.
+- **Erledigt:** README.md (Badges, HACS-Button oben und in beiden Installationsabschnitten,
+  `[!NOTE]`/`[!IMPORTANT]`/`[!WARNING]`-Boxen, Haftungsausschluss, vier neue Abschnitte je
+  Sprache, Referenzdefinitionen am Ende), neue CONTRIBUTING.md. Grep auf Herstellernamen: 0.
+- **Offen / Übergabe:** PR mergen, sobald CI grün ist. Badges nach dem Merge auf GitHub
+  ansehen. Produkt-Website-Link `https://www.ff-agent.com` vom Nutzer bestätigen lassen.
+- **Für die nächste Session:** Die Badge-URLs stehen gesammelt am Ende von README.md. Das
+  Tests-Badge hängt am Dateinamen `tests.yml`; wird der Workflow umbenannt, die URL mitziehen.
+
 ## 2026-10-18 – lokal-2026-10-18-standort-quelle – Standortquelle wählbar
 - **Nutzer-Auftrag:** Das Feld „Standort-Entität“ ist seltsam; wählbar sein sollen die
   HA-Zuhause-Position oder selbst eingetragene Koordinaten. Rückfrage: Entität behalten,

@@ -2,6 +2,18 @@
 
 <img src="https://raw.githubusercontent.com/rauchstefan/ha-ff-agent/main/custom_components/ff_agent/brand/icon.png" width="128" alt="ha-ff-agent">
 
+[![GitHub Release][releases-shield]][releases-url]
+[![Contributors][contributors-shield]][contributors-url]
+[![Issues][issues-shield]][issues-url]
+[![Discussions][discussions-shield]][discussions-url]
+[![HACS Custom][hacs-shield]][hacs-url]
+[![Tests][ci-shield]][ci-url]
+
+[![License: MIT][license-shield]][license-url]
+![Made with Python][python-shield]
+
+[![In HACS öffnen / Open in HACS][my-hacs-badge]][my-hacs-url]
+
 **Deutsch:** Custom-Integration für [Home Assistant](https://www.home-assistant.io/),
 installierbar über [HACS](https://hacs.xyz/), die **FF Agent** (Alarmierungs- und
 Einsatzsoftware für Feuerwehren und Hilfsorganisationen) in Home Assistant verfügbar macht.
@@ -10,6 +22,7 @@ Einsatzsoftware für Feuerwehren und Hilfsorganisationen) in Home Assistant verf
 installable through [HACS](https://hacs.xyz/), that makes **FF Agent** (alerting and
 mission software for fire brigades and emergency services) available in Home Assistant.
 
+> [!NOTE]
 > **Inoffizielles Community-Projekt, nicht mit dem Hersteller von FF Agent verbunden.**
 > **Unofficial community project, not affiliated with the vendor of FF Agent.**
 >
@@ -25,7 +38,7 @@ mission software for fire brigades and emergency services) available in Home Ass
 
 # Deutsch
 
-Inhalt: [Was die Integration tut](#was-die-integration-tut-und-was-nicht) ·
+Inhalt: [Haftungsausschluss](#haftungsausschluss) · [Was die Integration tut](#was-die-integration-tut-und-was-nicht) ·
 [Voraussetzungen](#voraussetzungen) · [Installation](#installation) ·
 [Wie kommt der Alarm an?](#wie-kommt-der-alarm-an) ·
 [Einrichtung](#einrichtung-schritt-für-schritt) ·
@@ -33,7 +46,18 @@ Inhalt: [Was die Integration tut](#was-die-integration-tut-und-was-nicht) ·
 [Neu konfigurieren](#neu-konfigurieren) · [Entitäten](#entitäten) · [Actions](#actions) ·
 [Beispiele](#beispiel-automationen) · [Datenschutz](#datenschutz) ·
 [Einschränkungen](#bekannte-einschränkungen) · [iCal](#optional-ical-über-remote-calendar) ·
-[Entfernen](#entfernen) · [Fehlerbehebung](#fehlerbehebung)
+[Entfernen](#entfernen) · [Fehlerbehebung](#fehlerbehebung) ·
+[Probleme melden](#probleme-melden-und-fragen) · [Mitmachen](#mitmachen) ·
+[Unterstützen](#unterstützen) · [Links](#weiterführende-links)
+
+## Haftungsausschluss
+
+> [!WARNING]
+> Dies ist ein inoffizielles, unabhängiges Community-Projekt und nicht mit dem Anbieter von
+> FF Agent verbunden. Marken- und Produktnamen gehören ihren jeweiligen Inhabern. Die
+> Nutzung erfolgt auf eigenes Risiko. Die Integration ist **kein Ersatz** für die offizielle
+> Alarmierung (Meldeempfänger/App). Es gibt keine Gewähr für Zustellung, Vollständigkeit
+> oder Rechtzeitigkeit von Alarmen.
 
 ## Was die Integration tut und was nicht
 
@@ -84,7 +108,13 @@ Agent auf. Daten kommen ausschließlich per Push von FF Agent, es gibt kein Abfr
 
 <!-- docs-installation-instructions -->
 
-**Über HACS (Custom Repository):**
+**Mit einem Klick:** Dieser Button öffnet deine eigene Home-Assistant-Instanz und fügt das
+Repository in HACS hinzu. Danach dort „FF Agent“ installieren und Home Assistant neu
+starten.
+
+[![In HACS öffnen][my-hacs-badge]][my-hacs-url]
+
+**Über HACS (Custom Repository), alternativ von Hand:**
 
 1. In HACS oben rechts das Menü (⋮) öffnen, *Benutzerdefinierte Repositories* wählen, die
    URL `https://github.com/rauchstefan/ha-ff-agent` eintragen und als Typ „Integration“
@@ -101,10 +131,11 @@ Agent auf. Daten kommen ausschließlich per Push von FF Agent, es gibt kein Abfr
 2. Home Assistant neu starten.
 3. Die Integration wie oben hinzufügen.
 
-**Nach jedem Update** (HACS und manuell): Home Assistant neu starten und die Seite im
-Browser hart neu laden (Strg+F5, am Mac Cmd+Umschalt+R). In der Companion-App die App neu
-starten bzw. den Frontend-Cache in den App-Einstellungen leeren. Sonst zeigen Dialoge der
-Integration unter Umständen keinen oder alten Text.
+> [!NOTE]
+> **Nach jedem Update** (HACS und manuell): Home Assistant neu starten und die Seite im
+> Browser hart neu laden (Strg+F5, am Mac Cmd+Umschalt+R). In der Companion-App die App neu
+> starten bzw. den Frontend-Cache in den App-Einstellungen leeren. Sonst zeigen Dialoge der
+> Integration unter Umständen keinen oder alten Text.
 
 ## Wie kommt der Alarm an?
 
@@ -290,9 +321,10 @@ zurück erhalten).
 | Standard-Verkehrsmittel | Wird beim Zusagen gesendet, wenn die Action keines angibt. Zur Auswahl stehen „Auto“, „Zu Fuß“ und „Fahrrad“. |
 | Standortquelle | „Kein Standort“ (Standard), „Zuhause-Position von Home Assistant“ (wird beim Zusagen gelesen), „Koordinaten manuell eingeben“ (Breiten- und Längengrad in Dezimalgrad) oder „Person oder Geräte-Tracker (Live-Standort)“. Ein Wechsel der Quelle löscht die Werte der alten Quelle. Bestehende Einträge mit Standort-Entität laufen unverändert weiter. |
 
-**Wichtig:** Das Speichern der Optionen lädt die Integration neu. Ein gerade aktiver Alarm
-wird dabei **zurückgesetzt** („Alarm aktiv“ geht aus, das Zeitfenster gegen Doppelalarme
-ist wieder offen). Ändere Optionen deshalb nicht mitten in einem Einsatz.
+> [!IMPORTANT]
+> Das Speichern der Optionen lädt die Integration neu. Ein gerade aktiver Alarm
+> wird dabei **zurückgesetzt** („Alarm aktiv“ geht aus, das Zeitfenster gegen Doppelalarme
+> ist wieder offen). Ändere Optionen deshalb nicht mitten in einem Einsatz.
 
 ## Neu konfigurieren
 
@@ -346,11 +378,12 @@ Die Entity-IDs beginnen mit dem Namen des Eintrags, zum Beispiel
 und Sprache ab. Suche sie unter *Einstellungen → Geräte & Dienste → FF Agent → Gerät* und
 wähle Entitäten in Automationen über die Oberfläche aus, statt IDs abzutippen.
 
-**Pflichtfilter für Automationen auf die Event-Entität:** Ein `state`-Trigger braucht immer
-`not_from: [unavailable, unknown]` und `not_to: [unavailable, unknown]`. Bei jedem Reload
-und jedem Neustart wird die Event-Entität kurz `unavailable` und stellt danach den alten
-Zeitstempel wieder her. Ohne die Filter hielte die Automation das für einen neuen Alarm
-und würde auslösen, etwa nach dem Speichern der Optionen.
+> [!IMPORTANT]
+> **Pflichtfilter für Automationen auf die Event-Entität:** Ein `state`-Trigger braucht immer
+> `not_from: [unavailable, unknown]` und `not_to: [unavailable, unknown]`. Bei jedem Reload
+> und jedem Neustart wird die Event-Entität kurz `unavailable` und stellt danach den alten
+> Zeitstempel wieder her. Ohne die Filter hielte die Automation das für einen neuen Alarm
+> und würde auslösen, etwa nach dem Speichern der Optionen.
 
 ## Actions
 
@@ -484,11 +517,14 @@ Header-Namen, Schlüssel, Typen, Längen), nie Werte. Kein Geheimnis erscheint i
 Entitätsattributen, Entity-Unique-IDs oder den Logs der Integration. Die Diagnose ist
 redigiert.
 
-**Home-Assistant-Logs.** Teile Home-Assistant-Logs nie ungeprüft. Die Webhook-ID kann auch
-in normalen Warn- und Fehlermeldungen von Home Assistant stehen, z. B. bei einem Aufruf
-an eine alte Webhook-Adresse nach „Neue geheime Adresse erzeugen“. Debug-Logs von
-`homeassistant.components.webhook`, `.http`, `.websocket_api` und `homeassistant.core`
-enthalten zusätzlich Dialoginhalte und Standortdaten. Das liegt in Home Assistant selbst.
+**Home-Assistant-Logs.**
+
+> [!WARNING]
+> Teile Home-Assistant-Logs nie ungeprüft. Die Webhook-ID kann auch
+> in normalen Warn- und Fehlermeldungen von Home Assistant stehen, z. B. bei einem Aufruf
+> an eine alte Webhook-Adresse nach „Neue geheime Adresse erzeugen“. Debug-Logs von
+> `homeassistant.components.webhook`, `.http`, `.websocket_api` und `homeassistant.core`
+> enthalten zusätzlich Dialoginhalte und Standortdaten. Das liegt in Home Assistant selbst.
 
 **Datenschutz bei ntfy.** Jeder Alarm läuft über den Dienst ntfy.sh. Dessen Betreiber
 sieht, wann ein Alarm kommt, und speichert die Meldung bis zu 12 Stunden. Einsatzdaten
@@ -575,9 +611,10 @@ laufenden Alarm taugt er vermutlich nicht, für den Verlauf schon. Binde ihn üb
 Core-Integration **Remote Calendar** ein (ab Home Assistant 2025.4, unterstützt
 Basic-Auth, Aktualisierung alle 24 Stunden oder per `homeassistant.update_entity`).
 
-**Recorder-Warnung:** Kalender-Attribute können Ort und Beschreibung des Einsatzes
-enthalten und landen im Recorder. Schließe die Kalender-Entität bei Bedarf aus, wie oben
-gezeigt.
+> [!WARNING]
+> **Recorder-Warnung:** Kalender-Attribute können Ort und Beschreibung des Einsatzes
+> enthalten und landen im Recorder. Schließe die Kalender-Entität bei Bedarf aus, wie oben
+> gezeigt.
 
 ## Entfernen
 
@@ -655,23 +692,75 @@ und auf `/accept` oder `/reject` enden, oder eine blanke UUID sein.
 **Fehler melden:** Öffne ein Issue im Repository. Hänge nur die Diagnose an, **keine
 Logs** (siehe [Datenschutz](#datenschutz)).
 
+## Probleme melden und Fragen
+
+- **Fehler gefunden?** Öffne ein [Issue][issues-url]. Beschreibe, was du getan hast, was du
+  erwartet hast und was passiert ist, und hänge die Diagnose an (siehe
+  [Fehlerbehebung](#fehlerbehebung)).
+- **Fragen, Ideen, Erfahrungen?** Nutze die [Diskussionen][discussions-url].
+- **Debug-Log:** *Einstellungen → Geräte & Dienste → FF Agent → Debug-Protokollierung
+  aktivieren*. Problem nachstellen, die Protokollierung beenden; Home Assistant bietet das
+  Log dann zum Download an.
+
+> [!WARNING]
+> Schwärze vor dem Posten von Logs, Screenshots oder Konfiguration Tokens, Webhook-URLs,
+> ntfy-Themen, Namen, Adressen und echte Einsatzdaten. Wer eine Webhook-URL oder ein Thema
+> kennt, kann falsche Alarme auslösen (siehe [Datenschutz](#datenschutz)).
+
+## Mitmachen
+
+Beiträge sind willkommen:
+
+- Übersetzungen (Dateien unter `custom_components/ff_agent/translations/`)
+- Rückmeldungen aus Tests mit einem echten FF Agent, besonders zu Zusage und Absage
+- Pull Requests
+
+Details stehen in [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Unterstützen
+
+Wenn dir die Integration nützt, freue ich mich über einen Stern auf GitHub. Wer das Projekt
+darüber hinaus unterstützen möchte, kann mir einen Kaffee spendieren. Beides ist völlig
+freiwillig.
+
+[![Buy me a coffee][bmc-badge]][bmc-url]
+
+## Weiterführende Links
+
+- [FF Agent](https://www.ff-agent.com) (Produkt-Website)
+- [Home Assistant](https://www.home-assistant.io/)
+- [HACS-Dokumentation zu Custom Repositories](https://hacs.xyz/docs/faq/custom_repositories/)
+- [CHANGELOG.md](CHANGELOG.md)
+- [docs/architektur.md](docs/architektur.md)
+- [Diskussionen][discussions-url]
+
 ---
 
 # English
 
-Contents: [What it does](#what-the-integration-does-and-does-not-do) ·
+Contents: [Disclaimer](#disclaimer) · [What it does](#what-the-integration-does-and-does-not-do) ·
 [Requirements](#requirements) · [Installing](#installing) ·
 [How does the alarm arrive?](#how-does-the-alarm-arrive) ·
 [Setup](#setup-step-by-step) · [Token protection](#optional-token-protection) ·
 [Options](#options) · [Reconfigure](#reconfigure) · [Entities](#entities) ·
 [Actions](#actions-services) · [Examples](#example-automations) · [Privacy](#privacy) ·
 [Limitations](#known-limitations) · [iCal](#optional-ical-through-remote-calendar) ·
-[Removal](#removal) · [Troubleshooting](#troubleshooting)
+[Removal](#removal) · [Troubleshooting](#troubleshooting) ·
+[Issues and questions](#issues-and-questions) · [Contributing](#contributing) ·
+[Support](#support-the-project) · [Resources](#further-resources)
 
 The integration's user interface is available in German and English. Names of buttons,
 options and entities below are the English texts of the interface. The names of the
 FF Agent web UI are German and are quoted as they appear there, with an English
 explanation where needed.
+
+## Disclaimer
+
+> [!WARNING]
+> This is an unofficial, independent community project and is not affiliated with the
+> provider of FF Agent. Trademarks and product names belong to their respective owners. Use
+> at your own risk. The integration is **not a replacement** for the official alerting
+> (pager/app). There is no guarantee that alarms are delivered, complete or on time.
 
 ## What the integration does and does not do
 
@@ -713,7 +802,12 @@ from FF Agent; nothing is polled.
 
 ## Installing
 
-**Through HACS (custom repository):**
+**With one click:** this button opens your own Home Assistant and adds the repository to
+HACS. Then install "FF Agent" there and restart Home Assistant.
+
+[![Open in HACS][my-hacs-badge]][my-hacs-url]
+
+**Through HACS (custom repository), alternatively by hand:**
 
 1. In HACS open the menu (⋮) at the top right, choose *Custom repositories*, enter the URL
    `https://github.com/rauchstefan/ha-ff-agent` and add it with type "Integration".
@@ -729,10 +823,11 @@ from FF Agent; nothing is polled.
 2. Restart Home Assistant.
 3. Add the integration as above.
 
-**After every update** (HACS and manual): restart Home Assistant and hard-reload the page in
-the browser (Ctrl+F5, on a Mac Cmd+Shift+R). In the companion app, restart the app or clear
-the frontend cache in the app settings. Otherwise the dialogs of the integration may show
-no text or old text.
+> [!NOTE]
+> **After every update** (HACS and manual): restart Home Assistant and hard-reload the page in
+> the browser (Ctrl+F5, on a Mac Cmd+Shift+R). In the companion app, restart the app or clear
+> the frontend cache in the app settings. Otherwise the dialogs of the integration may show
+> no text or old text.
 
 ## How does the alarm arrive?
 
@@ -910,9 +1005,10 @@ does not exist there (a value that was set is kept for a later switch back).
 | Default transport | Sent with an acceptance if the action does not name one. Choices are "Car", "On foot" and "Bicycle". |
 | Location source | "No location" (default), "Home position from Home Assistant" (read when accepting), "Enter coordinates manually" (latitude and longitude in decimal degrees) or "Person or device tracker (live location)". Changing the source deletes the values of the old source. Existing entries with a location entity keep working unchanged. |
 
-**Important:** Saving the options reloads the integration. An alarm that is active at that
-moment is **reset** ("Alarm active" turns off, the window against duplicate alarms is open
-again). So do not change options in the middle of a mission.
+> [!IMPORTANT]
+> Saving the options reloads the integration. An alarm that is active at that
+> moment is **reset** ("Alarm active" turns off, the window against duplicate alarms is open
+> again). So do not change options in the middle of a mission.
 
 ## Reconfigure
 
@@ -960,11 +1056,12 @@ depends on the name and the language (with the German interface, for example,
 Agent → device* and choose entities in automations through the interface instead of typing
 IDs.
 
-**Mandatory filter for automations on the event entity:** A `state` trigger always needs
-`not_from: [unavailable, unknown]` and `not_to: [unavailable, unknown]`. On every reload
-and every restart the event entity briefly becomes `unavailable` and then restores the old
-timestamp. Without the filters the automation would take that for a new alarm and fire,
-for example after saving the options.
+> [!IMPORTANT]
+> **Mandatory filter for automations on the event entity:** A `state` trigger always needs
+> `not_from: [unavailable, unknown]` and `not_to: [unavailable, unknown]`. On every reload
+> and every restart the event entity briefly becomes `unavailable` and then restores the old
+> timestamp. Without the filters the automation would take that for a new alarm and fire,
+> for example after saving the options.
 
 ## Actions (services)
 
@@ -1093,12 +1190,15 @@ the config entry. Of incoming calls only the **shape** is recorded (method, head
 keys, types, lengths), never values. No secret appears in entity attributes, entity unique
 IDs or the logs of the integration. The diagnostics are redacted.
 
-**Home Assistant logs.** Never share Home Assistant logs unchecked. The webhook ID can also
-appear in normal warnings and errors of Home Assistant, e.g. on a call to an old webhook
-address after "Create a new secret address". Debug logs of
-`homeassistant.components.webhook`, `.http`, `.websocket_api` and `homeassistant.core`
-additionally contain dialog contents and location data. That is inherent to Home Assistant
-itself.
+**Home Assistant logs.**
+
+> [!WARNING]
+> Never share Home Assistant logs unchecked. The webhook ID can also
+> appear in normal warnings and errors of Home Assistant, e.g. on a call to an old webhook
+> address after "Create a new secret address". Debug logs of
+> `homeassistant.components.webhook`, `.http`, `.websocket_api` and `homeassistant.core`
+> additionally contain dialog contents and location data. That is inherent to Home Assistant
+> itself.
 
 **Privacy with ntfy.** Every alarm runs through the service ntfy.sh. Its operator sees when
 an alarm comes in and keeps the message for up to 12 hours. No mission data is transmitted
@@ -1180,8 +1280,9 @@ probably unsuitable for a running alarm, but fine for the history. Add it throug
 integration **Remote Calendar** (from Home Assistant 2025.4; supports basic auth; refreshes
 every 24 hours or through `homeassistant.update_entity`).
 
-**Recorder warning:** Calendar attributes can contain the place and description of the
-mission and end up in the recorder. Exclude the calendar entity if needed, as shown above.
+> [!WARNING]
+> **Recorder warning:** Calendar attributes can contain the place and description of the
+> mission and end up in the recorder. Exclude the calendar entity if needed, as shown above.
 
 ## Removal
 
@@ -1253,6 +1354,45 @@ and end with `/accept` or `/reject`, or be a bare UUID.
 **Report a bug:** Open an issue in the repository. Attach only the diagnostics, **no logs**
 (see [Privacy](#privacy)).
 
+## Issues and questions
+
+- **Found a bug?** Open an [issue][issues-url]. Describe what you did, what you expected
+  and what happened, and attach the diagnostics (see [Troubleshooting](#troubleshooting)).
+- **Questions, ideas, experiences?** Use the [discussions][discussions-url].
+- **Debug log:** *Settings → Devices & services → FF Agent → Enable debug logging*. Reproduce
+  the problem, then stop the logging; Home Assistant offers the log as a download.
+
+> [!WARNING]
+> Before you post logs, screenshots or configuration, **redact** tokens, webhook URLs,
+> ntfy topics, names, addresses and real mission data. Anyone who sees a webhook URL or
+> topic can trigger false alarms (see [Privacy](#privacy)).
+
+## Contributing
+
+Contributions are welcome:
+
+- translations (files under `custom_components/ff_agent/translations/`)
+- feedback from tests with a real FF Agent, especially accepting and declining
+- pull requests
+
+Details are in [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Support the project
+
+If the integration is useful to you, a star on GitHub is appreciated. If you want to
+support the project further, you can buy me a coffee. Both are entirely optional.
+
+[![Buy me a coffee][bmc-badge]][bmc-url]
+
+## Further resources
+
+- [FF Agent](https://www.ff-agent.com) (product website)
+- [Home Assistant](https://www.home-assistant.io/)
+- [HACS documentation on custom repositories](https://hacs.xyz/docs/faq/custom_repositories/)
+- [CHANGELOG.md](CHANGELOG.md)
+- [docs/architektur.md](docs/architektur.md) (architecture, in German)
+- [Discussions][discussions-url]
+
 ---
 
 # Entwicklung und Lizenz / Development and license
@@ -1270,3 +1410,23 @@ status: [docs/quality-scale.md](docs/quality-scale.md). The developer documentat
 German.
 
 **Lizenz / License:** MIT, siehe / see [LICENSE](LICENSE).
+
+[releases-shield]: https://img.shields.io/github/v/release/rauchstefan/ha-ff-agent?include_prereleases&style=for-the-badge
+[releases-url]: https://github.com/rauchstefan/ha-ff-agent/releases
+[contributors-shield]: https://img.shields.io/github/contributors/rauchstefan/ha-ff-agent?style=for-the-badge
+[contributors-url]: https://github.com/rauchstefan/ha-ff-agent/graphs/contributors
+[issues-shield]: https://img.shields.io/github/issues/rauchstefan/ha-ff-agent?style=for-the-badge
+[issues-url]: https://github.com/rauchstefan/ha-ff-agent/issues
+[discussions-shield]: https://img.shields.io/github/discussions/rauchstefan/ha-ff-agent?style=for-the-badge
+[discussions-url]: https://github.com/rauchstefan/ha-ff-agent/discussions
+[hacs-shield]: https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=for-the-badge
+[hacs-url]: https://hacs.xyz/docs/faq/custom_repositories/
+[ci-shield]: https://img.shields.io/github/actions/workflow/status/rauchstefan/ha-ff-agent/tests.yml?branch=main&label=Tests&style=for-the-badge
+[ci-url]: https://github.com/rauchstefan/ha-ff-agent/actions/workflows/tests.yml
+[license-shield]: https://img.shields.io/github/license/rauchstefan/ha-ff-agent?style=for-the-badge
+[license-url]: LICENSE
+[python-shield]: https://img.shields.io/badge/Made%20with-Python-3776AB?style=for-the-badge&logo=python&logoColor=white
+[my-hacs-badge]: https://my.home-assistant.io/badges/hacs_repository.svg
+[my-hacs-url]: https://my.home-assistant.io/redirect/hacs_repository/?owner=rauchstefan&repository=ha-ff-agent&category=integration
+[bmc-badge]: https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png
+[bmc-url]: https://buymeacoffee.com/rauchstefan
