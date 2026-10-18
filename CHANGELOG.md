@@ -3,7 +3,7 @@
 Alle nennenswerten Änderungen an dieser Integration. Format angelehnt an
 [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionen nach SemVer.
 
-## [Unreleased]
+## [0.3.0] – 2026-10-18 (Vorabversion)
 
 **Update:** Nach dem Update Home Assistant neu starten **und die Seite im Browser hart neu
 laden** (Strg+F5, am Mac Cmd+Umschalt+R). In der Companion-App die App neu starten bzw.
@@ -161,5 +161,6 @@ Siehe README, Abschnitt „Bekannte Einschränkungen“. Die wichtigsten:
 - Belegt ist nur das Verkehrsmittel „Auto“.
 - Eine Antwort mit Status 2xx heißt nur „gesendet“, nicht sicher „verbucht“.
 
+[0.3.0]: https://github.com/rauchstefan/ha-ff-agent/releases/tag/v0.3.0
 [0.2.0]: https://github.com/rauchstefan/ha-ff-agent/releases/tag/v0.2.0
 [0.1.0]: https://github.com/rauchstefan/ha-ff-agent/releases/tag/v0.1.0
