@@ -22,6 +22,25 @@ Das Journal ist Verlauf, keine Wissensbasis: Dauerhaftes gehört nach `docs/` od
 
 <!-- Neue Einträge direkt unter dieser Zeile einfügen -->
 
+## 2026-10-18 – claude/readme-update-ha-anker-solix-2ea3b2 – Pre-Release v0.4.0
+- **Nutzer-Auftrag:** „update nochmal auf eine neue Vorabversion und gib diese frei“. Das
+  ist die ausdrückliche Freigabe für Tag und GitHub-Release.
+- **Delegiert:**
+  - doku (Haiku, Standard) schrieb CHANGELOG [0.4.0], die README-Versionsangaben und die
+    Release-Notes.
+  - tester (Sonnet) meldete PASS: 782 Tests, alle 5 CI-Checks grün.
+  - reviewer (Opus) meldete „freigegeben“ ohne blockierende Findings. Die zwei
+    Formulierungs-Hinweise im englischen CHANGELOG sind übernommen.
+- **Erledigt:**
+  - Version 0.4.0 (Minor: neue Standortquelle) per rauchstefan/ha-ff-agent#13 gemergt
+    (e05621a).
+  - Tag `v0.4.0` und GitHub-Release als Vorabversion angelegt.
+  - Bei den CHANGELOG-Vergleichslinks setzt [0.4.0] wie bisher auf `releases/tag`.
+    [Unreleased] vergleicht `v0.4.0...HEAD`.
+- **Offen / Übergabe:** 261018-test-zusage-absage bleibt offen (Test durch den Nutzer).
+- **Für die nächste Session:** Auto-Merge ist im Repo ausgeschaltet. PRs nach grüner CI
+  von Hand mergen.
+
 ## 2026-10-18 – claude/readme-update-ha-anker-solix-2ea3b2 – README nach Vorbild ha-anker-solix
 - **Nutzer-Auftrag:** README-Update nach `thomluther/ha-anker-solix`: Badge-Leiste mit
   aktuellen Werten, Button zur direkten Installation in HACS; weitere Elemente nur nach

@@ -3,9 +3,13 @@
 Was ist der aktuelle Stand der Integration? Diese Datei beantwortet das für jede neue
 Session. Von Hand gepflegt.
 
-- **Version:** 0.3.0. GitHub-Release `v0.3.0` als **Vorabversion** (2026-10-18, Tag auf
-  619a53e, rauchstefan/ha-ff-agent#9). Davor `v0.2.0` (dabe583) und `v0.1.0`, beide
-  Vorabversionen.
+- **Version:** 0.4.0. GitHub-Release `v0.4.0` als **Vorabversion** (2026-10-18, Tag auf
+  e05621a, rauchstefan/ha-ff-agent#13). Davor `v0.3.0` (619a53e), `v0.2.0` (dabe583) und
+  `v0.1.0`, alle Vorabversionen.
+- **Neu in v0.4.0:** Standortquelle wählbar (keine, HA-Zuhause, Koordinaten, Entität;
+  rauchstefan/ha-ff-agent#11), neues Symbol (#10), README mit Badges, HACS-Button,
+  Hinweisboxen und Community-Abschnitten, CONTRIBUTING.md, Discussions eingeschaltet
+  (#12). 782 Tests grün.
 - **Neu in v0.3.0:** README zweisprachig (Deutsch und Englisch in einer Datei),
   CHANGELOG mit englischer Fassung, dazu alles aus rauchstefan/ha-ff-agent#8 (siehe unten).
   679 Tests, Abdeckung 100 %. Ein echter Testalarm aus FF Agent kam beim Nutzer an.
@@ -46,7 +50,7 @@ Session. Von Hand gepflegt.
   - `tests.yml`: ruff, pytest mit pytest-homeassistant-custom-component, Python 3.14,
     Abdeckungs-Gate 95 %, aktuell 100 %
   - Dependabot
-- **Letzte Änderung:** 2026-10-18 – Pre-Release v0.3.0
+- **Letzte Änderung:** 2026-10-18 – Pre-Release v0.4.0
 
 ## Was funktioniert
 
