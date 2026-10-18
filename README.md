@@ -146,12 +146,24 @@ Schritt für Schritt durch den gewählten Weg. Wechseln kannst du später jederz
 3. **Zusage-Einstellungen wählen.** Der Schritt „Zusage: Verkehrsmittel und Standort“ fragt:
    - **Standard-Verkehrsmittel:** „Auto“, „Zu Fuß“ oder „Fahrrad“. Es wird bei jeder
      Zusage mitgesendet, wenn die Action keines angibt.
-   - **Standort-Entität (optional):** eine Person oder ein Geräte-Tracker. Sein aktueller
-     Standort wird bei jeder Zusage mitgesendet. Leer lassen, um keinen Standort zu senden.
+   - **Standortquelle:** woher der Standort kommt, der bei jeder Zusage mitgesendet wird.
+     Zur Auswahl stehen:
+     - **Kein Standort** (Standard): Es wird kein Standort gesendet.
+     - **Zuhause-Position von Home Assistant:** Die Position wird erst beim Zusagen gelesen,
+       Änderungen gelten also sofort. Ist in Home Assistant keine Position gesetzt (0/0),
+       wird ohne Standort zugesagt.
+     - **Koordinaten manuell eingeben:** Im Folgeschritt „Zusage: Koordinaten“ trägst du
+       Breitengrad (-90 bis 90) und Längengrad (-180 bis 180) in Dezimalgrad ein. Vorgeschlagen
+       wird die Zuhause-Position von Home Assistant; gespeichert wird dann eine feste Kopie.
+     - **Person oder Geräte-Tracker (Live-Standort):** Im Folgeschritt wählst du die Entität.
+       Ihr aktueller Standort wird bei jeder Zusage mitgesendet. Hat sie gerade keinen
+       Standort, wird ohne Standort zugesagt.
 
    Die Rückmelde-URL bleibt dabei unverändert; gespeichert werden nur UUID und Host.
-   Verkehrsmittel und Standort hängt die Integration bei jeder Zusage an. Jetzt wird nichts
-   gesendet. Beide Angaben änderst du später unter *Konfigurieren*.
+   Verkehrsmittel und Standortquelle hängt die Integration bei jeder Zusage an. Jetzt wird
+   nichts gesendet. Beide Angaben änderst du später unter *Konfigurieren*. Ein Wechsel der
+   Quelle löscht die Werte der alten Quelle; andere Optionen bleiben. Bestehende Einträge
+   mit einer Standort-Entität laufen unverändert weiter (sie gelten als Live-Standort).
 4. **Alarmweg wählen.** Auf die Frage „Nutzt du Home Assistant Cloud?“ antwortest du mit
    „Ja (empfohlen)“ (weiter mit [Weg A](#weg-a-home-assistant-cloud-oder-eigene-adresse))
    oder „Nein“ (Hinweis auf ntfy, weiter mit [Weg B](#weg-b-ntfy-kostenlos)). Ist Home
@@ -276,7 +288,7 @@ zurück erhalten).
 | Zusatz-Token verlangen | Wie oben. Standard: aus. |
 | Rücksetzzeit „Alarm aktiv“ | Minuten ohne neuen Alarm, nach denen „Alarm aktiv“ ausgeht (1 bis 1440, Standard 30). Ein neuer Alarm startet die Zeit neu. |
 | Standard-Verkehrsmittel | Wird beim Zusagen gesendet, wenn die Action keines angibt. Zur Auswahl stehen „Auto“, „Zu Fuß“ und „Fahrrad“. |
-| Standort-Entität | Optional: eine Person oder ein Geräte-Tracker. Sein Standort wird beim Zusagen mitgesendet. Leer lassen, um keinen Standort zu senden. |
+| Standortquelle | „Kein Standort“ (Standard), „Zuhause-Position von Home Assistant“ (wird beim Zusagen gelesen), „Koordinaten manuell eingeben“ (Breiten- und Längengrad in Dezimalgrad) oder „Person oder Geräte-Tracker (Live-Standort)“. Ein Wechsel der Quelle löscht die Werte der alten Quelle. Bestehende Einträge mit Standort-Entität laufen unverändert weiter. |
 
 **Wichtig:** Das Speichern der Optionen lädt die Integration neu. Ein gerade aktiver Alarm
 wird dabei **zurückgesetzt** („Alarm aktiv“ geht aus, das Zeitfenster gegen Doppelalarme
@@ -353,9 +365,9 @@ Oberfläche über die Auswahl „Eintrag“.
     `bicycle` (Fahrrad). Ohne Angabe gilt das Standard-Verkehrsmittel aus den Optionen.
     Home Assistant speichert die Werte klein geschrieben, an FF Agent gehen `CAR`, `FEET`
     und `BICYCLE`.
-  - `latitude` und `longitude` (optional): Standort, nur beide zusammen. Ohne Angabe wird
-    der Standort der Standort-Entität aus den Optionen gesendet, falls gesetzt, sonst kein
-    Standort.
+  - `latitude` und `longitude` (optional): Standort, nur beide zusammen. Er hat Vorrang vor
+    der Standortquelle aus den Optionen. Ohne Angabe gilt die Standortquelle aus den
+    Optionen; ist keine gewählt, wird kein Standort gesendet.
 - **`ff_agent.reject`** (Absagen)
   - `config_entry_id` (Pflicht)
 - **`ff_agent.reset_alarm`** (Alarm zurücksetzen)
@@ -451,7 +463,7 @@ automation:
   `latitude` und `longitude`, nur beide zusammen.
 - Ist in FF Agent „auch für Testalarme“ an, lösen Testalarme die Automation ebenfalls aus.
 - Der Standort wird nur gesendet, wenn er angegeben ist oder in den Optionen eine
-  Standort-Entität gesetzt ist.
+  Standortquelle gewählt ist (nicht „Kein Standort“). Die Absage sendet nie einen Standort.
 
 ## Datenschutz
 
@@ -758,12 +770,24 @@ way. You can switch later at any time under *Reconfigure*.
 3. **Choose the accept settings.** The step "Accepting: transport and location" asks for:
    - **Default transport:** "Car", "On foot" or "Bicycle". It is sent with every acceptance
      if the action does not name one.
-   - **Location entity (optional):** a person or a device tracker. Its current location is
-     sent with every acceptance. Leave empty to send no location.
+   - **Location source:** where the location comes from that is sent with every acceptance.
+     The choices are:
+     - **No location** (default): no location is sent.
+     - **Home position from Home Assistant:** The position is only read when accepting, so
+       changes take effect immediately. If Home Assistant has no position set (0/0), the
+       acceptance is sent without a location.
+     - **Enter coordinates manually:** In the next step "Accepting: coordinates" you enter
+       latitude (-90 to 90) and longitude (-180 to 180) in decimal degrees. The Home Assistant
+       home position is suggested; the value saved is then a fixed copy.
+     - **Person or device tracker (live location):** In the next step you choose the entity.
+       Its current location is sent with every acceptance. If it has no location at that
+       moment, the acceptance is sent without one.
 
    The mission reply URL stays unchanged; only the UUID and host are stored. The integration
-   appends transport and location to every acceptance. Nothing is sent now. You change both
-   later under *Configure*.
+   appends transport and location source to every acceptance. Nothing is sent now. You change
+   both later under *Configure*. Changing the source deletes the values of the old source;
+   other options stay. Existing entries with a location entity keep working unchanged (they
+   count as live location).
 4. **Choose the alarm way.** To the question "Do you use Home Assistant Cloud?" you answer
    "Yes (recommended)" (continue with
    [Route A](#route-a-home-assistant-cloud-or-own-address)) or "No" (a pointer to ntfy,
@@ -884,7 +908,7 @@ does not exist there (a value that was set is kept for a later switch back).
 | Require additional token | As above. Default: off. |
 | Reset time of "Alarm active" | Minutes without a new alarm after which "Alarm active" turns off (1 to 1440, default 30). A new alarm restarts the time. |
 | Default transport | Sent with an acceptance if the action does not name one. Choices are "Car", "On foot" and "Bicycle". |
-| Location entity | Optional: a person or a device tracker. Its location is sent with an acceptance. Leave empty to send no location. |
+| Location source | "No location" (default), "Home position from Home Assistant" (read when accepting), "Enter coordinates manually" (latitude and longitude in decimal degrees) or "Person or device tracker (live location)". Changing the source deletes the values of the old source. Existing entries with a location entity keep working unchanged. |
 
 **Important:** Saving the options reloads the integration. An alarm that is active at that
 moment is **reset** ("Alarm active" turns off, the window against duplicate alarms is open
@@ -952,8 +976,9 @@ through the "Entry" selector.
   - `transport` (optional): mode of transport `car` (default), `feet` (on foot) or
     `bicycle`. Without it the default transport from the options applies. Home Assistant
     stores the values in lower case; `CAR`, `FEET` and `BICYCLE` are sent to FF Agent.
-  - `latitude` and `longitude` (optional): location, only both together. Without them the
-    location of the location entity from the options is sent if set, otherwise no location.
+  - `latitude` and `longitude` (optional): location, only both together. It takes precedence
+    over the location source from the options. Without them the location source from the
+    options applies; if none is set, no location is sent.
 - **`ff_agent.reject`** (Decline)
   - `config_entry_id` (required)
 - **`ff_agent.reset_alarm`** (Reset alarm)
@@ -1046,7 +1071,7 @@ automation:
   `latitude` and `longitude`, only both together.
 - If "auch für Testalarme" (also for test alarms) is on in FF Agent, test alarms trigger
   the automation as well.
-- The location is only sent if it is given or a location entity is set in the options.
+- The location is only sent if it is given or a location source other than "No location" is set in the options. The rejection never sends a location.
 - The text values in the YAML (alias, title, message) are the German originals; translate
   them as you like.
 

@@ -135,6 +135,9 @@ nicht zurück.
 - **`options`:** `require_token` (Standard aus), `reset_minutes`, `default_transport`
   (`car`, `feet` oder `bicycle`; an FF Agent gehen `CAR`, `FEET`, `BICYCLE`) und
   `location_source` (`none`, `home`, `manual` oder `entity`; Standard `none`).
+  Der Options-Flow behält seit 261018-standort-quelle alle übrigen Optionen bei und ersetzt
+  nur die Standortschlüssel. Unbekannte oder veraltete Nicht-Standortschlüssel bleiben
+  dadurch dauerhaft erhalten.
   Zur Quelle gehören nur ihre eigenen Werte: bei `manual` `location_latitude` und
   `location_longitude`, bei `entity` `location_entity` (`person` oder `device_tracker`);
   bei `home` wird nichts gespeichert, die Zuhause-Position von Home Assistant liest
