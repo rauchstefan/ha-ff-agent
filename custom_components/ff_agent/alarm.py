@@ -140,6 +140,23 @@ class AlarmManager:
         async_dispatcher_send(self._hass, self._signal_state)
 
     @callback
+    def async_reset(self) -> bool:
+        """Switch "alarm active" off by hand; return False if nothing was active.
+
+        The timestamp of the last alarm stays, so the window against double alarms
+        is not touched: a repetition of the same alarm does not switch "alarm active"
+        on again, a new alarm after the window does.
+        """
+        if self._closed or not self.active:
+            return False
+        self._async_cancel_reset()
+        self.active = False
+        self.active_until = None
+        _LOGGER.debug("Alarm reset by hand")
+        async_dispatcher_send(self._hass, self._signal_state)
+        return True
+
+    @callback
     def _async_cancel_reset(self) -> None:
         """Cancel the reset timer, if one is running."""
         if self._cancel_reset is not None:

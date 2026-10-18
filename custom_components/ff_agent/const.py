@@ -101,6 +101,7 @@ REPLY_OPTIONS: Final = (REPLY_STATE_ACCEPTED, REPLY_STATE_REJECTED, REPLY_STATE_
 # Actions of the integration.
 SERVICE_ACCEPT: Final = "accept"
 SERVICE_REJECT: Final = "reject"
+SERVICE_RESET_ALARM: Final = "reset_alarm"
 ATTR_TRANSPORT: Final = "transport"
 
 # Dispatcher signals of the alarm manager, one pair per config entry.

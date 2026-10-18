@@ -232,16 +232,20 @@ def test_translations_name_the_alarm_entities(
 
 
 def test_icons_cover_the_reply_entities_and_actions() -> None:
-    """The buttons, the sensor and both actions have an icon."""
+    """The buttons, the sensor and the three actions have an icon."""
     icons = _load(INTEGRATION / "icons.json")
     assert icons["entity"]["button"]["accept"] == {"default": "mdi:check-circle"}
     assert icons["entity"]["button"]["reject"] == {"default": "mdi:close-circle"}
+    assert icons["entity"]["button"]["reset_alarm"] == {
+        "default": "mdi:alarm-light-off"
+    }
     assert icons["entity"]["sensor"]["last_reply"] == {
         "default": "mdi:message-reply-text"
     }
     assert icons["services"] == {
         "accept": {"service": "mdi:check-circle"},
         "reject": {"service": "mdi:close-circle"},
+        "reset_alarm": {"service": "mdi:alarm-light-off"},
     }
 
 
@@ -252,6 +256,7 @@ def test_translations_cover_replies_actions_and_exceptions(language: str) -> Non
     entity = texts["entity"]
     assert entity["button"]["accept"]["name"]
     assert entity["button"]["reject"]["name"]
+    assert entity["button"]["reset_alarm"]["name"]
     last_reply = entity["sensor"]["last_reply"]
     assert last_reply["name"]
     assert set(last_reply["state"]) == {"accepted", "rejected", "failed"}
@@ -261,12 +266,13 @@ def test_translations_cover_replies_actions_and_exceptions(language: str) -> Non
     for label in texts["selector"]["transport"]["options"].values():
         assert label
     assert texts["exceptions"]["reply_connection_error"]["message"]
-    for service in ("accept", "reject"):
+    for service in ("accept", "reject", "reset_alarm"):
         assert texts["services"][service]["name"]
         assert texts["services"][service]["description"]
     fields = texts["services"]["accept"]["fields"]
     assert set(fields) == {"config_entry_id", "transport", "latitude", "longitude"}
     assert set(texts["services"]["reject"]["fields"]) == {"config_entry_id"}
+    assert set(texts["services"]["reset_alarm"]["fields"]) == {"config_entry_id"}
     for field in fields.values():
         assert field["name"]
         assert field["description"]
@@ -285,7 +291,7 @@ def test_error_messages_do_not_contain_addresses(language: str) -> None:
 def test_services_yaml_matches_the_translations_and_the_schemas() -> None:
     """Every field of services.yaml is translated and the transport list matches."""
     services = yaml_util.load_yaml(str(INTEGRATION / "services.yaml"))
-    assert set(services) == {"accept", "reject"}
+    assert set(services) == {"accept", "reject", "reset_alarm"}
     assert set(services["accept"]["fields"]) == {
         "config_entry_id",
         "transport",
@@ -293,6 +299,7 @@ def test_services_yaml_matches_the_translations_and_the_schemas() -> None:
         "longitude",
     }
     assert set(services["reject"]["fields"]) == {"config_entry_id"}
+    assert set(services["reset_alarm"]["fields"]) == {"config_entry_id"}
     for service in services.values():
         entry = service["fields"]["config_entry_id"]
         assert entry["required"] is True

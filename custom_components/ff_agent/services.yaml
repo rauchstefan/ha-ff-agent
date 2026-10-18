@@ -40,3 +40,10 @@ reject:
       selector:
         config_entry:
           integration: ff_agent
+reset_alarm:
+  fields:
+    config_entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: ff_agent

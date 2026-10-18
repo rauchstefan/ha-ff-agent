@@ -183,6 +183,9 @@
       },
       "reject": {
         "name": "Absagen"
+      },
+      "reset_alarm": {
+        "name": "Alarm zurücksetzen"
       }
     },
     "event": {
@@ -267,6 +270,16 @@
         "config_entry_id": {
           "name": "Eintrag",
           "description": "Der FF-Agent-Eintrag der Person, die absagt."
+        }
+      }
+    },
+    "reset_alarm": {
+      "name": "Alarm zurücksetzen",
+      "description": "Schaltet „Alarm aktiv“ einer Person sofort aus und beendet die Rücksetzzeit. „Letzter Alarm“ bleibt. Ohne aktiven Alarm passiert nichts. An FF Agent wird nichts gesendet.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Eintrag",
+          "description": "Der FF-Agent-Eintrag der Person, deren Alarm zurückgesetzt wird."
         }
       }
     }

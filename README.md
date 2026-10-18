@@ -294,6 +294,7 @@ Alle Entitäten gehören zu einem Gerät je Eintrag (Typ Dienst).
 | Letzte Rückmeldung | Sensor | `Zugesagt`, `Abgesagt` oder `Fehlgeschlagen` |
 | Zusagen | Button | Sagt mit Standard-Verkehrsmittel und optional Standort zu |
 | Absagen | Button | Sagt ab |
+| Alarm zurücksetzen | Button | Schaltet „Alarm aktiv“ sofort aus und beendet die Rücksetzzeit. „Letzter Alarm“ bleibt, und das 30-Sekunden-Fenster gegen Doppelalarme bleibt offen: Eine Wiederholung desselben Alarms schaltet „Alarm aktiv“ nicht wieder ein, ein neuer Alarm danach schon. Ohne aktiven Alarm passiert nichts, an FF Agent wird nichts gesendet. |
 
 Die Entity-IDs beginnen mit dem Namen des Eintrags, zum Beispiel
 `event.ff_agent_alarm` und `binary_sensor.ff_agent_alarm_aktiv`. Der Rest hängt von Name
@@ -310,7 +311,7 @@ und würde auslösen, etwa nach dem Speichern der Optionen.
 
 <!-- docs-actions -->
 
-Beide Actions brauchen die ID des Eintrags (`config_entry_id`). Wähle ihn in der
+Alle Actions brauchen die ID des Eintrags (`config_entry_id`). Wähle ihn in der
 Oberfläche über die Auswahl „Eintrag“.
 
 - **`ff_agent.accept`** (Zusagen)
@@ -324,6 +325,9 @@ Oberfläche über die Auswahl „Eintrag“.
     Standort.
 - **`ff_agent.reject`** (Absagen)
   - `config_entry_id` (Pflicht)
+- **`ff_agent.reset_alarm`** (Alarm zurücksetzen)
+  - `config_entry_id` (Pflicht): der Eintrag der Person, deren „Alarm aktiv“ ausgehen soll.
+    Wirkt wie der Button: kein Aufruf an FF Agent, ohne aktiven Alarm passiert nichts.
 
 Die Rückmeldung bezieht sich auf den **aktuellen Einsatz** in FF Agent. Zu- und Absage
 funktionieren nur, wenn die Person für diesen Einsatz alarmiert wurde (wie in der
@@ -474,8 +478,8 @@ Entity-IDs beginnen mit dem Namen des Eintrags in Kleinbuchstaben und mit Unters
 Beim Standardnamen „FF Agent“ ist das `*ff_agent*`; heißt dein Eintrag anders, setze den
 passenden Namen ein oder liste die IDs einzeln unter `entities:` auf. So findest du sie: *Einstellungen →
 Geräte & Dienste → FF Agent → Gerät → Entitäten*, oder *Einstellungen → Entitäten* mit der
-Suche nach dem Namen des Eintrags. Es sind sechs Entitäten (Binary-Sensor, Event,
-zwei Sensoren, zwei Buttons).
+Suche nach dem Namen des Eintrags. Es sind sieben Entitäten (Binary-Sensor, Event,
+zwei Sensoren, drei Buttons).
 
 ## Bekannte Einschränkungen
 
@@ -586,7 +590,7 @@ der letzten Rückmeldung (ohne Adresse).
 (siehe Entitäten).
 
 **„Alarm aktiv“ ging unerwartet aus:** Ein Neustart, Reload, Speichern der Optionen oder
-ein Reconfigure setzt den Zustand zurück.
+ein Reconfigure setzt den Zustand zurück. Auch der Button oder die Action „Alarm zurücksetzen“ schaltet ihn aus, wenn jemand sie ausgelöst hat (zum Beispiel eine Automation).
 
 **Zusage meldet einen Fehler:** Prüfe die Internetverbindung und, ob in FF Agent für den
 aktuellen Einsatz eine Rückmeldung möglich ist (die Person muss dafür alarmiert worden
@@ -624,7 +628,8 @@ is a pre-release that has not yet been tested against a real FF Agent account.
   "Reconfigure". The integration exposes an `Alarm` event entity (use it as automation trigger), an "Alarm
   active" binary sensor with a configurable reset time, the time of the last alarm, and
   accept/decline buttons and actions (`ff_agent.accept`, `ff_agent.reject`) that call your
-  personal reply URL.
+  personal reply URL, and a "Reset alarm" button and action (`ff_agent.reset_alarm`) that
+  switches "Alarm active" off by hand without contacting FF Agent.
 - **What it does not do:** trigger alarms, provide mission details, or tell test alarms from
   real ones.
 - **Setup:** copy your accept URL from FF Agent into the config flow, then create a generic

@@ -362,3 +362,108 @@ async def test_handle_alarm_after_shutdown_does_nothing(
     assert manager.alarms_total == 0
     assert not manager.active
     assert signals.alarms == []
+
+
+# --- Reset by hand -----------------------
+
+
+async def test_reset_by_hand_ends_the_alarm(
+    hass: HomeAssistant,
+    freezer: FrozenDateTimeFactory,
+    manager: AlarmManager,
+    signals: Signals,
+) -> None:
+    """The reset switches the state off, keeps the last alarm and stops the timer."""
+    call = _call()
+    manager.async_handle_call(call)
+    await hass.async_block_till_done()
+    assert signals.states == 1
+
+    assert manager.async_reset() is True
+    await hass.async_block_till_done()
+
+    assert manager.active is False
+    assert manager.active_until is None
+    assert manager.last_alarm == call.received_at
+    assert signals.states == 2
+    assert len(signals.alarms) == 1
+    # The timer is stopped: when the reset time is over, no further signal comes.
+    await _advance(hass, freezer, timedelta(minutes=31))
+    assert signals.states == 2
+
+
+async def test_reset_without_an_alarm_does_nothing(
+    hass: HomeAssistant, manager: AlarmManager, signals: Signals
+) -> None:
+    """Without an active alarm the reset returns False and sends no signal."""
+    assert manager.async_reset() is False
+    await hass.async_block_till_done()
+
+    assert manager.active is False
+    assert signals.states == 0
+
+
+async def test_reset_twice_changes_nothing_the_second_time(
+    hass: HomeAssistant, manager: AlarmManager, signals: Signals
+) -> None:
+    """A second reset right after the first one is a no-op."""
+    manager.async_handle_call(_call())
+
+    assert manager.async_reset() is True
+    assert manager.async_reset() is False
+    await hass.async_block_till_done()
+
+    assert signals.states == 2
+
+
+async def test_reset_after_shutdown_does_nothing(
+    hass: HomeAssistant, manager: AlarmManager, signals: Signals
+) -> None:
+    """After the shutdown a reset is ignored."""
+    manager.async_handle_call(_call())
+    await hass.async_block_till_done()
+    manager.async_shutdown()
+
+    assert manager.async_reset() is False
+    await hass.async_block_till_done()
+
+    assert manager.active is True
+    assert signals.states == 1
+
+
+async def test_repetition_after_a_reset_does_not_reactivate(
+    hass: HomeAssistant,
+    freezer: FrozenDateTimeFactory,
+    manager: AlarmManager,
+    signals: Signals,
+) -> None:
+    """The window against double alarms stays: a repetition leaves the state off."""
+    manager.async_handle_call(_call())
+    assert manager.async_reset() is True
+    await _advance(hass, freezer, timedelta(seconds=10))
+
+    manager.async_handle_call(_call())
+    await hass.async_block_till_done()
+
+    assert manager.active is False
+    assert (manager.alarms_total, manager.deduplicated_total) == (1, 1)
+    assert len(signals.alarms) == 1
+
+
+async def test_new_alarm_after_a_reset_activates_again(
+    hass: HomeAssistant,
+    freezer: FrozenDateTimeFactory,
+    manager: AlarmManager,
+    signals: Signals,
+) -> None:
+    """A new alarm after the window switches the state on again."""
+    manager.async_handle_call(_call())
+    assert manager.async_reset() is True
+    await _advance(hass, freezer, timedelta(seconds=31))
+
+    manager.async_handle_call(_call())
+    await hass.async_block_till_done()
+
+    assert manager.active is True
+    assert manager.alarms_total == 2
+    assert len(signals.alarms) == 2

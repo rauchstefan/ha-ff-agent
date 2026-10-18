@@ -1,4 +1,4 @@
-"""Tests of the buttons "accept" and "decline" and of the sensor "last reply"."""
+"""Tests of the buttons "accept", "decline", "reset alarm" and "last reply"."""
 
 from __future__ import annotations
 
@@ -8,11 +8,13 @@ from typing import TYPE_CHECKING
 
 import aiohttp
 import pytest
+from homeassistant.components import webhook
 from homeassistant.const import ATTR_ENTITY_ID
 from homeassistant.core import HomeAssistant, State
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers import entity_registry as er
+from homeassistant.util.aiohttp import MockRequest
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.ff_agent import button
@@ -53,6 +55,15 @@ def _state(hass: HomeAssistant, entity_id: str) -> State:
     return state
 
 
+async def _alarm_comes_in(hass: HomeAssistant) -> None:
+    """Let FF Agent call the webhook once, as it does through a cloudhook."""
+    response = await webhook.async_handle_webhook(
+        hass, WEBHOOK_ID, MockRequest(b"", "test", method="POST")
+    )
+    assert response.status == 200
+    await hass.async_block_till_done()
+
+
 async def _press(hass: HomeAssistant, entry: MockConfigEntry, key: str) -> None:
     """Press one of the buttons of the entry."""
     await hass.services.async_call(
@@ -79,7 +90,7 @@ def test_the_button_platform_does_not_update_in_parallel() -> None:
 async def test_buttons_and_sensor_exist_and_belong_to_the_device(
     hass: HomeAssistant, mock_config_entry: MockConfigEntry
 ) -> None:
-    """Two buttons and the sensor share the service device of the entry."""
+    """Three buttons and the sensor share the service device of the entry."""
     await async_setup_entry(hass, mock_config_entry)
 
     device = dr.async_get(hass).async_get_device_by_identifier(
@@ -90,6 +101,7 @@ async def test_buttons_and_sensor_exist_and_belong_to_the_device(
     for platform, key in (
         ("button", "accept"),
         ("button", "reject"),
+        ("button", "reset_alarm"),
         ("sensor", "last_reply"),
     ):
         entity = registry.async_get(_entity_id(hass, mock_config_entry, platform, key))
@@ -105,8 +117,22 @@ async def test_buttons_and_sensor_exist_and_belong_to_the_device(
 @pytest.mark.parametrize(
     ("language", "names"),
     [
-        ("en", ["FF Agent Test Accept", "FF Agent Test Decline"]),
-        ("de", ["FF Agent Test Zusagen", "FF Agent Test Absagen"]),
+        (
+            "en",
+            [
+                "FF Agent Test Accept",
+                "FF Agent Test Decline",
+                "FF Agent Test Reset alarm",
+            ],
+        ),
+        (
+            "de",
+            [
+                "FF Agent Test Zusagen",
+                "FF Agent Test Absagen",
+                "FF Agent Test Alarm zurücksetzen",
+            ],
+        ),
     ],
 )
 async def test_button_names_are_translated(
@@ -119,7 +145,7 @@ async def test_button_names_are_translated(
     hass.config.language = language
     await async_setup_entry(hass, mock_config_entry)
 
-    keys = ("accept", "reject")
+    keys = ("accept", "reject", "reset_alarm")
     ids = [_entity_id(hass, mock_config_entry, "button", key) for key in keys]
     assert [_state(hass, i).attributes["friendly_name"] for i in ids] == names
 
@@ -379,6 +405,7 @@ async def test_unloading_makes_the_entities_unavailable(
     ids = [
         _entity_id(hass, mock_config_entry, "button", "accept"),
         _entity_id(hass, mock_config_entry, "button", "reject"),
+        _entity_id(hass, mock_config_entry, "button", "reset_alarm"),
         _entity_id(hass, mock_config_entry, "sensor", "last_reply"),
     ]
 
@@ -416,3 +443,60 @@ async def test_changing_your_mind_within_ten_seconds_is_sent_every_time(
 
     assert aioclient_mock.call_count == 3
     assert seen == states
+
+
+# --- Reset alarm ----------------------------------------------------------------
+
+
+async def test_reset_button_switches_the_alarm_off(
+    hass: HomeAssistant,
+    aioclient_mock: AiohttpClientMocker,
+    mock_config_entry: MockConfigEntry,
+) -> None:
+    """The button ends "alarm active" at once, keeps "last alarm", sends nothing."""
+    await async_setup_entry(hass, mock_config_entry)
+    alarm_id = _entity_id(hass, mock_config_entry, "binary_sensor", "alarm")
+    last_alarm_id = _entity_id(hass, mock_config_entry, "sensor", "last_alarm")
+    await _alarm_comes_in(hass)
+    assert _state(hass, alarm_id).state == "on"
+    last_alarm = _state(hass, last_alarm_id).state
+
+    await _press(hass, mock_config_entry, "reset_alarm")
+    await hass.async_block_till_done()
+
+    assert _state(hass, alarm_id).state == "off"
+    assert _state(hass, last_alarm_id).state == last_alarm
+    assert aioclient_mock.call_count == 0
+    # The reset is no reply: the sensor "last reply" is untouched.
+    assert _last_reply(hass, mock_config_entry) == "unknown"
+
+
+async def test_reset_button_without_an_alarm_does_nothing(
+    hass: HomeAssistant,
+    aioclient_mock: AiohttpClientMocker,
+    mock_config_entry: MockConfigEntry,
+) -> None:
+    """A press without an active alarm changes nothing and raises no error."""
+    await async_setup_entry(hass, mock_config_entry)
+    alarm_id = _entity_id(hass, mock_config_entry, "binary_sensor", "alarm")
+
+    await _press(hass, mock_config_entry, "reset_alarm")
+
+    assert _state(hass, alarm_id).state == "off"
+    assert aioclient_mock.call_count == 0
+
+
+async def test_reject_does_not_reset_the_alarm(
+    hass: HomeAssistant,
+    aioclient_mock: AiohttpClientMocker,
+    mock_config_entry: MockConfigEntry,
+) -> None:
+    """Declining a mission is a reply to FF Agent; it leaves "alarm active" alone."""
+    aioclient_mock.get(REJECT_URL)
+    await async_setup_entry(hass, mock_config_entry)
+    alarm_id = _entity_id(hass, mock_config_entry, "binary_sensor", "alarm")
+    await _alarm_comes_in(hass)
+
+    await _press(hass, mock_config_entry, "reject")
+
+    assert _state(hass, alarm_id).state == "on"

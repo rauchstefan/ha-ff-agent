@@ -183,6 +183,9 @@
       },
       "reject": {
         "name": "Decline"
+      },
+      "reset_alarm": {
+        "name": "Reset alarm"
       }
     },
     "event": {
@@ -267,6 +270,16 @@
         "config_entry_id": {
           "name": "Entry",
           "description": "The FF Agent entry of the person who declines."
+        }
+      }
+    },
+    "reset_alarm": {
+      "name": "Reset alarm",
+      "description": "Turns \"Alarm active\" of one person off right away and stops the reset time. \"Last alarm\" stays. Nothing happens without an active alarm. Nothing is sent to FF Agent.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Entry",
+          "description": "The FF Agent entry of the person whose alarm is reset."
         }
       }
     }

@@ -1,4 +1,4 @@
-"""Tests of the actions ff_agent.accept and ff_agent.reject."""
+"""Tests of the actions ff_agent.accept, ff_agent.reject and ff_agent.reset_alarm."""
 
 from __future__ import annotations
 
@@ -7,9 +7,12 @@ from typing import TYPE_CHECKING, Any
 
 import pytest
 import voluptuous as vol
+from homeassistant.components import webhook
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
 from homeassistant.setup import async_setup_component
+from homeassistant.util import dt as dt_util
+from homeassistant.util.aiohttp import MockRequest
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.ff_agent.const import DOMAIN
@@ -24,6 +27,7 @@ from .const import (
     OTHER_REPLY_ID,
     REJECT_URL,
     REPLY_ID,
+    WEBHOOK_ID,
 )
 
 if TYPE_CHECKING:
@@ -39,6 +43,15 @@ async def _call(hass: HomeAssistant, service: str, data: dict[str, Any]) -> None
     await hass.services.async_call(DOMAIN, service, data, blocking=True)
 
 
+async def _alarm_comes_in(hass: HomeAssistant) -> None:
+    """Let FF Agent call the webhook once, as it does through a cloudhook."""
+    response = await webhook.async_handle_webhook(
+        hass, WEBHOOK_ID, MockRequest(b"", "test", method="POST")
+    )
+    assert response.status == 200
+    await hass.async_block_till_done()
+
+
 # --- Registration ---------------------------------------------------------------
 
 
@@ -48,6 +61,7 @@ async def test_actions_exist_even_without_an_entry(hass: HomeAssistant) -> None:
 
     assert hass.services.has_service(DOMAIN, "accept")
     assert hass.services.has_service(DOMAIN, "reject")
+    assert hass.services.has_service(DOMAIN, "reset_alarm")
 
 
 async def test_actions_are_registered_when_an_entry_is_set_up(
@@ -58,6 +72,7 @@ async def test_actions_are_registered_when_an_entry_is_set_up(
 
     assert hass.services.has_service(DOMAIN, "accept")
     assert hass.services.has_service(DOMAIN, "reject")
+    assert hass.services.has_service(DOMAIN, "reset_alarm")
 
 
 # --- Accept ---------------------------------------------------------------------
@@ -204,6 +219,60 @@ async def test_reject_sends_the_rejection(
     assert url.query_string == ""
 
 
+# --- Reset alarm ----------------------------------------------------------------
+
+
+async def test_reset_alarm_switches_the_alarm_off(
+    hass: HomeAssistant,
+    aioclient_mock: AiohttpClientMocker,
+    mock_config_entry: MockConfigEntry,
+) -> None:
+    """The action ends "alarm active" of the named entry and sends nothing."""
+    await async_setup_entry(hass, mock_config_entry)
+    alarm = mock_config_entry.runtime_data.alarm
+    await _alarm_comes_in(hass)
+    assert alarm.active is True
+    last_alarm = alarm.last_alarm
+
+    await _call(hass, "reset_alarm", {"config_entry_id": mock_config_entry.entry_id})
+
+    assert alarm.active is False
+    assert alarm.last_alarm == last_alarm
+    assert aioclient_mock.call_count == 0
+
+
+async def test_reset_alarm_without_an_alarm_does_nothing(
+    hass: HomeAssistant,
+    aioclient_mock: AiohttpClientMocker,
+    mock_config_entry: MockConfigEntry,
+) -> None:
+    """Without an active alarm the action succeeds and changes nothing."""
+    await async_setup_entry(hass, mock_config_entry)
+
+    await _call(hass, "reset_alarm", {"config_entry_id": mock_config_entry.entry_id})
+
+    assert mock_config_entry.runtime_data.alarm.active is False
+    assert aioclient_mock.call_count == 0
+
+
+async def test_reset_alarm_only_touches_the_named_entry(
+    hass: HomeAssistant,
+    mock_config_entry: MockConfigEntry,
+    other_entry: MockConfigEntry,
+) -> None:
+    """With two people the reset ends the alarm of the named person only."""
+    await async_setup_entry(hass, mock_config_entry)
+    await async_setup_entry(hass, other_entry)
+    now = dt_util.utcnow()
+    mock_config_entry.runtime_data.alarm.async_handle_alarm(now)
+    other_entry.runtime_data.alarm.async_handle_alarm(now)
+
+    await _call(hass, "reset_alarm", {"config_entry_id": other_entry.entry_id})
+
+    assert mock_config_entry.runtime_data.alarm.active is True
+    assert other_entry.runtime_data.alarm.active is False
+
+
 # --- Several people -------------------------------------------------------------
 
 
@@ -234,7 +303,7 @@ async def test_the_reply_id_of_the_named_entry_is_used(
 # --- Errors ---------------------------------------------------------------------
 
 
-@pytest.mark.parametrize("service", ["accept", "reject"])
+@pytest.mark.parametrize("service", ["accept", "reject", "reset_alarm"])
 async def test_an_unknown_entry_is_refused(
     hass: HomeAssistant,
     aioclient_mock: AiohttpClientMocker,
@@ -250,7 +319,7 @@ async def test_an_unknown_entry_is_refused(
     assert aioclient_mock.call_count == 0
 
 
-@pytest.mark.parametrize("service", ["accept", "reject"])
+@pytest.mark.parametrize("service", ["accept", "reject", "reset_alarm"])
 async def test_an_entry_of_another_integration_is_refused(
     hass: HomeAssistant,
     aioclient_mock: AiohttpClientMocker,
@@ -268,7 +337,7 @@ async def test_an_entry_of_another_integration_is_refused(
     assert aioclient_mock.call_count == 0
 
 
-@pytest.mark.parametrize("service", ["accept", "reject"])
+@pytest.mark.parametrize("service", ["accept", "reject", "reset_alarm"])
 async def test_an_entry_that_is_not_loaded_is_refused(
     hass: HomeAssistant,
     aioclient_mock: AiohttpClientMocker,
@@ -286,7 +355,7 @@ async def test_an_entry_that_is_not_loaded_is_refused(
     assert aioclient_mock.call_count == 0
 
 
-@pytest.mark.parametrize("service", ["accept", "reject"])
+@pytest.mark.parametrize("service", ["accept", "reject", "reset_alarm"])
 async def test_the_entry_is_required(
     hass: HomeAssistant,
     aioclient_mock: AiohttpClientMocker,
@@ -321,6 +390,8 @@ async def test_the_entry_is_required(
         # The rejection has no further fields.
         ("reject", {"transport": "CAR"}),
         ("reject", {"latitude": LATITUDE, "longitude": LONGITUDE}),
+        # Neither has the reset.
+        ("reset_alarm", {"transport": "CAR"}),
     ],
 )
 async def test_invalid_fields_are_rejected_by_the_schema(

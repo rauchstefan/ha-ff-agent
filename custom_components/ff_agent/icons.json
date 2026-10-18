@@ -14,6 +14,9 @@
       },
       "reject": {
         "default": "mdi:close-circle"
+      },
+      "reset_alarm": {
+        "default": "mdi:alarm-light-off"
       }
     },
     "event": {
@@ -36,6 +39,9 @@
     },
     "reject": {
       "service": "mdi:close-circle"
+    },
+    "reset_alarm": {
+      "service": "mdi:alarm-light-off"
     }
   }
 }
