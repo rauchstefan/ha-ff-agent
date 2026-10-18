@@ -125,5 +125,7 @@ PRs nach bestandenem Qualitäts-Gate mergen, `ai/`-Dateien pflegen, GitHub-Issue
 - **Kein Hersteller- oder Firmenname von FF Agent in Texten, die Nutzer sehen** (UI,
   Geräte-Info, README, CHANGELOG, Release-Notes). Das hier ist ein inoffizielles
   Community-Projekt; die Geräte-Info zeigt den Hersteller „ha-ff-agent (inoffiziell)“.
-  Der Produktname „FF Agent“ und die Produkt-Website sind erlaubt. Ein Test in
+  Der Produktname „FF Agent“ ist erlaubt. **Kein Link zur FF-Agent-Website** in Texten für
+  Nutzer (Entscheidung des Nutzers, 2026-10-18). Technische Beispiel-URLs der API in der
+  Einrichtung sind davon ausgenommen. Ein Test in
   `tests/test_metadata.py` prüft Code, README und CHANGELOG.
