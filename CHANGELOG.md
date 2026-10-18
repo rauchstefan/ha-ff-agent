@@ -7,6 +7,15 @@ Alle nennenswerten Änderungen an dieser Integration. Format angelehnt an
 
 ### Geändert
 
+- **Standortquelle statt Standort-Entität:** Das optionale Feld „Standort-Entität“ ist durch
+  die Pflicht-Auswahl „Standortquelle“ ersetzt, im Einrichtungsschritt „Zusage: Verkehrsmittel
+  und Standort“ und unter „Konfigurieren“. Zur Auswahl stehen „Kein Standort“ (Standard),
+  „Zuhause-Position von Home Assistant“ (wird beim Zusagen gelesen), „Koordinaten manuell
+  eingeben“ (Breiten- und Längengrad in Dezimalgrad) und „Person oder Geräte-Tracker
+  (Live-Standort)“. Bestehende Einträge mit Standort-Entität laufen unverändert weiter.
+  Wechsel der Quelle löscht die Werte der alten Quelle. Koordinaten sind in den Diagnosedaten
+  geschwärzt und werden nie geloggt. Die Action `ff_agent.accept` mit `latitude` und
+  `longitude` hat weiter Vorrang; die Absage sendet nie einen Standort.
 - **Neues Symbol:** Das Symbol der Integration ist jetzt ein Haus mit „FF“ auf rotem,
   abgerundetem Quadrat statt des schlichten „FF“-Quadrats. Es ist ein eigenes, allgemeines
   Motiv (kein Logo von FF Agent, Home Assistant oder HACS). Die Quelle liegt unter
@@ -16,6 +25,15 @@ Alle nennenswerten Änderungen an dieser Integration. Format angelehnt an
 
 #### Changed
 
+- **Location source instead of location entity:** The optional field "Location entity" is
+  replaced by the required choice "Location source", in the setup step "Accepting: transport
+  and location" and under "Configure". The choices are "No location" (default), "Home position
+  from Home Assistant" (read when accepting), "Enter coordinates manually" (latitude and
+  longitude in decimal degrees) and "Person or device tracker (live location)". Existing
+  entries with a location entity keep working unchanged. Changing the source deletes the
+  values of the old source. Coordinates are redacted in the diagnostics and are never logged.
+  The action `ff_agent.accept` with `latitude` and `longitude` still takes precedence; a
+  rejection never sends a location.
 - **New icon:** The icon of the integration is now a house with "FF" on a red rounded
   square instead of the plain "FF" square. It is an original, generic motif (not a logo of
   FF Agent, Home Assistant or HACS). The source is `docs/assets/logo.svg`, and the README

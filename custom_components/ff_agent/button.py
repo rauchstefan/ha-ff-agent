@@ -34,8 +34,8 @@ async def async_setup_entry(
 class ReplyButton(FFAgentEntity, ButtonEntity):
     """Replies to the current mission with the options of the entry.
 
-    An acceptance uses the default transport and, if the option is set, the location
-    of the location entity. The state of a button is the time of the last press; it
+    An acceptance uses the default transport and the location of the chosen location
+    source, if there is one. The state of a button is the time of the last press; it
     holds no information about the result, that is the job of the sensor "last reply".
     """
 

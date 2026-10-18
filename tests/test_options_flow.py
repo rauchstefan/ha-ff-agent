@@ -11,6 +11,7 @@ from typing import TYPE_CHECKING, Any
 from unittest.mock import patch
 
 import pytest
+import voluptuous as vol
 from homeassistant.components import webhook
 from homeassistant.config_entries import ConfigEntryState
 from homeassistant.core import HomeAssistant
@@ -24,6 +25,9 @@ from custom_components.ff_agent import webhook as webhook_module
 from custom_components.ff_agent.const import (
     CONF_DEFAULT_TRANSPORT,
     CONF_LOCATION_ENTITY,
+    CONF_LOCATION_LATITUDE,
+    CONF_LOCATION_LONGITUDE,
+    CONF_LOCATION_SOURCE,
     CONF_NTFY_ENTITY_UUID,
     CONF_NTFY_TOPIC,
     CONF_REQUIRE_TOKEN,
@@ -47,6 +51,8 @@ from .const import (
     LATITUDE,
     LOCATION_ENTITY,
     LONGITUDE,
+    MANUAL_LATITUDE,
+    MANUAL_LONGITUDE,
     NTFY_ENTITY_ID,
     NTFY_PUBLISH_URL,
     REPLY_ID,
@@ -60,6 +66,7 @@ if TYPE_CHECKING:
 
 TRANSLATIONS = Path(__file__).parents[1] / "custom_components/ff_agent/translations"
 PATH = f"/api/webhook/{WEBHOOK_ID}"
+POSITION = {"latitude": LATITUDE, "longitude": LONGITUDE}
 
 
 async def _open(hass: HomeAssistant, entry: MockConfigEntry) -> FlowResult:
@@ -83,6 +90,15 @@ async def _call_webhook(hass: HomeAssistant, webhook_id: str = WEBHOOK_ID) -> in
     response = await webhook.async_handle_webhook(hass, webhook_id, request)
     await hass.async_block_till_done()
     return response.status
+
+
+def _suggested(result: FlowResult) -> dict[str, Any]:
+    """Return the suggested values of a form; fields without one are missing."""
+    return {
+        str(key): key.description["suggested_value"]
+        for key in result["data_schema"].schema
+        if key.description
+    }
 
 
 def _alarm_state(hass: HomeAssistant, entry: MockConfigEntry) -> str:
@@ -182,7 +198,7 @@ async def test_the_schema_keys_are_translated(
         CONF_REQUIRE_TOKEN,
         CONF_RESET_MINUTES,
         CONF_DEFAULT_TRANSPORT,
-        CONF_LOCATION_ENTITY,
+        CONF_LOCATION_SOURCE,
     }
     for language in ("en", "de"):
         texts = json.loads((TRANSLATIONS / f"{language}.json").read_text("utf-8"))
@@ -206,6 +222,7 @@ async def test_saving_the_defaults_keeps_the_current_options(
         CONF_REQUIRE_TOKEN: False,
         CONF_RESET_MINUTES: 30,
         CONF_DEFAULT_TRANSPORT: "car",
+        CONF_LOCATION_SOURCE: "none",
     }
     # Nothing changed, so there is no reload and a running alarm stays.
     assert mock_config_entry.runtime_data.alarm is alarm
@@ -277,14 +294,17 @@ async def test_a_legacy_transport_is_offered_in_lower_case(
         {CONF_DEFAULT_TRANSPORT: "BICYCLE"},
         {CONF_DEFAULT_TRANSPORT: "bike"},
         {CONF_DEFAULT_TRANSPORT: "walk"},
-        {CONF_LOCATION_ENTITY: "light.kitchen"},
-        {CONF_LOCATION_ENTITY: "not an entity"},
+        {CONF_LOCATION_SOURCE: "satellite"},
+        {CONF_LOCATION_SOURCE: ""},
+        # The values of a source are asked in a step of their own.
+        {CONF_LOCATION_ENTITY: LOCATION_ENTITY},
+        {CONF_LOCATION_LATITUDE: MANUAL_LATITUDE},
     ],
 )
 async def test_invalid_values_are_refused(
     hass: HomeAssistant, mock_config_entry: MockConfigEntry, values: dict[str, Any]
 ) -> None:
-    """Out-of-range numbers, unknown transports and other entities are refused."""
+    """Out-of-range numbers, unknown transports and unknown sources are refused."""
     await async_setup_entry(hass, mock_config_entry)
     result = await _open(hass, mock_config_entry)
     options = dict(mock_config_entry.options)
@@ -317,9 +337,11 @@ async def test_person_and_device_tracker_are_accepted(
     """The location comes from a person or a device tracker."""
     await async_setup_entry(hass, mock_config_entry)
     result = await _open(hass, mock_config_entry)
+    result = await _save(hass, result["flow_id"], {CONF_LOCATION_SOURCE: "entity"})
 
     await _save(hass, result["flow_id"], {CONF_LOCATION_ENTITY: entity_id})
 
+    assert mock_config_entry.options[CONF_LOCATION_SOURCE] == "entity"
     assert mock_config_entry.options[CONF_LOCATION_ENTITY] == entity_id
 
 
@@ -335,15 +357,21 @@ async def test_saving_changes_the_options_and_reloads_with_the_new_reset_time(
     assert old_alarm.reset_minutes == 30
     result = await _open(hass, mock_config_entry)
 
-    saved = await _save(
+    result = await _save(
         hass,
         result["flow_id"],
         {
             CONF_REQUIRE_TOKEN: True,
             CONF_RESET_MINUTES: 5,
             CONF_DEFAULT_TRANSPORT: "car",
-            CONF_LOCATION_ENTITY: LOCATION_ENTITY,
+            CONF_LOCATION_SOURCE: "entity",
         },
+    )
+    # Nothing is saved before the last step.
+    assert result["type"] is FlowResultType.FORM
+    assert mock_config_entry.runtime_data.alarm is old_alarm
+    saved = await _save(
+        hass, result["flow_id"], {CONF_LOCATION_ENTITY: LOCATION_ENTITY}
     )
 
     assert saved["type"] is FlowResultType.CREATE_ENTRY
@@ -351,6 +379,7 @@ async def test_saving_changes_the_options_and_reloads_with_the_new_reset_time(
         CONF_REQUIRE_TOKEN: True,
         CONF_RESET_MINUTES: 5,
         CONF_DEFAULT_TRANSPORT: "car",
+        CONF_LOCATION_SOURCE: "entity",
         CONF_LOCATION_ENTITY: LOCATION_ENTITY,
     }
     new_alarm = mock_config_entry.runtime_data.alarm
@@ -379,71 +408,374 @@ async def test_saving_resets_an_active_alarm(
 
 # --- The location -----------------------
 
+HOME_QUERY = {"transport": "CAR", "lat": "1.234500", "lng": "6.789000"}
+MANUAL_QUERY = {"transport": "CAR", "lat": "12.345600", "lng": "-65.432100"}
+NO_LOCATION = {"transport": "CAR"}
 
-async def test_the_location_entity_can_be_cleared(
+
+def _query(aioclient_mock: AiohttpClientMocker) -> dict[str, str]:
+    """Return the query of the only request."""
+    assert aioclient_mock.call_count == 1
+    method, url, _data, _headers = aioclient_mock.mock_calls[0]
+    assert method == "GET"
+    return dict(url.query)
+
+
+async def test_the_source_field_is_a_dropdown_in_the_agreed_order(
+    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+) -> None:
+    """None first, then home, manual, and the entity as the last option."""
+    await async_setup_entry(hass, mock_config_entry)
+    result = await _open(hass, mock_config_entry)
+
+    schema = result["data_schema"].schema
+    key = next(key for key in schema if key == CONF_LOCATION_SOURCE)
+
+    assert isinstance(key, vol.Required)
+    assert schema[key].config["options"] == ["none", "home", "manual", "entity"]
+    assert schema[key].config["mode"] == "dropdown"
+    assert schema[key].config["translation_key"] == "location_source"
+
+
+@pytest.mark.parametrize(
+    ("fixture", "expected"),
+    [
+        ("mock_config_entry", "none"),
+        ("home_location_entry", "home"),
+        ("manual_location_entry", "manual"),
+        ("location_entry", "entity"),
+        # Created before the source existed: it follows from the location entity.
+        ("legacy_location_entry", "entity"),
+    ],
+)
+async def test_the_source_field_starts_with_the_source_of_the_entry(
+    hass: HomeAssistant,
+    request: pytest.FixtureRequest,
+    fixture: str,
+    expected: str,
+) -> None:
+    """The dropdown shows what the entry uses now."""
+    entry: MockConfigEntry = request.getfixturevalue(fixture)
+    await async_setup_entry(hass, entry)
+
+    result = await _open(hass, entry)
+
+    schema = result["data_schema"].schema
+    key = next(key for key in schema if key == CONF_LOCATION_SOURCE)
+    assert key.default() == expected
+
+
+async def test_an_old_entry_without_a_location_gets_the_source_none(
+    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+) -> None:
+    """Options without source and without entity mean no location."""
+    await async_setup_entry(hass, mock_config_entry)
+    options = dict(mock_config_entry.options)
+    del options[CONF_LOCATION_SOURCE]
+    hass.config_entries.async_update_entry(mock_config_entry, options=options)
+    result = await _open(hass, mock_config_entry)
+
+    saved = await _save(hass, result["flow_id"])
+
+    assert saved["data"][CONF_LOCATION_SOURCE] == "none"
+    assert mock_config_entry.options[CONF_LOCATION_SOURCE] == "none"
+
+
+async def test_an_old_entry_with_an_entity_is_saved_with_the_source_entity(
+    hass: HomeAssistant,
+    aioclient_mock: AiohttpClientMocker,
+    legacy_location_entry: MockConfigEntry,
+) -> None:
+    """Saving writes the derived source; the entity is asked again and kept."""
+    aioclient_mock.get(ACCEPT_URL)
+    hass.states.async_set(LOCATION_ENTITY, "home", POSITION)
+    await async_setup_entry(hass, legacy_location_entry)
+    result = await _open(hass, legacy_location_entry)
+
+    result = await _save(hass, result["flow_id"])
+
+    assert result["type"] is FlowResultType.FORM
+    assert result["step_id"] == "location_entity"
+    assert _suggested(result) == {CONF_LOCATION_ENTITY: LOCATION_ENTITY}
+    await _save(hass, result["flow_id"], {CONF_LOCATION_ENTITY: LOCATION_ENTITY})
+
+    assert legacy_location_entry.options[CONF_LOCATION_SOURCE] == "entity"
+    assert legacy_location_entry.options[CONF_LOCATION_ENTITY] == LOCATION_ENTITY
+    await async_send_reply(hass, legacy_location_entry, ReplyAction.ACCEPT)
+    assert _query(aioclient_mock) == HOME_QUERY
+
+
+async def test_switching_to_none_removes_every_location_value(
+    hass: HomeAssistant,
+    aioclient_mock: AiohttpClientMocker,
+    manual_location_entry: MockConfigEntry,
+) -> None:
+    """No old coordinates stay behind; the next acceptance sends no location."""
+    aioclient_mock.get(ACCEPT_URL)
+    await async_setup_entry(hass, manual_location_entry)
+    result = await _open(hass, manual_location_entry)
+
+    saved = await _save(hass, result["flow_id"], {CONF_LOCATION_SOURCE: "none"})
+
+    assert saved["type"] is FlowResultType.CREATE_ENTRY
+    assert dict(manual_location_entry.options) == {
+        CONF_REQUIRE_TOKEN: False,
+        CONF_RESET_MINUTES: 30,
+        CONF_DEFAULT_TRANSPORT: "car",
+        CONF_LOCATION_SOURCE: "none",
+    }
+    await async_send_reply(hass, manual_location_entry, ReplyAction.ACCEPT)
+    assert _query(aioclient_mock) == NO_LOCATION
+
+
+async def test_switching_from_an_entity_to_none_removes_the_entity(
     hass: HomeAssistant,
     aioclient_mock: AiohttpClientMocker,
     location_entry: MockConfigEntry,
 ) -> None:
-    """A cleared field removes the option; the next acceptance sends no location."""
+    """The entity is gone from the options, so it cannot come back by itself."""
     aioclient_mock.get(ACCEPT_URL)
-    hass.states.async_set(
-        LOCATION_ENTITY, "home", {"latitude": LATITUDE, "longitude": LONGITUDE}
-    )
+    hass.states.async_set(LOCATION_ENTITY, "home", POSITION)
     await async_setup_entry(hass, location_entry)
     result = await _open(hass, location_entry)
-    # The current value is only suggested. A default would come back when it is cleared.
-    location_key = next(
-        key for key in result["data_schema"].schema if key == CONF_LOCATION_ENTITY
-    )
-    assert location_key.description == {"suggested_value": LOCATION_ENTITY}
 
-    # The frontend leaves a cleared field out of the input.
+    await _save(hass, result["flow_id"], {CONF_LOCATION_SOURCE: "none"})
+
+    assert CONF_LOCATION_ENTITY not in location_entry.options
+    assert location_entry.options[CONF_LOCATION_SOURCE] == "none"
+    await async_send_reply(hass, location_entry, ReplyAction.ACCEPT)
+    assert _query(aioclient_mock) == NO_LOCATION
+
+
+async def test_changing_the_source_keeps_the_other_options(
+    hass: HomeAssistant, token_entry: MockConfigEntry
+) -> None:
+    """Token switch, reset time and transport survive a change of the source."""
+    await async_setup_entry(hass, token_entry)
+    result = await _open(hass, token_entry)
+
     await _save(
         hass,
         result["flow_id"],
         {
-            CONF_REQUIRE_TOKEN: False,
-            CONF_RESET_MINUTES: 30,
-            CONF_DEFAULT_TRANSPORT: "car",
+            CONF_RESET_MINUTES: 5,
+            CONF_DEFAULT_TRANSPORT: "feet",
+            CONF_LOCATION_SOURCE: "home",
         },
     )
 
-    assert CONF_LOCATION_ENTITY not in location_entry.options
-    await async_send_reply(hass, location_entry, ReplyAction.ACCEPT)
-    assert aioclient_mock.call_count == 1
-    method, url, _data, _headers = aioclient_mock.mock_calls[0]
-    assert method == "GET"
-    assert dict(url.query) == {"transport": "CAR"}
+    assert dict(token_entry.options) == {
+        CONF_REQUIRE_TOKEN: True,
+        CONF_RESET_MINUTES: 5,
+        CONF_DEFAULT_TRANSPORT: "feet",
+        CONF_LOCATION_SOURCE: "home",
+    }
 
 
-async def test_a_chosen_location_entity_is_used_by_the_next_acceptance(
+async def test_the_home_source_is_saved_at_once_without_stored_values(
     hass: HomeAssistant,
     aioclient_mock: AiohttpClientMocker,
-    mock_config_entry: MockConfigEntry,
+    manual_location_entry: MockConfigEntry,
 ) -> None:
-    """The option from the form reaches the reply, after the reload."""
+    """The home position is read when sending; the old coordinates are dropped."""
     aioclient_mock.get(ACCEPT_URL)
-    hass.states.async_set(
-        LOCATION_ENTITY, "home", {"latitude": LATITUDE, "longitude": LONGITUDE}
+    hass.config.latitude = LATITUDE
+    hass.config.longitude = LONGITUDE
+    await async_setup_entry(hass, manual_location_entry)
+    result = await _open(hass, manual_location_entry)
+
+    saved = await _save(hass, result["flow_id"], {CONF_LOCATION_SOURCE: "home"})
+
+    assert saved["type"] is FlowResultType.CREATE_ENTRY
+    assert CONF_LOCATION_LATITUDE not in manual_location_entry.options
+    assert CONF_LOCATION_LONGITUDE not in manual_location_entry.options
+    await async_send_reply(hass, manual_location_entry, ReplyAction.ACCEPT)
+    assert _query(aioclient_mock) == HOME_QUERY
+
+
+async def test_the_manual_source_asks_for_coordinates_and_saves_them(
+    hass: HomeAssistant,
+    aioclient_mock: AiohttpClientMocker,
+    location_entry: MockConfigEntry,
+) -> None:
+    """A second form follows; the home position is suggested; the entity is dropped."""
+    aioclient_mock.get(ACCEPT_URL)
+    hass.config.latitude = LATITUDE
+    hass.config.longitude = LONGITUDE
+    await async_setup_entry(hass, location_entry)
+    before = dict(location_entry.options)
+    result = await _open(hass, location_entry)
+
+    result = await _save(hass, result["flow_id"], {CONF_LOCATION_SOURCE: "manual"})
+
+    assert result["type"] is FlowResultType.FORM
+    assert result["step_id"] == "location_manual"
+    assert _suggested(result) == {
+        CONF_LOCATION_LATITUDE: LATITUDE,
+        CONF_LOCATION_LONGITUDE: LONGITUDE,
+    }
+    # Nothing is saved before the last step.
+    assert dict(location_entry.options) == before
+
+    saved = await _save(
+        hass,
+        result["flow_id"],
+        {
+            CONF_LOCATION_LATITUDE: MANUAL_LATITUDE,
+            CONF_LOCATION_LONGITUDE: MANUAL_LONGITUDE,
+        },
     )
+
+    assert saved["type"] is FlowResultType.CREATE_ENTRY
+    assert dict(location_entry.options) == {
+        CONF_REQUIRE_TOKEN: False,
+        CONF_RESET_MINUTES: 30,
+        CONF_DEFAULT_TRANSPORT: "car",
+        CONF_LOCATION_SOURCE: "manual",
+        CONF_LOCATION_LATITUDE: MANUAL_LATITUDE,
+        CONF_LOCATION_LONGITUDE: MANUAL_LONGITUDE,
+    }
+    await async_send_reply(hass, location_entry, ReplyAction.ACCEPT)
+    assert _query(aioclient_mock) == MANUAL_QUERY
+
+
+async def test_the_manual_form_starts_with_the_stored_coordinates(
+    hass: HomeAssistant, manual_location_entry: MockConfigEntry
+) -> None:
+    """The stored values win over the home position."""
+    hass.config.latitude = LATITUDE
+    hass.config.longitude = LONGITUDE
+    await async_setup_entry(hass, manual_location_entry)
+    result = await _open(hass, manual_location_entry)
+
+    result = await _save(hass, result["flow_id"])
+
+    assert result["step_id"] == "location_manual"
+    assert _suggested(result) == {
+        CONF_LOCATION_LATITUDE: MANUAL_LATITUDE,
+        CONF_LOCATION_LONGITUDE: MANUAL_LONGITUDE,
+    }
+
+
+async def test_the_manual_form_without_any_position_suggests_nothing(
+    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+) -> None:
+    """Neither stored coordinates nor a home position: empty fields."""
+    hass.config.latitude = 0
+    hass.config.longitude = 0
     await async_setup_entry(hass, mock_config_entry)
     result = await _open(hass, mock_config_entry)
-    # Without a location the field has no suggested value.
-    location_key = next(
-        key for key in result["data_schema"].schema if key == CONF_LOCATION_ENTITY
+
+    result = await _save(hass, result["flow_id"], {CONF_LOCATION_SOURCE: "manual"})
+
+    assert result["step_id"] == "location_manual"
+    assert _suggested(result) == {}
+
+
+@pytest.mark.parametrize(
+    ("latitude", "longitude", "errors"),
+    [
+        (91, 6.789, {CONF_LOCATION_LATITUDE: "invalid_latitude"}),
+        (float("nan"), 6.789, {CONF_LOCATION_LATITUDE: "invalid_latitude"}),
+        (1.2345, -180.5, {CONF_LOCATION_LONGITUDE: "invalid_longitude"}),
+        (1.2345, float("inf"), {CONF_LOCATION_LONGITUDE: "invalid_longitude"}),
+        (
+            -95,
+            181,
+            {
+                CONF_LOCATION_LATITUDE: "invalid_latitude",
+                CONF_LOCATION_LONGITUDE: "invalid_longitude",
+            },
+        ),
+    ],
+)
+async def test_invalid_coordinates_are_an_error_in_the_form(
+    hass: HomeAssistant,
+    manual_location_entry: MockConfigEntry,
+    latitude: float,
+    longitude: float,
+    errors: dict[str, str],
+) -> None:
+    """The form shows the error and nothing is saved."""
+    await async_setup_entry(hass, manual_location_entry)
+    before = dict(manual_location_entry.options)
+    result = await _open(hass, manual_location_entry)
+    result = await _save(hass, result["flow_id"])
+
+    result = await _save(
+        hass,
+        result["flow_id"],
+        {CONF_LOCATION_LATITUDE: latitude, CONF_LOCATION_LONGITUDE: longitude},
     )
-    assert location_key.description is None
 
-    await _save(hass, result["flow_id"], {CONF_LOCATION_ENTITY: LOCATION_ENTITY})
+    assert result["type"] is FlowResultType.FORM
+    assert result["step_id"] == "location_manual"
+    assert result["errors"] == errors
+    assert dict(manual_location_entry.options) == before
 
-    await async_send_reply(hass, mock_config_entry, ReplyAction.ACCEPT)
-    _method, url, _data, _headers = aioclient_mock.mock_calls[0]
-    assert dict(url.query) == {
-        "transport": "CAR",
-        "lat": "1.234500",
-        "lng": "6.789000",
+    # A correction saves.
+    result = await _save(
+        hass,
+        result["flow_id"],
+        {CONF_LOCATION_LATITUDE: 10.5, CONF_LOCATION_LONGITUDE: -20.25},
+    )
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    assert manual_location_entry.options[CONF_LOCATION_LATITUDE] == 10.5
+    assert manual_location_entry.options[CONF_LOCATION_LONGITUDE] == -20.25
+
+
+async def test_the_entity_source_asks_for_the_entity(
+    hass: HomeAssistant,
+    aioclient_mock: AiohttpClientMocker,
+    manual_location_entry: MockConfigEntry,
+) -> None:
+    """The entity is required in its own form; the old coordinates are dropped."""
+    aioclient_mock.get(ACCEPT_URL)
+    hass.states.async_set(LOCATION_ENTITY, "home", POSITION)
+    await async_setup_entry(hass, manual_location_entry)
+    result = await _open(hass, manual_location_entry)
+
+    result = await _save(hass, result["flow_id"], {CONF_LOCATION_SOURCE: "entity"})
+
+    assert result["type"] is FlowResultType.FORM
+    assert result["step_id"] == "location_entity"
+    schema = result["data_schema"].schema
+    assert set(schema) == {CONF_LOCATION_ENTITY}
+    assert all(isinstance(key, vol.Required) for key in schema)
+    assert _suggested(result) == {}
+    for values in ({}, {CONF_LOCATION_ENTITY: "light.kitchen"}):
+        with pytest.raises(InvalidData):
+            await _save(hass, result["flow_id"], values)
+
+    saved = await _save(
+        hass, result["flow_id"], {CONF_LOCATION_ENTITY: LOCATION_ENTITY}
+    )
+
+    assert saved["type"] is FlowResultType.CREATE_ENTRY
+    assert dict(manual_location_entry.options) == {
+        CONF_REQUIRE_TOKEN: False,
+        CONF_RESET_MINUTES: 30,
+        CONF_DEFAULT_TRANSPORT: "car",
+        CONF_LOCATION_SOURCE: "entity",
+        CONF_LOCATION_ENTITY: LOCATION_ENTITY,
     }
+    await async_send_reply(hass, manual_location_entry, ReplyAction.ACCEPT)
+    assert _query(aioclient_mock) == HOME_QUERY
+
+
+async def test_the_entity_form_starts_with_the_stored_entity(
+    hass: HomeAssistant, location_entry: MockConfigEntry
+) -> None:
+    """The current entity is suggested and can be replaced."""
+    await async_setup_entry(hass, location_entry)
+    result = await _open(hass, location_entry)
+
+    result = await _save(hass, result["flow_id"])
+
+    assert result["step_id"] == "location_entity"
+    assert _suggested(result) == {CONF_LOCATION_ENTITY: LOCATION_ENTITY}
+    await _save(hass, result["flow_id"], {CONF_LOCATION_ENTITY: "device_tracker.phone"})
+    assert location_entry.options[CONF_LOCATION_ENTITY] == "device_tracker.phone"
 
 
 # --- The additional token -----------------------
@@ -612,7 +944,7 @@ async def test_ntfy_form_has_no_token_switch(
     result = await _open_ntfy(hass, ntfy_entry)
 
     keys = {str(key) for key in result["data_schema"].schema}
-    assert keys == {CONF_RESET_MINUTES, CONF_DEFAULT_TRANSPORT, CONF_LOCATION_ENTITY}
+    assert keys == {CONF_RESET_MINUTES, CONF_DEFAULT_TRANSPORT, CONF_LOCATION_SOURCE}
     assert result["description_placeholders"] == {
         "ntfy_entity": NTFY_ENTITY_ID,
         "ntfy_publish_url": NTFY_PUBLISH_URL,
@@ -646,6 +978,7 @@ async def test_ntfy_form_keeps_the_token_option(
         CONF_RESET_MINUTES: 9,
         CONF_DEFAULT_TRANSPORT: "car",
         CONF_REQUIRE_TOKEN: True,
+        CONF_LOCATION_SOURCE: "none",
     }
     assert ntfy_entry.runtime_data.alarm is not old_alarm
     assert ntfy_entry.runtime_data.alarm.reset_minutes == 9
@@ -672,4 +1005,41 @@ async def test_ntfy_form_without_entity_and_topic(
         CONF_RESET_MINUTES: 30,
         CONF_DEFAULT_TRANSPORT: "car",
         CONF_REQUIRE_TOKEN: False,
+        CONF_LOCATION_SOURCE: "none",
+    }
+
+
+async def test_ntfy_form_asks_for_the_location_values_in_a_second_step(
+    hass: HomeAssistant, ntfy_entry: MockConfigEntry
+) -> None:
+    """The follow-up steps work in ntfy mode too; the token option is kept."""
+    ntfy_entry.add_to_hass(hass)
+    hass.config_entries.async_update_entry(
+        ntfy_entry, options={**ntfy_entry.options, CONF_REQUIRE_TOKEN: True}
+    )
+    assert await hass.config_entries.async_setup(ntfy_entry.entry_id)
+    await hass.async_block_till_done()
+    result = await _open_ntfy(hass, ntfy_entry)
+
+    result = await _save(hass, result["flow_id"], {CONF_LOCATION_SOURCE: "manual"})
+
+    assert result["type"] is FlowResultType.FORM
+    assert result["step_id"] == "location_manual"
+    saved = await _save(
+        hass,
+        result["flow_id"],
+        {
+            CONF_LOCATION_LATITUDE: MANUAL_LATITUDE,
+            CONF_LOCATION_LONGITUDE: MANUAL_LONGITUDE,
+        },
+    )
+
+    assert saved["type"] is FlowResultType.CREATE_ENTRY
+    assert dict(ntfy_entry.options) == {
+        CONF_RESET_MINUTES: 30,
+        CONF_DEFAULT_TRANSPORT: "car",
+        CONF_REQUIRE_TOKEN: True,
+        CONF_LOCATION_SOURCE: "manual",
+        CONF_LOCATION_LATITUDE: MANUAL_LATITUDE,
+        CONF_LOCATION_LONGITUDE: MANUAL_LONGITUDE,
     }

@@ -1,7 +1,7 @@
 """Config flow, reconfigure flow and options flow for the FF Agent integration.
 
 The config flow first asks for the reply URL, then for what is sent with an acceptance
-(transport and location entity, step "reply_settings"), then how the alarm reaches Home
+(transport and location source, step "reply_settings"), then how the alarm reaches Home
 Assistant (ADR 0003): through Home Assistant Cloud or an own internet address (a
 webhook), or through the free service ntfy. Each path is a guide with numbered steps,
 and the user can switch between the paths at any time.
@@ -23,7 +23,7 @@ from homeassistant.config_entries import (
     OptionsFlowWithReload,
 )
 from homeassistant.const import CONF_NAME, CONF_WEBHOOK_ID
-from homeassistant.core import callback
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers import issue_registry as ir
 from homeassistant.helpers.selector import (
@@ -35,6 +35,7 @@ from homeassistant.helpers.selector import (
     NumberSelectorMode,
     SelectSelector,
     SelectSelectorConfig,
+    SelectSelectorMode,
     TextSelector,
     TextSelectorConfig,
     TextSelectorType,
@@ -49,6 +50,9 @@ from .const import (
     CONF_DEFAULT_TRANSPORT,
     CONF_HEADER_TOKEN,
     CONF_LOCATION_ENTITY,
+    CONF_LOCATION_LATITUDE,
+    CONF_LOCATION_LONGITUDE,
+    CONF_LOCATION_SOURCE,
     CONF_NTFY_ENTITY,
     CONF_NTFY_ENTITY_UUID,
     CONF_NTFY_SERVER,
@@ -59,11 +63,17 @@ from .const import (
     CONF_REPLY_URL,
     CONF_REQUIRE_TOKEN,
     CONF_RESET_MINUTES,
+    DEFAULT_LOCATION_SOURCE,
     DEFAULT_RESET_MINUTES,
     DEFAULT_TRANSPORT,
     DOMAIN,
     ISSUE_NTFY_ENTITY_MISSING,
     ISSUE_TOKEN_REJECTED,
+    LOCATION_OPTION_KEYS,
+    LOCATION_SOURCE_ENTITY,
+    LOCATION_SOURCE_MANUAL,
+    LOCATION_SOURCES,
+    LOCATION_VALUE_KEYS,
     MAX_RESET_MINUTES,
     MENU_ALARM_SOURCE,
     MENU_CLOUD_NOT_CONNECTED,
@@ -92,7 +102,13 @@ from .ntfy_source import (
     async_generate_topic,
     ntfy_publish_url,
 )
-from .reply import configured_transport
+from .reply import (
+    configured_location_source,
+    configured_transport,
+    home_position,
+    valid_latitude,
+    valid_longitude,
+)
 from .reply_url import InvalidReplyUrl, parse_reply_input, reply_unique_id
 from .webhook_url import (
     CloudhookUnavailable,
@@ -137,6 +153,32 @@ TRANSPORT_SELECTOR = SelectSelector(
 
 LOCATION_SELECTOR = EntitySelector(
     EntitySelectorConfig(domain=["person", "device_tracker"])
+)
+
+LOCATION_SOURCE_SELECTOR = SelectSelector(
+    SelectSelectorConfig(
+        options=list(LOCATION_SOURCES),
+        mode=SelectSelectorMode.DROPDOWN,
+        translation_key="location_source",
+    )
+)
+
+# Decimal degrees with as many places as the user types. No minimum and maximum here:
+# the selector would refuse a value outside of the range with a generic error, the
+# step checks it and shows a message at the field.
+COORDINATE_SELECTOR = NumberSelector(
+    NumberSelectorConfig(step="any", mode=NumberSelectorMode.BOX)
+)
+
+MANUAL_LOCATION_SCHEMA = vol.Schema(
+    {
+        vol.Required(CONF_LOCATION_LATITUDE): COORDINATE_SELECTOR,
+        vol.Required(CONF_LOCATION_LONGITUDE): COORDINATE_SELECTOR,
+    }
+)
+
+ENTITY_LOCATION_SCHEMA = vol.Schema(
+    {vol.Required(CONF_LOCATION_ENTITY): LOCATION_SELECTOR}
 )
 
 ALARM_SOURCE_SELECTOR = SelectSelector(
@@ -196,7 +238,88 @@ def _reconfigure_schema(current_source: str) -> vol.Schema:
     )
 
 
-class FFAgentConfigFlow(ConfigFlow, domain=DOMAIN):
+@callback
+def _home_suggestion(hass: HomeAssistant) -> dict[str, float]:
+    """Return the home position as the suggestion for the manual coordinates."""
+    if (home := home_position(hass)) is None:
+        return {}
+    return {CONF_LOCATION_LATITUDE: home[0], CONF_LOCATION_LONGITUDE: home[1]}
+
+
+class LocationStepsMixin:
+    """The follow-up steps of the location source, shared by both flows.
+
+    Only the sources "manual" and "entity" need a second question. The mixin belongs
+    in front of a flow handler (it uses ``async_show_form`` and
+    ``add_suggested_values_to_schema``). The flow remembers the chosen source in
+    ``_location_source`` and has to provide two methods:
+
+    - ``_location_suggestions()`` returns the values the follow-up forms start with.
+    - ``_async_location_chosen(values)`` continues with the options of the chosen
+      source (``values`` is empty for the sources none and home).
+
+    Coordinates and the location entity are personal data and are never logged.
+    """
+
+    _location_source: str = DEFAULT_LOCATION_SOURCE
+
+    async def _async_choose_location(self, source: str) -> ConfigFlowResult:
+        """Go to the follow-up step of the source, or finish if it needs none."""
+        self._location_source = source
+        if source == LOCATION_SOURCE_MANUAL:
+            return await self.async_step_location_manual()
+        if source == LOCATION_SOURCE_ENTITY:
+            return await self.async_step_location_entity()
+        return await self._async_location_chosen({})
+
+    async def async_step_location_manual(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Ask for latitude and longitude; invalid values show an error."""
+        errors: dict[str, str] = {}
+        if user_input is not None:
+            latitude = user_input[CONF_LOCATION_LATITUDE]
+            longitude = user_input[CONF_LOCATION_LONGITUDE]
+            if not valid_latitude(latitude):
+                errors[CONF_LOCATION_LATITUDE] = "invalid_latitude"
+            if not valid_longitude(longitude):
+                errors[CONF_LOCATION_LONGITUDE] = "invalid_longitude"
+            if not errors:
+                return await self._async_location_chosen(
+                    {
+                        CONF_LOCATION_LATITUDE: float(latitude),
+                        CONF_LOCATION_LONGITUDE: float(longitude),
+                    }
+                )
+
+        # After a mistake the form keeps what the user typed.
+        suggested = user_input or self._location_suggestions()
+        return self.async_show_form(
+            step_id="location_manual",
+            data_schema=self.add_suggested_values_to_schema(
+                MANUAL_LOCATION_SCHEMA, suggested
+            ),
+            errors=errors,
+        )
+
+    async def async_step_location_entity(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Ask for the person or device tracker (a required field here)."""
+        if user_input is not None:
+            return await self._async_location_chosen(
+                {CONF_LOCATION_ENTITY: user_input[CONF_LOCATION_ENTITY]}
+            )
+
+        return self.async_show_form(
+            step_id="location_entity",
+            data_schema=self.add_suggested_values_to_schema(
+                ENTITY_LOCATION_SCHEMA, self._location_suggestions()
+            ),
+        )
+
+
+class FFAgentConfigFlow(LocationStepsMixin, ConfigFlow, domain=DOMAIN):
     """Handle the config flow for FF Agent.
 
     One config entry stands for one person. The flow makes no request to FF Agent,
@@ -271,20 +394,18 @@ class FFAgentConfigFlow(ConfigFlow, domain=DOMAIN):
     async def async_step_reply_settings(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
-        """Ask what is sent with every acceptance: transport and location entity.
+        """Ask what is sent with every acceptance: transport and location source.
 
         The values become the options of the new entry, the same ones the options flow
-        shows later. Nothing is sent now. The location entity is personal data and is
-        never logged.
+        shows later. Nothing is sent now. The sources "manual" and "entity" ask for the
+        coordinates or the entity in a follow-up step. The location is personal data
+        and is never logged.
         """
         if user_input is not None:
             self._reply_options = {
                 CONF_DEFAULT_TRANSPORT: user_input[CONF_DEFAULT_TRANSPORT]
             }
-            # A cleared field is missing from the input: no location is stored.
-            if location := user_input.get(CONF_LOCATION_ENTITY):
-                self._reply_options[CONF_LOCATION_ENTITY] = location
-            return await self.async_step_alarm_source()
+            return await self._async_choose_location(user_input[CONF_LOCATION_SOURCE])
 
         return self.async_show_form(
             step_id="reply_settings",
@@ -293,10 +414,23 @@ class FFAgentConfigFlow(ConfigFlow, domain=DOMAIN):
                     vol.Required(
                         CONF_DEFAULT_TRANSPORT, default=DEFAULT_TRANSPORT
                     ): TRANSPORT_SELECTOR,
-                    vol.Optional(CONF_LOCATION_ENTITY): LOCATION_SELECTOR,
+                    vol.Required(
+                        CONF_LOCATION_SOURCE, default=DEFAULT_LOCATION_SOURCE
+                    ): LOCATION_SOURCE_SELECTOR,
                 }
             ),
         )
+
+    @callback
+    def _location_suggestions(self) -> dict[str, Any]:
+        """Suggest the home position of Home Assistant for the coordinates."""
+        return _home_suggestion(self.hass)
+
+    async def _async_location_chosen(self, values: dict[str, Any]) -> ConfigFlowResult:
+        """Remember the location options and go on with the alarm source."""
+        self._reply_options[CONF_LOCATION_SOURCE] = self._location_source
+        self._reply_options.update(values)
+        return await self.async_step_alarm_source()
 
     @callback
     def _new_entry_options(self) -> dict[str, Any]:
@@ -784,8 +918,14 @@ class FFAgentConfigFlow(ConfigFlow, domain=DOMAIN):
         )
 
 
-class FFAgentOptionsFlow(OptionsFlowWithReload):
+class FFAgentOptionsFlow(LocationStepsMixin, OptionsFlowWithReload):
     """Options of one entry. Saving reloads the entry and resets a running alarm."""
+
+    def __init__(self) -> None:
+        """Initialize the state of the flow."""
+        super().__init__()
+        # The options of the form, kept while a follow-up step asks for the location.
+        self._form_options: dict[str, Any] = {}
 
     async def async_step_init(
         self, user_input: dict[str, Any] | None = None
@@ -795,9 +935,7 @@ class FFAgentOptionsFlow(OptionsFlowWithReload):
             return await self.async_step_ntfy()
 
         if user_input is not None:
-            # The options are replaced as a whole. A cleared location entity is missing
-            # from the input, so no location is sent afterwards.
-            return self.async_create_entry(data=user_input)
+            return await self._async_submit(user_input)
 
         entry = self.config_entry
         # URL and token are secrets. They are shown here on purpose and never logged.
@@ -822,8 +960,8 @@ class FFAgentOptionsFlow(OptionsFlowWithReload):
         if user_input is not None:
             # The token option is kept, so it applies again after a switch back to
             # the webhook.
-            return self.async_create_entry(
-                data={
+            return await self._async_submit(
+                {
                     **user_input,
                     CONF_REQUIRE_TOKEN: bool(options.get(CONF_REQUIRE_TOKEN, False)),
                 }
@@ -847,19 +985,48 @@ class FFAgentOptionsFlow(OptionsFlowWithReload):
             },
         )
 
+    async def _async_submit(self, user_input: dict[str, Any]) -> ConfigFlowResult:
+        """Take the form and go on with the location source.
+
+        The options are replaced as a whole, but only the ones of the location source
+        are dropped: all others are kept. A source that needs no follow-up step saves
+        right away; the fields of the other sources are gone afterwards.
+        """
+        kept = {
+            key: value
+            for key, value in self.config_entry.options.items()
+            if key not in LOCATION_OPTION_KEYS
+        }
+        form = {k: v for k, v in user_input.items() if k != CONF_LOCATION_SOURCE}
+        self._form_options = {**kept, **form}
+        return await self._async_choose_location(user_input[CONF_LOCATION_SOURCE])
+
+    @callback
+    def _location_suggestions(self) -> dict[str, Any]:
+        """Suggest the stored values; the coordinates default to the home position."""
+        options = self.config_entry.options
+        suggestions: dict[str, Any] = _home_suggestion(self.hass)
+        for key in LOCATION_VALUE_KEYS:
+            if (value := options.get(key)) is not None:
+                suggestions[key] = value
+        return suggestions
+
+    async def _async_location_chosen(self, values: dict[str, Any]) -> ConfigFlowResult:
+        """Save the options with the chosen source and only its own fields."""
+        return self.async_create_entry(
+            data={
+                **self._form_options,
+                CONF_LOCATION_SOURCE: self._location_source,
+                **values,
+            }
+        )
+
     @callback
     def _schema(self, *, with_token: bool) -> vol.Schema:
         """Return the options form with the current values."""
         options = self.config_entry.options
         reset_minutes = int(
             clamp_reset_minutes(options.get(CONF_RESET_MINUTES, DEFAULT_RESET_MINUTES))
-        )
-        # "suggested_value" instead of "default": a default would come back when the
-        # field is cleared, so the location could never be removed.
-        location = options.get(CONF_LOCATION_ENTITY)
-        location_key = vol.Optional(
-            CONF_LOCATION_ENTITY,
-            description={"suggested_value": location} if location else None,
         )
         schema: dict[Any, Any] = {
             vol.Required(
@@ -869,7 +1036,9 @@ class FFAgentOptionsFlow(OptionsFlowWithReload):
                 CONF_DEFAULT_TRANSPORT,
                 default=configured_transport(options.get(CONF_DEFAULT_TRANSPORT)),
             ): TRANSPORT_SELECTOR,
-            location_key: LOCATION_SELECTOR,
+            vol.Required(
+                CONF_LOCATION_SOURCE, default=configured_location_source(options)
+            ): LOCATION_SOURCE_SELECTOR,
         }
         if with_token:
             # The token switch comes first, as it always did.

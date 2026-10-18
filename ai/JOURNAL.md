@@ -22,6 +22,24 @@ Das Journal ist Verlauf, keine Wissensbasis: Dauerhaftes gehört nach `docs/` od
 
 <!-- Neue Einträge direkt unter dieser Zeile einfügen -->
 
+## 2026-10-18 – lokal-2026-10-18-standort-quelle – Standortquelle wählbar
+- **Nutzer-Auftrag:** Das Feld „Standort-Entität“ ist seltsam; wählbar sein sollen die
+  HA-Zuhause-Position oder selbst eingetragene Koordinaten. Rückfrage: Entität behalten,
+  „allerdings als letzte Option“.
+- **Delegiert:** entwickler (Sonnet), tester (Sonnet), reviewer (Opus), doku (Haiku);
+  Standardmodelle, kein architekt (Design im Briefing vorgegeben, überschaubar).
+- **Erledigt:** rauchstefan/ha-ff-agent#11: Option `location_source`
+  (none/home/manual/entity), Folgeschritte `location_manual`/`location_entity` in Einrichtung
+  und Options-Flow, Auflösung in `reply.py`, Diagnostics-Redaktion, 782 Tests, 100 %.
+  Altbestand per Ableitung `configured_location_source` statt Migration. README, CHANGELOG
+  `[Unreleased]`, `docs/architektur.md` angepasst. Tester PASS, reviewer freigegeben.
+- **Offen / Übergabe:** Nicht in echter HA-Instanz getestet. Reviewer-Hinweise (nicht
+  blockierend): Mixin-Typisierung für mypy, gelöschte Entität im Options-Flow ist Pflichtfeld.
+  `docs/plaene/261017-beispiel-automationen.md` nennt noch „Standort-Entität“ (historischer
+  Plan, bewusst unverändert).
+- **Für die nächste Session:** Der Options-Flow ersetzt die Optionen nicht mehr als Ganzes,
+  sondern nur die Standortschlüssel.
+
 ## 2026-10-18 – lokal-2026-10-18-v0-2-feedback – Neues Icon
 - **Nutzer-Auftrag:** „Cooles Logo, das Home Assistant/HACS zeigt, mit FF oder FF-Agent;
   nicht das offizielle FF-Agent-Logo.“

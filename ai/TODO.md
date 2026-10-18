@@ -377,6 +377,19 @@ Gemeinsame Angaben für alle sechs Schritte:
 
 ## Erledigt
 
+### 261018-standort-quelle – Standortquelle wählbar (HA-Zuhause, Koordinaten, Entität)
+- **Status:** erledigt (2026-10-18, rauchstefan/ha-ff-agent#11)
+- **Priorität:** hoch
+- **Rolle(n):** entwickler, tester, reviewer, doku
+- **Beschreibung:** Das Feld „Standort-Entität“ im Einrichtungsdialog wirkt seltsam. Der Nutzer
+  will als Standort bei der Zusage wählen können: kein Standort, die Zuhause-Position von
+  Home Assistant, manuell eingetragene Koordinaten (Breiten-/Längengrad) oder – als letzte
+  Option – wie bisher eine Person/einen Geräte-Tracker.
+- **Definition of Done:** Auswahl im Config- und Options-Flow; Zusage sendet den Standort
+  der gewählten Quelle; bestehende Einträge mit Entität laufen unverändert weiter; Tests
+  grün bei 100 % Abdeckung; README und CHANGELOG angepasst.
+- **Verweise:** Chat vom 2026-10-18
+
 ### 261018-leere-dialogtexte – Hinweis auf Browser-Cache nach Update (leere Menütexte in v0.2.0)
 - **Status:** erledigt (2026-10-18, PR rauchstefan/ha-ff-agent#8, 24d4f43)
 - **Priorität:** niedrig
