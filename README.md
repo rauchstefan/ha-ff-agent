@@ -1,5 +1,7 @@
 # FF Agent für Home Assistant / FF Agent for Home Assistant
 
+<img src="https://raw.githubusercontent.com/rauchstefan/ha-ff-agent/main/custom_components/ff_agent/brand/icon.png" width="128" alt="ha-ff-agent">
+
 **Deutsch:** Custom-Integration für [Home Assistant](https://www.home-assistant.io/),
 installierbar über [HACS](https://hacs.xyz/), die **FF Agent** (Alarmierungs- und
 Einsatzsoftware für Feuerwehren und Hilfsorganisationen) in Home Assistant verfügbar macht.

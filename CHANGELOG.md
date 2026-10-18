@@ -3,6 +3,24 @@
 Alle nennenswerten Änderungen an dieser Integration. Format angelehnt an
 [Keep a Changelog](https://keepachangelog.com/de/1.1.0/), Versionen nach SemVer.
 
+## [Unreleased]
+
+### Geändert
+
+- **Neues Symbol:** Das Symbol der Integration ist jetzt ein Haus mit „FF“ auf rotem,
+  abgerundetem Quadrat statt des schlichten „FF“-Quadrats. Es ist ein eigenes, allgemeines
+  Motiv (kein Logo von FF Agent, Home Assistant oder HACS). Die Quelle liegt unter
+  `docs/assets/logo.svg`, die README zeigt das Symbol oben.
+
+### English
+
+#### Changed
+
+- **New icon:** The icon of the integration is now a house with "FF" on a red rounded
+  square instead of the plain "FF" square. It is an original, generic motif (not a logo of
+  FF Agent, Home Assistant or HACS). The source is `docs/assets/logo.svg`, and the README
+  shows the icon at the top.
+
 ## [0.3.0] – 2026-10-18 (Vorabversion)
 
 Dritte Vorabversion. Ein Testalarm und ein echter Alarm aus FF Agent sind beim Entwickler über ntfy erfolgreich angekommen; Zusagen und Absagen sind noch nicht gegen ein echtes FF Agent geprüft.
