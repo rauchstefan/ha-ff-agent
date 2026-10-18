@@ -31,8 +31,29 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
 
 ## Offen
 
+### 261018-recherche-namen – Namen Dritter in öffentlichen Recherche-Dateien
+- **Status:** offen (Entscheidung des Nutzers)
+- **Priorität:** mittel
+- **Rolle(n):** Nutzer, Projektleiter, doku
+- **Beschreibung:** Hinweis des reviewers zu #7: `docs/recherche/261016-ffagent-schnittstellen.md`
+  nennt im öffentlichen Repo:
+  - den Firmennamen des Herstellers
+  - Personennamen (Geschäftsführer, PDF-Autor)
+  - die Geschäftsadresse
+
+  Weitere Treffer: `docs/plaene/261017-alarmquelle-ntfy.md` (Prüfpunkt) und dieses TODO.
+  Die Angaben stammen aus dem öffentlichen Impressum; ein Sicherheitsproblem ist das
+  nicht, es geht um den Auftritt und um Datenschutz.
+
+  Optionen:
+  - neutralisieren, etwa „Hersteller von FF Agent“, ohne Personennamen und Adresse
+  - so lassen
+
+  Achtung: Neutralisieren wirkt nur ab jetzt, die Git-Historie behält die Angaben. Sie
+  ganz zu entfernen hieße, die Historie erneut umzuschreiben.
+
 ### 261018-release-0-2-0 – Release v0.2.0 als Vorabversion
-- **Status:** in Arbeit (lokal-2026-10-16-hacs-recherche, 2026-10-18)
+- **Status:** Release-PR gemergt (rauchstefan/ha-ff-agent#7, dabe583, CI grün; tester PASS, reviewer freigegeben). Wartet auf das Go des Nutzers für Tag und GitHub-Release v0.2.0 (Pre-Release).
 - **Priorität:** hoch
 - **Rolle(n):** entwickler, tester, reviewer, Projektleiter
 - **Beschreibung:** Auftrag des Nutzers: „Bereite ein Release v0.2.0 als Vorabversion
@@ -146,7 +167,7 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
 - **Definition of Done:** neue Texte de/en, README, Tests.
 
 ### 261017-geraeteinfo-hersteller – Kein Herstellername in der Geräte-Info
-- **Status:** in Arbeit (2026-10-18, mit Release-Vorbereitung v0.2.0). Entscheidung des Nutzers: neutraler Eintrag „ha-ff-agent (inoffiziell)“
+- **Status:** erledigt (2026-10-18, PR rauchstefan/ha-ff-agent#7, dabe583; neutraler Eintrag „ha-ff-agent (inoffiziell)“, Test und Regel in CLAUDE.md)
 - **Priorität:** hoch (Rechtliches, sichtbar in der HA-UI)
 - **Rolle(n):** entwickler, tester, reviewer, doku
 - **Beschreibung:** Vorgabe des Nutzers vom 2026-10-17: „Erwähne nicht mackoy consulting
