@@ -22,6 +22,24 @@ Das Journal ist Verlauf, keine Wissensbasis: Dauerhaftes gehört nach `docs/` od
 
 <!-- Neue Einträge direkt unter dieser Zeile einfügen -->
 
+## 2026-10-18 – lokal-2026-10-18-v0-2-feedback – Neues Icon
+- **Nutzer-Auftrag:** „Cooles Logo, das Home Assistant/HACS zeigt, mit FF oder FF-Agent;
+  nicht das offizielle FF-Agent-Logo.“
+- **Vorgehen:** Der Projektleiter hat drei Entwürfe als Skizze gezeigt; der Nutzer wählte
+  Entwurf A (rot, Haus-Umriss, „FF“). Die echten Logos von Home Assistant und HACS sind
+  bewusst nicht verwendet, sie sind Marken.
+- **Delegiert:**
+  - entwickler (Sonnet): Rendering per PowerShell/System.Drawing, ohne Downloads
+  - reviewer mit `model: sonnet` und tester mit `model: haiku`: kleiner Diff ohne Python-Code
+- **Erledigt:** PR rauchstefan/ha-ff-agent#10 per Squash gemergt (2b760c9):
+  - `brand/icon.png` und `brand/icon@2x.png` neu
+  - Quelle `docs/assets/logo.svg`
+  - Logo in der README mit absoluter URL, damit es auch in HACS erscheint
+  - CHANGELOG `[Unreleased]`
+- **Offen:** Ob HA ohne `brand/logo.png` das Icon als Logo zeigt, ist ungeprüft. Fehlt es in
+  der Integrationsansicht, eine Kopie als `logo.png` nachreichen. Das Icon ist noch in
+  keinem Release.
+
 ## 2026-10-18 – lokal-2026-10-18-v0-2-feedback – Doku zweisprachig, Release v0.3.0
 - **Nutzer-Auftrag:** „Doku auf GitHub sauber ziehen, Deutsch und Englisch, dann auf 0.3
   hochziehen und veröffentlichen.“
