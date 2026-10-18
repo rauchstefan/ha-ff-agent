@@ -3,7 +3,16 @@
 Was ist der aktuelle Stand der Integration? Diese Datei beantwortet das für jede neue
 Session. Von Hand gepflegt.
 
-- **Version:** 0.1.0, GitHub-Release `v0.1.0` als **Vorabversion** (2026-10-17)
+- **Version:** 0.1.0, GitHub-Release `v0.1.0` als **Vorabversion** (2026-10-17). `main` ist
+  weiter: Die Änderungen aus #4 und #6 stehen im CHANGELOG unter „Unreleased“. Ein neues
+  Release (v0.2.0) gibt es nur mit Freigabe des Nutzers.
+- **Seit v0.1.0 auf main (2026-10-18):**
+  - Fundort der Rückmelde-URL korrigiert; Verkehrsmittel `car`/`feet`/`bicycle`
+    (rauchstefan/ha-ff-agent#4)
+  - Alarmquelle wählbar, Home Assistant Cloud/Webhook oder ntfy, mit geführten
+    Einrichtungsdialogen; Migration 1.1 → 1.2; Selbstheilung bei neuem ntfy-Abo
+    (rauchstefan/ha-ff-agent#6, ADR 0003)
+  - 642 Tests, Abdeckung 100 %
 - **Repo:** öffentlich seit 2026-10-17, über HACS als Custom Repository installierbar. Die
   HACS-Validierung besteht alle 9 Checks ohne `ignore`. Die alte Historie mit den PRs
   liegt im privaten Archiv `rauchstefan/ha-ff-agent-archiv`.
@@ -29,7 +38,7 @@ Session. Von Hand gepflegt.
   - `tests.yml`: ruff, pytest mit pytest-homeassistant-custom-component, Python 3.14,
     Abdeckungs-Gate 95 %, aktuell 100 %
   - Dependabot
-- **Letzte Änderung:** 2026-10-17 – MVP PR 6 (rauchstefan/ha-ff-agent-archiv#7)
+- **Letzte Änderung:** 2026-10-18 – Merge von rauchstefan/ha-ff-agent#4 und #6
 
 ## Was funktioniert
 

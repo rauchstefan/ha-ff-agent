@@ -90,11 +90,8 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
   Klärung der Markenrechte am Namen „FF Agent“ mit dem Hersteller.
 
 ### 261017-fundort-transport – Fundort der Rückmelde-URL korrigieren, Verkehrsmittel erweitern
-- **Status:** Gate bestanden, wartet auf Merge-Okay des Nutzers (2026-10-18).
-  PR rauchstefan/ha-ff-agent#4: CI grün, tester PASS, reviewer freigegeben.
-  - Nicht mergen, bis der Nutzer sein Okay gibt; er testet noch.
-  - Reihenfolge: zuerst #4 nach main, dann die Base von #6 auf main umstellen und #6
-    mergen.
+- **Status:** erledigt (2026-10-18, PR rauchstefan/ha-ff-agent#4, 5696f51; tester PASS,
+  reviewer freigegeben)
 - **Priorität:** hoch (Finding des Nutzers aus dem echten Test)
 - **Rolle(n):** entwickler, tester, reviewer
 - **Beschreibung:**
@@ -114,9 +111,9 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
 - **Definition of Done:** docs/recherche/261017-erreichbarkeit.md mit Empfehlung.
 
 ### 261017-ux-erreichbarkeit – Alarmquelle wählbar (Webhook/Nabu Casa oder ntfy), verständlicher Hinweis
-- **Status:** Gate bestanden, wartet auf Merge-Okay des Nutzers (2026-10-18).
-  - PR rauchstefan/ha-ff-agent#6 (Base #4), Stand f3fa723: CI grün, 642 Tests,
-    Abdeckung 100 %, tester PASS, reviewer freigegeben inklusive Nachprüfung.
+- **Status:** erledigt (2026-10-18, PR rauchstefan/ha-ff-agent#6, dddc3f9)
+  - Geprüfter Stand f3fa723: CI grün, 642 Tests, Abdeckung 100 %, tester PASS,
+    reviewer freigegeben inklusive Nachprüfung.
   - Auftrag des Nutzers: „bitte 1 und 2 umsetzen, und dem Nutzer die Wahl geben“.
     Gemeint sind (1) Nabu Casa mit Einrichtungslink und verständlichem Text, (2) ntfy.sh
     als kostenlose Alternative.

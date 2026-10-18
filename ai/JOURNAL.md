@@ -22,6 +22,26 @@ Das Journal ist Verlauf, keine Wissensbasis: Dauerhaftes gehört nach `docs/` od
 
 <!-- Neue Einträge direkt unter dieser Zeile einfügen -->
 
+## 2026-10-18 – lokal-2026-10-16-hacs-recherche – Merge von #4 und #6
+- **Nutzer-Auftrag:** „Ich bin mit dem Testen fertig. Merge #4 und #6.“
+- **Erledigt:**
+  - #4 per Squash nach main (5696f51).
+  - Die Base von #6 auf main umgestellt. Danach gab es Konflikte, weil #4 als Squash
+    gemergt war und #6 dieselben Änderungen als Einzelcommits trug.
+  - Gelöst durch Merge von origin/main in den Branch von #6, mit der Fassung von #6 in
+    den vier Konfliktdateien (CHANGELOG, de.json, en.json, test_metadata.py).
+  - Geprüft: Gegenüber dem freigegebenen Stand f3fa723 ändern sich nur `ai/`-Dateien.
+  - CI grün, #6 per Squash gemergt (dddc3f9), beide Branches gelöscht, main grün.
+- **Lernpunkt:** Gestapelte PRs, die einzeln per Squash gemergt werden, erzeugen beim
+  zweiten PR Konflikte. Künftig entweder den unteren PR mergen und den oberen sofort
+  rebasen lassen, oder gestapelte Arbeit in einem PR bündeln.
+- **Offen / Übergabe:**
+  - Ergebnisse des echten Tests des Nutzers (Rückmeldeliste) stehen noch aus und gehören
+    in ADR 0002/0003.
+  - Ein Release v0.2.0 nur mit Freigabe.
+  - Folge-TODOs: 261018-ntfy-feinschliff, 261018-configflow-aufteilen,
+    261017-geraeteinfo-hersteller, 261017-zusage-standort-transport.
+
 ## 2026-10-18 – lokal-2026-10-16-hacs-recherche – Wählbare Alarmquelle (ADR 0003), Gate für #4 und #6
 - **Nutzer-Aufträge:**
   - „bitte 1 und 2 umsetzen, und dem Nutzer die Wahl geben“ (Nabu Casa und ntfy).
