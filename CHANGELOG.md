@@ -5,9 +5,21 @@ Alle nennenswerten Änderungen an dieser Integration. Format angelehnt an
 
 ## [Unreleased]
 
-## [0.4.0] – 2026-10-18 (Vorabversion)
+### Geändert
 
-Vierte Vorabversion. Test- und Echtalarm aus FF Agent sind beim Entwickler über ntfy erfolgreich angekommen; Zusagen und Absagen sind noch nicht gegen ein echtes FF Agent geprüft.
+- HACS bietet den Branch `main` nicht mehr zur Installation an (`hide_default_branch`). Dadurch
+  zeigt der Update-Dialog Versionsnummern statt Commit-Kennungen.
+
+### English
+
+#### Changed
+
+- HACS no longer offers the branch `main` for installation (`hide_default_branch`). As a
+  result, the update dialog shows version numbers instead of commit identifiers.
+
+## [0.4.0] – 2026-10-18
+
+Erste reguläre Version (bisher nur Vorabversionen). Test- und Echtalarm aus FF Agent sind beim Entwickler über ntfy erfolgreich angekommen; Zusagen und Absagen sind noch nicht gegen ein echtes FF Agent geprüft.
 
 **Update:** Nach dem Update Home Assistant neu starten **und die Seite im Browser hart neu
 laden** (Strg+F5, am Mac Cmd+Umschalt+R). In der Companion-App die App neu starten bzw.
@@ -41,7 +53,7 @@ unter Umständen keinen oder alten Text.
 
 ### English
 
-Fourth pre-release. A test alarm and a real alarm from FF Agent have arrived successfully through ntfy on the developer's system; accepting and declining have not yet been checked against a real FF Agent.
+First regular release (previously only pre-releases). A test alarm and a real alarm from FF Agent have arrived successfully through ntfy on the developer's system; accepting and declining have not yet been checked against a real FF Agent.
 
 **Update:** After updating, restart Home Assistant **and hard-reload the page in the
 browser** (Ctrl+F5, on a Mac Cmd+Shift+R). In the companion app, restart the app or clear

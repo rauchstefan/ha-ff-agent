@@ -31,6 +31,31 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
 
 ## Offen
 
+### 261018-release-1-0 – Version 1.0.0 und Aufnahme in den HACS-Standard-Store
+- **Status:** offen (wartet auf 261018-test-zusage-absage)
+- **Priorität:** hoch
+- **Rolle(n):** tester, reviewer, doku, projektleiter
+- **Beschreibung:** Auftrag des Nutzers vom 2026-10-18: Wenn alles abgeschlossen ist,
+  Version 1.0.0 releasen und im HACS-Store (hacs/default) veröffentlichen. Voraussetzung:
+  Zusage und Absage sind gegen ein echtes FF Agent getestet. Für hacs/default prüfen:
+  Anforderungen (Brands-Eintrag bzw. lokaler brand-Ordner, Releases, Topics,
+  Beschreibung), siehe docs/recherche/261016-hacs-anforderungen.md.
+- **Definition of Done:** Release v1.0.0 (Freigabe des Nutzers), PR an hacs/default
+  gestellt (Freigabe des Nutzers, da öffentlicher Beitrag unter seinem Konto).
+- **Verweise:** docs/recherche/261018-hacs-update-dialog.md
+
+### 261018-hacs-icon – Logo im HACS-Update-Dialog fehlt
+- **Status:** offen (Entscheidung des Nutzers: PR an home-assistant/brands?)
+- **Priorität:** niedrig
+- **Rolle(n):** projektleiter
+- **Beschreibung:** Die HACS-Update-Entität lädt ihr Bild fest von
+  `https://brands.home-assistant.io/_/ff_agent/icon.png`, nicht aus dem lokalen
+  `brand/`-Ordner. Abhilfe nur über einen Eintrag `custom_integrations/ff_agent/` im Repo
+  home-assistant/brands (Ordnername = Integrations-Domain, nicht Repo-Name). Der Ordner
+  gilt dort als „Legacy“.
+- **Definition of Done:** Entscheidung getroffen; ggf. PR gestellt.
+- **Verweise:** docs/recherche/261018-hacs-update-dialog.md
+
 ### 261018-test-zusage-absage – Zusage und Absage gegen echtes FF Agent prüfen
 - **Status:** offen (Test durch den Nutzer)
 - **Priorität:** hoch
