@@ -101,6 +101,7 @@ REPLY_OPTIONS: Final = (REPLY_STATE_ACCEPTED, REPLY_STATE_REJECTED, REPLY_STATE_
 # Actions of the integration.
 SERVICE_ACCEPT: Final = "accept"
 SERVICE_REJECT: Final = "reject"
+SERVICE_RESET_ALARM: Final = "reset_alarm"
 ATTR_TRANSPORT: Final = "transport"
 
 # Dispatcher signals of the alarm manager, one pair per config entry.
@@ -116,7 +117,6 @@ EVENT_TYPE_ALARM: Final = "alarm"
 # unofficial community project and must not name the vendor or operator of FF Agent.
 MANUFACTURER: Final = "ha-ff-agent (inoffiziell)"
 MODEL: Final = "FF Agent"
-CONFIGURATION_URL: Final = "https://www.ff-agent.com"
 
 # Analysis of an incoming webhook call: only the shape is kept, never a value.
 # A body longer than MAX_BODY_ANALYSIS_CHARS is cut before it is parsed, so a large

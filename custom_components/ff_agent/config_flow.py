@@ -1,6 +1,7 @@
 """Config flow, reconfigure flow and options flow for the FF Agent integration.
 
-The config flow first asks for the reply URL, then how the alarm reaches Home
+The config flow first asks for the reply URL, then for what is sent with an acceptance
+(transport and location entity, step "reply_settings"), then how the alarm reaches Home
 Assistant (ADR 0003): through Home Assistant Cloud or an own internet address (a
 webhook), or through the free service ntfy. Each path is a guide with numbered steps,
 and the user can switch between the paths at any time.
@@ -153,6 +154,9 @@ UNREACHABLE_KINDS = (UrlKind.INTERNAL, UrlKind.PATH_ONLY)
 # Shown instead of the ntfy entity when the entry has none.
 NO_VALUE = "–"
 
+# Closing text when the chosen ntfy entity differs from the address the guide showed.
+NTFY_OTHER_ADDRESS = "ntfy_other_address"
+
 
 def _link_placeholders() -> dict[str, str]:
     """Return the My Home Assistant links that the texts use as placeholders."""
@@ -208,12 +212,15 @@ class FFAgentConfigFlow(ConfigFlow, domain=DOMAIN):
         """Initialize the state of the flow."""
         self._name = NAME
         self._reply_data: dict[str, Any] = {}  # reply ID and host of a new entry
+        self._reply_options: dict[str, Any] = {}  # transport, location of a new entry
         self._reply_updates: dict[str, Any] = {}  # reconfigure: changed reply data
         self._unique_id: str | None = None  # reconfigure: unique ID after the change
         self._webhook_id = ""
         self._header_token = ""
         self._regenerate = False
         self._ntfy_topic: str | None = None
+        # The URL for FF Agent that the ntfy guide showed last (a secret, never logged).
+        self._shown_ntfy_url: str | None = None
         self._cloud_attempts = 0  # unsuccessful checks in the cloud path
 
     @staticmethod
@@ -253,13 +260,48 @@ class FFAgentConfigFlow(ConfigFlow, domain=DOMAIN):
                 # to the webhook then needs no special case.
                 self._webhook_id = webhook.async_generate_id()
                 self._header_token = secrets.token_urlsafe(32)
-                return await self.async_step_alarm_source()
+                return await self.async_step_reply_settings()
 
         return self.async_show_form(
             step_id="user",
             data_schema=self.add_suggested_values_to_schema(USER_SCHEMA, user_input),
             errors=errors,
         )
+
+    async def async_step_reply_settings(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Ask what is sent with every acceptance: transport and location entity.
+
+        The values become the options of the new entry, the same ones the options flow
+        shows later. Nothing is sent now. The location entity is personal data and is
+        never logged.
+        """
+        if user_input is not None:
+            self._reply_options = {
+                CONF_DEFAULT_TRANSPORT: user_input[CONF_DEFAULT_TRANSPORT]
+            }
+            # A cleared field is missing from the input: no location is stored.
+            if location := user_input.get(CONF_LOCATION_ENTITY):
+                self._reply_options[CONF_LOCATION_ENTITY] = location
+            return await self.async_step_alarm_source()
+
+        return self.async_show_form(
+            step_id="reply_settings",
+            data_schema=vol.Schema(
+                {
+                    vol.Required(
+                        CONF_DEFAULT_TRANSPORT, default=DEFAULT_TRANSPORT
+                    ): TRANSPORT_SELECTOR,
+                    vol.Optional(CONF_LOCATION_ENTITY): LOCATION_SELECTOR,
+                }
+            ),
+        )
+
+    @callback
+    def _new_entry_options(self) -> dict[str, Any]:
+        """Return the options of the new entry: the defaults and the reply settings."""
+        return {**_default_options(), **self._reply_options}
 
     async def async_step_alarm_source(
         self, user_input: dict[str, Any] | None = None
@@ -376,7 +418,7 @@ class FFAgentConfigFlow(ConfigFlow, domain=DOMAIN):
                     CONF_NTFY_TOPIC: None,
                     CONF_NTFY_SERVER: None,
                 },
-                options=_default_options(),
+                options=self._new_entry_options(),
                 description=kind,
                 description_placeholders={**_link_placeholders(), "webhook_url": url},
             )
@@ -511,15 +553,19 @@ class FFAgentConfigFlow(ConfigFlow, domain=DOMAIN):
             CONF_CLOUDHOOK_URL: None,
         }
         placeholders = _link_placeholders()
-        text = "ntfy_topic_unknown"
-        if topic:
-            placeholders[NTFY_PUBLISH_URL] = ntfy_publish_url(server, topic)
+        if not topic:
+            text = "ntfy_topic_unknown"
+        elif (url := ntfy_publish_url(server, topic)) == self._shown_ntfy_url:
+            # Short text: the guide showed exactly this URL, so it is not repeated.
             text = SOURCE_NTFY
+        else:
+            text = NTFY_OTHER_ADDRESS
+            placeholders[NTFY_PUBLISH_URL] = url
         if not self._reconfiguring:
             return self.async_create_entry(
                 title=self._name,
                 data={**self._reply_data, **ntfy_data},
-                options=_default_options(),
+                options=self._new_entry_options(),
                 description=text,
                 description_placeholders=placeholders,
             )
@@ -575,7 +621,11 @@ class FFAgentConfigFlow(ConfigFlow, domain=DOMAIN):
 
     @callback
     def _ntfy_placeholders(self) -> dict[str, str]:
-        """Return topic, URL for FF Agent and links for the ntfy texts."""
+        """Return topic, URL for FF Agent and links for the ntfy texts.
+
+        Only the steps "ntfy" and "ntfy_select" call this, and both show the URL. It is
+        remembered, so the closing dialog can tell whether the chosen entity changes it.
+        """
         topic = self._topic
         ntfy_entries = self.hass.config_entries.async_entries(NTFY_DOMAIN)
         server = NTFY_DEFAULT_SERVER
@@ -583,10 +633,11 @@ class FFAgentConfigFlow(ConfigFlow, domain=DOMAIN):
             url = ntfy_entries[0].data.get(NTFY_CONF_URL)
             if isinstance(url, str) and url:
                 server = url
+        self._shown_ntfy_url = ntfy_publish_url(server, topic)
         return {
             **_link_placeholders(),
             "ntfy_topic": topic,
-            NTFY_PUBLISH_URL: ntfy_publish_url(server, topic),
+            NTFY_PUBLISH_URL: self._shown_ntfy_url,
         }
 
     @callback

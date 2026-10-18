@@ -45,15 +45,15 @@ custom_components/ff_agent/
   webhook_url.py     Webhook-URL: Cloudhook > extern > intern > Pfad; Erreichbarkeit prüfen
   ntfy_source.py     ntfy-Abo suchen (Subentry/Registry), Listener mit Filterregel
   webhook.py         Handler; erfasst nur die Form des Aufrufs, keine Werte
-  alarm.py           AlarmManager: Dedup (30 s), Rücksetz-Timer, Dispatcher-Signale
+  alarm.py           AlarmManager: Dedup (30 s), Rücksetz-Timer, Reset von Hand, Dispatcher-Signale
   reply.py           ReplyClient: GET, Timeout 10 s, Lock, Doppelklick-Schutz
-  services.py        Actions ff_agent.accept / ff_agent.reject
+  services.py        Actions ff_agent.accept / ff_agent.reject / ff_agent.reset_alarm
   services.yaml      Felder und Selektoren der Actions
   entity.py          Basisentität mit Gerät (DeviceEntryType.SERVICE)
   binary_sensor.py   alarm
   event.py           alarm
   sensor.py          last_alarm, last_reply
-  button.py          accept, reject
+  button.py          accept, reject, reset_alarm
   diagnostics.py     redigierte Diagnose
   config_flow.py     user, Menüs je Alarmweg, reconfigure, Options Flow (je Quelle)
   icons.json
@@ -115,10 +115,12 @@ Zweiter Eingang (ntfy-Modus), statt des Webhooks:
 | Sensor „Letzte Rückmeldung“ | `last_reply` | `ENUM`: `accepted`, `rejected`, `failed` | Zustand |
 | Button „Zusagen“ | `accept` | Rückmeldung mit Standard-Verkehrsmittel und optional Standort | Zeitstempel |
 | Button „Absagen“ | `reject` | Rückmeldung | Zeitstempel |
+| Button „Alarm zurücksetzen“ | `reset_alarm` | schaltet „Alarm aktiv“ sofort aus, stoppt den Timer; `last_alarm` bleibt, das Dedup-Fenster läuft weiter; ohne aktiven Alarm passiert nichts; kein Aufruf an FF Agent | Zeitstempel |
 
 Dazu kommen die Actions `ff_agent.accept` (Felder `config_entry_id`, `transport`,
-`latitude`, `longitude`) und `ff_agent.reject` (`config_entry_id`). Ein eigenes Bus-Event
-gibt es nicht.
+`latitude`, `longitude`), `ff_agent.reject` und `ff_agent.reset_alarm` (je
+`config_entry_id`). Ein eigenes Bus-Event gibt es nicht. Eine Absage setzt „Alarm aktiv“
+nicht zurück.
 
 ## Config-Eintrag
 
@@ -131,10 +133,13 @@ gibt es nicht.
   (Registry-UUID), `ntfy_topic`, `ntfy_server`. Webhook-ID und Token bleiben im
   ntfy-Modus ruhend erhalten, damit ein Wechsel zurück ohne Sonderfall geht.
 - **`options`:** `require_token` (Standard aus), `reset_minutes`, `default_transport`
-  (`car`, `feet` oder `bicycle`; an FF Agent gehen `CAR`, `FEET`, `BICYCLE`), `location_entity` (optional, `person` oder `device_tracker`)
+  (`car`, `feet` oder `bicycle`; an FF Agent gehen `CAR`, `FEET`, `BICYCLE`), `location_entity` (optional, `person` oder `device_tracker`). Beide Werte
+  fragt auch der Einrichtungsschritt `reply_settings` ab, sie landen beim Anlegen in `options`.
 - **Flows:**
   - `user` mit Name und Rückmelde-URL; ohne Online-Test, weil jeder Test eine echte
-    Rückmeldung wäre. Danach die Frage „Nutzt du Home Assistant Cloud?“ (Menü
+    Rückmeldung wäre. Danach der Schritt `reply_settings` (Standard-Verkehrsmittel,
+    optional Standort-Entität; ohne Zonen, die Werte hängt `reply.py` bei jeder Zusage
+    an; an der gespeicherten Rückmelde-UUID ändert sich nichts) und die Frage „Nutzt du Home Assistant Cloud?“ (Menü
     `alarm_source` bzw. `alarm_source_cloud`) und je Pfad ein Einrichtungsdialog
     (`cloud_setup`/`cloud_setup_retry`/`cloud_not_connected` bzw. `ntfy`, `ntfy_select`).
     Plan: `docs/plaene/261017-alarmquelle-ntfy.md`.
@@ -191,6 +196,13 @@ gibt es nicht.
   deshalb immer `not_from: [unavailable, unknown]` und `not_to: [unavailable, unknown]`.
   Zwei Tests in `tests/test_entities.py` belegen das (mit Filter löst er nicht aus, ohne
   Filter schon). README und Beispiel-Automation (PR 6) müssen das zeigen.
+- **Geräteseite sortiert nach Anzeigename.** Die Entitäten eines Geräts erscheinen
+  alphabetisch nach `entry.name ?? original_name` (Systemsprache, `Intl.Collator`). Die
+  Reihenfolge im Code, die Registrierung und die Entity-ID wirken nicht; ohne Umbenennung
+  gibt es keine Stellschraube.
+- **`configuration_url` muss explizit `None` sein, um einen gespeicherten Link zu löschen.**
+  Lässt man das Feld in `DeviceInfo` weg, behält `async_get_or_create` den Wert bestehender
+  Geräte (`UNDEFINED` wird nicht übernommen); ein ausdrückliches `None` löscht ihn.
 - **Reload löscht den laufenden Alarm.** Der `AlarmManager` startet bei jedem Setup leer.
   Jede Options-Änderung und jedes Reconfigure mit Änderung lädt den Eintrag neu (`OptionsFlowWithReload`), damit
   springt „Alarm aktiv“ auf aus und das Dedup-Fenster ist offen. Das ist bewusst so

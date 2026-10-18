@@ -162,7 +162,7 @@ async def test_entities_belong_to_one_service_device(
     assert device.name == mock_config_entry.title
     assert device.manufacturer == "ha-ff-agent (inoffiziell)"
     assert device.model == "FF Agent"
-    assert device.configuration_url == "https://www.ff-agent.com"
+    assert device.configuration_url is None
 
     registry = er.async_get(hass)
     for entity_id in _entity_ids(hass, mock_config_entry).values():
@@ -171,6 +171,26 @@ async def test_entities_belong_to_one_service_device(
         assert entry.device_id == device.id
         assert entry.has_entity_name is True
         assert entry.translation_key in ("alarm", "last_alarm")
+
+
+async def test_an_old_configuration_url_is_removed(
+    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+) -> None:
+    """A device created by an earlier version loses its stored product link."""
+    mock_config_entry.add_to_hass(hass)
+    dr.async_get(hass).async_get_or_create(
+        config_entry_id=mock_config_entry.entry_id,
+        identifiers={(DOMAIN, mock_config_entry.entry_id)},
+        configuration_url="https://www.ff-agent.com",
+    )
+
+    await _load(hass, mock_config_entry)
+
+    device = dr.async_get(hass).async_get_device_by_identifier(
+        (DOMAIN, mock_config_entry.entry_id), mock_config_entry.entry_id
+    )
+    assert device is not None
+    assert device.configuration_url is None
 
 
 async def test_unique_ids_contain_the_entry_id_but_no_secret(
@@ -186,10 +206,11 @@ async def test_unique_ids_contain_the_entry_id_but_no_secret(
         f"{mock_config_entry.entry_id}_last_alarm",
         f"{mock_config_entry.entry_id}_accept",
         f"{mock_config_entry.entry_id}_reject",
+        f"{mock_config_entry.entry_id}_reset_alarm",
         f"{mock_config_entry.entry_id}_last_reply",
     }
     # Binary sensor and event share the key "alarm".
-    assert len(entries) == 6
+    assert len(entries) == 7
     for entry in entries:
         for secret in (REPLY_ID, WEBHOOK_ID, HEADER_TOKEN):
             assert secret not in entry.unique_id

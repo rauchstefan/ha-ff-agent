@@ -122,6 +122,12 @@ def test_translations_cover_the_config_flow(language: str) -> None:
         "config.step.user.data.name",
         "config.step.user.data.reply_url",
         "config.step.user.data_description.reply_url",
+        "config.step.reply_settings.title",
+        "config.step.reply_settings.description",
+        "config.step.reply_settings.data.default_transport",
+        "config.step.reply_settings.data.location_entity",
+        "config.step.reply_settings.data_description.default_transport",
+        "config.step.reply_settings.data_description.location_entity",
         "config.error.invalid_reply_url",
         "config.error.ntfy_not_set_up",
         "config.error.ntfy_entity_not_found",
@@ -131,6 +137,7 @@ def test_translations_cover_the_config_flow(language: str) -> None:
         "config.abort.already_configured",
         "config.abort.unknown",
         "config.abort.reconfigure_successful_ntfy",
+        "config.abort.reconfigure_successful_ntfy_other_address",
         "config.abort.reconfigure_successful_ntfy_topic_unknown",
         "config.abort.reconfigure_successful_local",
         "config.create_entry.ntfy_topic_unknown",
@@ -139,6 +146,7 @@ def test_translations_cover_the_config_flow(language: str) -> None:
         "config.create_entry.internal",
         "config.create_entry.path_only",
         "config.create_entry.ntfy",
+        "config.create_entry.ntfy_other_address",
         "config.step.ntfy_select.title",
         "config.step.ntfy_select.description",
         "config.step.ntfy_select.data.ntfy_entity",
@@ -224,16 +232,20 @@ def test_translations_name_the_alarm_entities(
 
 
 def test_icons_cover_the_reply_entities_and_actions() -> None:
-    """The buttons, the sensor and both actions have an icon."""
+    """The buttons, the sensor and the three actions have an icon."""
     icons = _load(INTEGRATION / "icons.json")
     assert icons["entity"]["button"]["accept"] == {"default": "mdi:check-circle"}
     assert icons["entity"]["button"]["reject"] == {"default": "mdi:close-circle"}
+    assert icons["entity"]["button"]["reset_alarm"] == {
+        "default": "mdi:alarm-light-off"
+    }
     assert icons["entity"]["sensor"]["last_reply"] == {
         "default": "mdi:message-reply-text"
     }
     assert icons["services"] == {
         "accept": {"service": "mdi:check-circle"},
         "reject": {"service": "mdi:close-circle"},
+        "reset_alarm": {"service": "mdi:alarm-light-off"},
     }
 
 
@@ -244,6 +256,7 @@ def test_translations_cover_replies_actions_and_exceptions(language: str) -> Non
     entity = texts["entity"]
     assert entity["button"]["accept"]["name"]
     assert entity["button"]["reject"]["name"]
+    assert entity["button"]["reset_alarm"]["name"]
     last_reply = entity["sensor"]["last_reply"]
     assert last_reply["name"]
     assert set(last_reply["state"]) == {"accepted", "rejected", "failed"}
@@ -253,12 +266,13 @@ def test_translations_cover_replies_actions_and_exceptions(language: str) -> Non
     for label in texts["selector"]["transport"]["options"].values():
         assert label
     assert texts["exceptions"]["reply_connection_error"]["message"]
-    for service in ("accept", "reject"):
+    for service in ("accept", "reject", "reset_alarm"):
         assert texts["services"][service]["name"]
         assert texts["services"][service]["description"]
     fields = texts["services"]["accept"]["fields"]
     assert set(fields) == {"config_entry_id", "transport", "latitude", "longitude"}
     assert set(texts["services"]["reject"]["fields"]) == {"config_entry_id"}
+    assert set(texts["services"]["reset_alarm"]["fields"]) == {"config_entry_id"}
     for field in fields.values():
         assert field["name"]
         assert field["description"]
@@ -277,7 +291,7 @@ def test_error_messages_do_not_contain_addresses(language: str) -> None:
 def test_services_yaml_matches_the_translations_and_the_schemas() -> None:
     """Every field of services.yaml is translated and the transport list matches."""
     services = yaml_util.load_yaml(str(INTEGRATION / "services.yaml"))
-    assert set(services) == {"accept", "reject"}
+    assert set(services) == {"accept", "reject", "reset_alarm"}
     assert set(services["accept"]["fields"]) == {
         "config_entry_id",
         "transport",
@@ -285,6 +299,7 @@ def test_services_yaml_matches_the_translations_and_the_schemas() -> None:
         "longitude",
     }
     assert set(services["reject"]["fields"]) == {"config_entry_id"}
+    assert set(services["reset_alarm"]["fields"]) == {"config_entry_id"}
     for service in services.values():
         entry = service["fields"]["config_entry_id"]
         assert entry["required"] is True
@@ -436,8 +451,8 @@ def test_ntfy_texts_show_the_url_for_ff_agent(language: str) -> None:
     config = texts["config"]
     for text in (
         config["step"]["ntfy"]["description"],
-        config["create_entry"]["ntfy"],
-        config["abort"]["reconfigure_successful_ntfy"],
+        config["create_entry"]["ntfy_other_address"],
+        config["abort"]["reconfigure_successful_ntfy_other_address"],
         texts["options"]["step"]["ntfy"]["description"],
     ):
         assert "{ntfy_publish_url}" in text
@@ -449,6 +464,23 @@ def test_ntfy_texts_show_the_url_for_ff_agent(language: str) -> None:
     assert "{cloud_url}" in cloud_guide
     assert "{network_url}" in cloud_guide
     assert "{cloud_url}" in texts["options"]["step"]["init"]["description"]
+
+
+@pytest.mark.parametrize("language", ["en", "de"])
+def test_short_ntfy_closing_texts_repeat_no_values(language: str) -> None:
+    """If the guide showed the URL, the closing text only points to a test alarm."""
+    texts = _load(INTEGRATION / "translations" / f"{language}.json")
+    config = texts["config"]
+    test_alarm = {"en": "test alarm", "de": "Testalarm"}[language]
+    good_to_know = {"en": "Good to know", "de": "Gut zu wissen"}[language]
+    for text in (
+        config["create_entry"]["ntfy"],
+        config["abort"]["reconfigure_successful_ntfy"],
+    ):
+        assert not re.findall(r"\{\w+\}", text)
+        assert "GET" not in text
+        assert test_alarm in text
+    assert good_to_know in config["create_entry"]["ntfy"]
 
 
 @pytest.mark.parametrize("language", ["en", "de"])
@@ -511,3 +543,20 @@ def test_ntfy_texts_use_the_terms_of_the_ui(
     aborts = texts["config"]["abort"]
     assert "{webhook_url}" in aborts["reconfigure_successful_local"]
     assert "GET" in aborts["reconfigure_successful_ntfy_topic_unknown"]
+
+
+@pytest.mark.parametrize(
+    ("language", "subscription", "domain", "free"),
+    [("en", "subscription", "domain", "free"), ("de", "Abo", "Domain", "kostenlos")],
+)
+def test_reconfigure_asks_how_the_alarm_arrives(
+    language: str, subscription: str, domain: str, free: str
+) -> None:
+    """The field is a question and each option names what it requires."""
+    texts = _load(INTEGRATION / "translations" / f"{language}.json")
+    label = texts["config"]["step"]["reconfigure"]["data"]["alarm_source"]
+    assert label.endswith("?")
+    options = texts["selector"]["alarm_source"]["options"]
+    assert subscription in options["webhook"]
+    assert domain in options["webhook"]
+    assert free in options["ntfy"]

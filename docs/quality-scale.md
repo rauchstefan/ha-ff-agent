@@ -17,14 +17,14 @@ Status: `done` (erfüllt, mit Beleg), `exempt` (nicht zutreffend, mit Begründun
 
 | Regel | Status | Beleg bzw. Begründung |
 |---|---|---|
-| `action-setup` | done | Actions werden in `async_setup` registriert: `custom_components/ff_agent/__init__.py`, `services.py`; Test `tests/test_services.py` |
+| `action-setup` | done | Actions werden in `async_setup` registriert: `custom_components/ff_agent/__init__.py`, `services.py`; Test `tests/test_services.py` (`accept`, `reject`, `reset_alarm`) |
 | `appropriate-polling` | exempt | Kein Polling, `iot_class: cloud_push` (`manifest.json`). Es gibt keinen Coordinator. |
 | `brands` | done | `custom_components/ff_agent/brand/icon.png` und `icon@2x.png`. Ob Name und Logo des Herstellers verwendet werden dürfen, ist offen (TODO `261016-repo-oeffentlich`). |
 | `common-modules` | done | Basisklasse in `entity.py`; die Regel kennt keine Ausnahmen. Konstanten in `const.py`. |
 | `config-flow` | done | `config_flow.py` mit UI-Flow, Felder in `translations/*.json` mit `data_description`; `tests/test_config_flow.py` |
 | `config-flow-test-coverage` | done | `tests/test_config_flow.py`, `tests/test_options_flow.py`, `tests/test_reconfigure.py` (Erfolg, Fehler, Recovery, doppelte Einträge); `config_flow.py` ist durch das Abdeckungs-Gate (siehe `test-coverage`) abgedeckt |
 | `dependency-transparency` | exempt | `requirements: []` in `manifest.json`, es gibt keine externen Bibliotheken |
-| `docs-actions` | done | README, Abschnitt „Actions“ |
+| `docs-actions` | done | README, Abschnitt „Actions“ (`accept`, `reject`, `reset_alarm`) |
 | `docs-conditions` | exempt | Die Integration hat keine eigenen Conditions. |
 | `docs-high-level-description` | done | README, Abschnitt „Was die Integration tut und was nicht“ |
 | `docs-installation-instructions` | done | README, Abschnitte „Voraussetzungen“ und „Installation“ |

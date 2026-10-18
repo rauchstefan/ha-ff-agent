@@ -64,6 +64,9 @@ Agent auf. Daten kommen ausschließlich per Push von FF Agent, es gibt kein Abfr
 2. „FF Agent“ öffnen. Solange es nur Vorabversionen gibt (aktuell 0.2.0): im Menü (⋮) bzw. in den
    Einstellungen des Repositorys Beta-/Vorabversionen aktivieren. Dann herunterladen und Home
    Assistant neu starten.
+   **Nach jedem Update:** Home Assistant neu starten und die Seite im Browser hart neu
+   laden (Strg+F5, am Mac Cmd+Umschalt+R). In der Companion-App die App neu starten bzw.
+   den Frontend-Cache in den App-Einstellungen leeren.
 3. Unter *Einstellungen → Geräte & Dienste → Integration hinzufügen* „FF Agent“ wählen.
 
 **Manuell:**
@@ -71,6 +74,9 @@ Agent auf. Daten kommen ausschließlich per Push von FF Agent, es gibt kein Abfr
 1. Den Ordner `custom_components/ff_agent` in das Verzeichnis `custom_components` deiner
    Home-Assistant-Konfiguration kopieren.
 2. Home Assistant neu starten.
+   **Nach jedem Update:** Home Assistant neu starten und die Seite im Browser hart neu
+   laden (Strg+F5, am Mac Cmd+Umschalt+R). In der Companion-App die App neu starten bzw.
+   den Frontend-Cache in den App-Einstellungen leeren.
 3. Die Integration wie oben hinzufügen.
 
 ## Wie kommt der Alarm an?
@@ -110,7 +116,16 @@ Schritt für Schritt durch den gewählten Weg. Wechseln kannst du später jederz
 
    Die Integration sendet dabei **nichts** an FF Agent, denn jeder Test wäre eine echte
    Zusage.
-3. **Alarmweg wählen.** Auf die Frage „Nutzt du Home Assistant Cloud?“ antwortest du mit
+3. **Zusage-Einstellungen wählen.** Der Schritt „Zusage: Verkehrsmittel und Standort“ fragt:
+   - **Standard-Verkehrsmittel:** „Auto“, „Zu Fuß“ oder „Fahrrad“. Es wird bei jeder
+     Zusage mitgesendet, wenn die Action keines angibt.
+   - **Standort-Entität (optional):** eine Person oder ein Geräte-Tracker. Sein aktueller
+     Standort wird bei jeder Zusage mitgesendet. Leer lassen, um keinen Standort zu senden.
+
+   Die Rückmelde-URL bleibt dabei unverändert; gespeichert werden wie bisher nur UUID und Host.
+   Verkehrsmittel und Standort hängt die Integration bei jeder Zusage an. Jetzt wird nichts
+   gesendet. Beide Angaben änderst du später unter *Konfigurieren*.
+4. **Alarmweg wählen.** Auf die Frage „Nutzt du Home Assistant Cloud?“ antwortest du mit
    „Ja (empfohlen)“ (weiter mit [Weg A](#weg-a-home-assistant-cloud-oder-eigene-adresse))
    oder „Nein“ (Hinweis auf ntfy, weiter mit [Weg B](#weg-b-ntfy-kostenlos)). Ist Home
    Assistant Cloud schon aktiv, sagt die Frage das, entscheidet aber nicht für dich.
@@ -184,8 +199,8 @@ besten in einem neuen Tab und lass den Dialog offen.
    Header, Inhalt und Query-Parameter bleiben **leer**.
 4. **In der FF-Agent-Einrichtung „Erledigt“ wählen.** Die Integration sucht die Entität des
    Themas selbst. Nur wenn sie nichts findet, wählst du sie aus (oder ein Thema, das du
-   schon abonniert hast). Der Abschlussdialog zeigt die Werte für FF Agent noch einmal mit
-   der Adresse des tatsächlichen Abos.
+   schon abonniert hast). Der Abschlussdialog wiederholt die Werte nur, wenn die gewählte
+   Entität eine andere Adresse hat als angezeigt.
 5. **Mit einem Testalarm prüfen:** „Alarm aktiv“ springt an.
 
 Die Reihenfolge ist wichtig: Erst abonnieren, dann in FF Agent eintragen. ntfy liefert
@@ -234,7 +249,7 @@ zurück erhalten).
 | Zusatz-Token verlangen | Wie oben. Standard: aus. |
 | Rücksetzzeit „Alarm aktiv“ | Minuten ohne neuen Alarm, nach denen „Alarm aktiv“ ausgeht (1 bis 1440, Standard 30). Ein neuer Alarm startet die Zeit neu. |
 | Standard-Verkehrsmittel | Wird beim Zusagen gesendet, wenn die Action keines angibt. Zur Auswahl stehen „Auto“, „Zu Fuß“ und „Fahrrad“. |
-| Standort-Entität | Optional: eine Person oder ein Gerät-Tracker. Sein Standort wird beim Zusagen mitgesendet. Leer lassen, um keinen Standort zu senden. |
+| Standort-Entität | Optional: eine Person oder ein Geräte-Tracker. Sein Standort wird beim Zusagen mitgesendet. Leer lassen, um keinen Standort zu senden. |
 
 **Wichtig:** Das Speichern der Optionen lädt die Integration neu. Ein gerade aktiver Alarm
 wird dabei **zurückgesetzt** („Alarm aktiv“ geht aus, das Zeitfenster gegen Doppelalarme
@@ -250,7 +265,10 @@ ist wieder offen). Ändere Optionen deshalb nicht mitten in einem Einsatz.
   Beispiel nach dem Neuerzeugen der UUID in FF Agent. Leer bedeutet unverändert. Die
   bisherige URL wird nicht angezeigt. Gehört die neue URL zu einer anderen vorhandenen
   Einrichtung, bricht der Dialog ab.
-- **Weg für den Alarm:** Home Assistant Cloud bzw. eigene Internetadresse oder ntfy. Beim
+- **Wie bekommt Home Assistant den Alarm?** Über Home Assistant Cloud oder eine eigene
+  Internetadresse (empfohlen; Voraussetzung: ein Cloud-Abo oder eine aus dem Internet
+  erreichbare Adresse, also IP-Adresse oder Domain) oder kostenlos über ntfy (kein Abo,
+  Home Assistant muss nicht aus dem Internet erreichbar sein). Beim
   Wechsel führt dich derselbe Einrichtungsdialog wie bei der Einrichtung durch die
   Schritte. Danach den alten Webhook in FF Agent löschen. Ein Cloudhook wird beim Wechsel
   zu ntfy gelöscht. Bleibst du bei ntfy und änderst nur die Rückmelde-URL, speichert der
@@ -282,6 +300,7 @@ Alle Entitäten gehören zu einem Gerät je Eintrag (Typ Dienst).
 | Letzte Rückmeldung | Sensor | `Zugesagt`, `Abgesagt` oder `Fehlgeschlagen` |
 | Zusagen | Button | Sagt mit Standard-Verkehrsmittel und optional Standort zu |
 | Absagen | Button | Sagt ab |
+| Alarm zurücksetzen | Button | Schaltet „Alarm aktiv“ sofort aus und beendet die Rücksetzzeit. „Letzter Alarm“ bleibt, und das 30-Sekunden-Fenster gegen Doppelalarme läuft weiter: Eine Wiederholung desselben Alarms schaltet „Alarm aktiv“ nicht wieder ein, ein neuer Alarm danach schon. Ohne aktiven Alarm passiert nichts, an FF Agent wird nichts gesendet. |
 
 Die Entity-IDs beginnen mit dem Namen des Eintrags, zum Beispiel
 `event.ff_agent_alarm` und `binary_sensor.ff_agent_alarm_aktiv`. Der Rest hängt von Name
@@ -298,7 +317,7 @@ und würde auslösen, etwa nach dem Speichern der Optionen.
 
 <!-- docs-actions -->
 
-Beide Actions brauchen die ID des Eintrags (`config_entry_id`). Wähle ihn in der
+Alle Actions brauchen die ID des Eintrags (`config_entry_id`). Wähle ihn in der
 Oberfläche über die Auswahl „Eintrag“.
 
 - **`ff_agent.accept`** (Zusagen)
@@ -312,6 +331,9 @@ Oberfläche über die Auswahl „Eintrag“.
     Standort.
 - **`ff_agent.reject`** (Absagen)
   - `config_entry_id` (Pflicht)
+- **`ff_agent.reset_alarm`** (Alarm zurücksetzen)
+  - `config_entry_id` (Pflicht): der Eintrag der Person, deren „Alarm aktiv“ ausgehen soll.
+    Wirkt wie der Button: kein Aufruf an FF Agent, ohne aktiven Alarm passiert nichts.
 
 Die Rückmeldung bezieht sich auf den **aktuellen Einsatz** in FF Agent. Zu- und Absage
 funktionieren nur, wenn die Person für diesen Einsatz alarmiert wurde (wie in der
@@ -462,8 +484,8 @@ Entity-IDs beginnen mit dem Namen des Eintrags in Kleinbuchstaben und mit Unters
 Beim Standardnamen „FF Agent“ ist das `*ff_agent*`; heißt dein Eintrag anders, setze den
 passenden Namen ein oder liste die IDs einzeln unter `entities:` auf. So findest du sie: *Einstellungen →
 Geräte & Dienste → FF Agent → Gerät → Entitäten*, oder *Einstellungen → Entitäten* mit der
-Suche nach dem Namen des Eintrags. Es sind sechs Entitäten (Binary-Sensor, Event,
-zwei Sensoren, zwei Buttons).
+Suche nach dem Namen des Eintrags. Es sind sieben Entitäten (Binary-Sensor, Event,
+zwei Sensoren, drei Buttons).
 
 ## Bekannte Einschränkungen
 
@@ -538,6 +560,11 @@ gezeigt.
 `url_kind`, `calls_total`, `rejected_total`, die Form des letzten Aufrufs und das Ergebnis
 der letzten Rückmeldung (ohne Adresse).
 
+**Dialoge ohne Text oder mit alten Texten:** Die Ursache ist meist der Browser-Cache. Ein
+Neustart von Home Assistant allein reicht nicht: Lade die Seite hart neu (Strg+F5, am Mac
+Cmd+Umschalt+R). In der Companion-App die App neu starten bzw. den Frontend-Cache in den
+App-Einstellungen leeren.
+
 **„Alarm kommt nicht an“**
 
 - Art der Adresse (`url_kind`): `internal` oder `path_only` erreicht FF Agent nicht. Home
@@ -574,7 +601,7 @@ der letzten Rückmeldung (ohne Adresse).
 (siehe Entitäten).
 
 **„Alarm aktiv“ ging unerwartet aus:** Ein Neustart, Reload, Speichern der Optionen oder
-ein Reconfigure setzt den Zustand zurück.
+ein Reconfigure setzt den Zustand zurück. Auch der Button oder die Action „Alarm zurücksetzen“ schaltet ihn aus, wenn jemand sie ausgelöst hat (zum Beispiel eine Automation).
 
 **Zusage meldet einen Fehler:** Prüfe die Internetverbindung und, ob in FF Agent für den
 aktuellen Einsatz eine Rückmeldung möglich ist (die Person muss dafür alarmiert worden
@@ -612,7 +639,8 @@ is a pre-release that has not yet been tested against a real FF Agent account.
   "Reconfigure". The integration exposes an `Alarm` event entity (use it as automation trigger), an "Alarm
   active" binary sensor with a configurable reset time, the time of the last alarm, and
   accept/decline buttons and actions (`ff_agent.accept`, `ff_agent.reject`) that call your
-  personal reply URL.
+  personal reply URL, and a "Reset alarm" button and action (`ff_agent.reset_alarm`) that
+  switches "Alarm active" off by hand without contacting FF Agent.
 - **What it does not do:** trigger alarms, provide mission details, or tell test alarms from
   real ones.
 - **Setup:** copy your accept URL from FF Agent into the config flow, then create a generic

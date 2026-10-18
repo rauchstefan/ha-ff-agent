@@ -760,11 +760,8 @@ async def test_webhook_to_ntfy(
 
     assert result["type"] is FlowResultType.ABORT
     assert result["reason"] == "reconfigure_successful_ntfy"
-    publish_url = f"https://ntfy.sh/{topic}/trigger"
-    assert result["description_placeholders"] == {
-        **LINKS,
-        "ntfy_publish_url": publish_url,
-    }
+    # The guide showed exactly this URL, so the closing text does not repeat it.
+    assert result["description_placeholders"] == LINKS
     data = cloudhook_entry.data
     assert data[CONF_ALARM_SOURCE] == "ntfy"
     assert data[CONF_NTFY_ENTITY_UUID] == registry_entry.id
@@ -968,9 +965,10 @@ async def test_ntfy_own_entity_is_not_in_use(
 
     result = await _submit(hass, result["flow_id"], {"ntfy_entity": NTFY_ENTITY_ID})
 
-    # The topic is read from the entity, so it stays; the webhook values are new.
+    # The topic is read from the entity, so it stays; the guide showed a new one, so
+    # the closing text repeats the full values.
     assert result["type"] is FlowResultType.ABORT
-    assert result["reason"] == "reconfigure_successful_ntfy"
+    assert result["reason"] == "reconfigure_successful_ntfy_other_address"
     assert result["description_placeholders"]["ntfy_publish_url"] == NTFY_PUBLISH_URL
     assert ntfy_entry.data[CONF_NTFY_TOPIC] == NTFY_TOPIC
     assert ntfy_entry.data[CONF_WEBHOOK_ID] != WEBHOOK_ID

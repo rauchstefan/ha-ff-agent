@@ -10,9 +10,10 @@ from typing import Any
 from unittest.mock import patch
 
 import pytest
+import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.config_entries import ConfigEntry, ConfigEntryState
-from homeassistant.const import CONF_NAME, CONF_WEBHOOK_ID
+from homeassistant.const import ATTR_ENTITY_ID, CONF_NAME, CONF_WEBHOOK_ID
 from homeassistant.core import HomeAssistant
 from homeassistant.core_config import async_process_ha_core_config
 from homeassistant.data_entry_flow import FlowResult, FlowResultType
@@ -26,6 +27,7 @@ from custom_components.ff_agent.const import (
     CONF_CLOUDHOOK_URL,
     CONF_DEFAULT_TRANSPORT,
     CONF_HEADER_TOKEN,
+    CONF_LOCATION_ENTITY,
     CONF_NTFY_ENTITY,
     CONF_NTFY_ENTITY_UUID,
     CONF_NTFY_SERVER,
@@ -48,9 +50,11 @@ from custom_components.ff_agent.webhook_url import UrlKind
 
 from .common import add_ntfy_entity, add_ntfy_entry, patch_cloud
 from .const import (
+    ACCEPT_URL,
     CLOUDHOOK_URL,
     EXTERNAL_URL,
     INTERNAL_URL,
+    LOCATION_ENTITY,
     NTFY_ENTITY_ID,
     OTHER_NTFY_ENTITY_ID,
     OTHER_NTFY_SUBENTRY_ID,
@@ -72,6 +76,8 @@ LINKS = {
     "ntfy_integration_url": MY_NTFY_INTEGRATION_URL,
 }
 TOPIC = re.compile(r"^[0-9a-f]{32}$")
+# What the step "reply_settings" gets in the helpers below: the default answer.
+DEFAULT_SETTINGS = {CONF_DEFAULT_TRANSPORT: "car"}
 
 
 async def _start_flow(hass: HomeAssistant) -> FlowResult:
@@ -85,10 +91,21 @@ async def _submit(
     flow_id: str,
     reply_url: str = REPLY_URL,
     name: str = "Test Person",
+    settings: dict[str, Any] | None = DEFAULT_SETTINGS,
 ) -> FlowResult:
+    """Enter name and reply URL, then answer the step "reply_settings" if it comes.
+
+    With ``settings=None`` the flow stops at that step.
+    """
     result = await hass.config_entries.flow.async_configure(
         flow_id, {CONF_NAME: name, CONF_REPLY_URL: reply_url}
     )
+    if (
+        settings is not None
+        and result["type"] is FlowResultType.FORM
+        and result["step_id"] == "reply_settings"
+    ):
+        result = await hass.config_entries.flow.async_configure(flow_id, settings)
     await hass.async_block_till_done()
     return result
 
@@ -193,6 +210,193 @@ async def test_first_question_with_cloud_only_changes_the_text(
     assert result["menu_options"] == ["cloud", "no_cloud"]
     cloud_mocks["get_or_create"].assert_not_called()
     assert hass.config_entries.async_entries(DOMAIN) == []
+
+
+# --- The step "reply_settings" -----------------------
+
+SETTINGS = {CONF_DEFAULT_TRANSPORT: "bicycle", CONF_LOCATION_ENTITY: LOCATION_ENTITY}
+
+
+async def _create_via(
+    hass: HomeAssistant, path: str, settings: dict[str, Any]
+) -> FlowResult:
+    """Run the whole flow to the end of the given path and return the last result."""
+    if path == "external":
+        await async_process_ha_core_config(hass, {"external_url": EXTERNAL_URL})
+    result = await _start_flow(hass)
+    result = await _submit(hass, result["flow_id"], settings=settings)
+    flow_id = result["flow_id"]
+    if path == "ntfy":
+        result = await _choose(hass, flow_id, "no_cloud")
+        result = await _choose(hass, flow_id, "ntfy")
+        _subscribe(hass, result["description_placeholders"]["ntfy_topic"])
+        return await _choose(hass, flow_id, "ntfy_find")
+    result = await _choose(hass, flow_id, "cloud")
+    if path == "webhook_anyway":
+        result = await _choose(hass, flow_id, "webhook_anyway")
+    return result
+
+
+async def test_reply_settings_follow_the_reply_url(hass: HomeAssistant) -> None:
+    """After the reply URL the flow asks for transport and location, nothing else."""
+    result = await _start_flow(hass)
+
+    result = await _submit(hass, result["flow_id"], settings=None)
+
+    assert result["type"] is FlowResultType.FORM
+    assert result["step_id"] == "reply_settings"
+    schema = result["data_schema"].schema
+    assert set(schema) == {CONF_DEFAULT_TRANSPORT, CONF_LOCATION_ENTITY}
+    transport = next(key for key in schema if key == CONF_DEFAULT_TRANSPORT)
+    location = next(key for key in schema if key == CONF_LOCATION_ENTITY)
+    assert isinstance(transport, vol.Required)
+    assert transport.default() == "car"
+    assert isinstance(location, vol.Optional)
+    assert hass.config_entries.async_entries(DOMAIN) == []
+
+
+@pytest.mark.parametrize("path", ["external", "webhook_anyway", "ntfy"])
+async def test_reply_settings_land_in_the_options(
+    hass: HomeAssistant, path: str
+) -> None:
+    """Every end of the flow stores the answers as the options of the entry."""
+    result = await _create_via(hass, path, SETTINGS)
+
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    assert result["result"].options == {
+        CONF_RESET_MINUTES: 30,
+        CONF_DEFAULT_TRANSPORT: "bicycle",
+        CONF_REQUIRE_TOKEN: False,
+        CONF_LOCATION_ENTITY: LOCATION_ENTITY,
+    }
+
+
+async def test_reply_settings_without_a_location(hass: HomeAssistant) -> None:
+    """No location entity: the option is missing altogether, not None."""
+    result = await _create_via(hass, "external", {CONF_DEFAULT_TRANSPORT: "feet"})
+
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    assert result["result"].options == {
+        CONF_RESET_MINUTES: 30,
+        CONF_DEFAULT_TRANSPORT: "feet",
+        CONF_REQUIRE_TOKEN: False,
+    }
+
+
+async def test_reply_settings_reach_the_accept_button(
+    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+) -> None:
+    """An entry created with "on foot" accepts with transport=FEET."""
+    aioclient_mock.get(ACCEPT_URL)
+    result = await _create_via(hass, "external", {CONF_DEFAULT_TRANSPORT: "feet"})
+    entry: ConfigEntry = result["result"]
+    button_id = er.async_get(hass).async_get_entity_id(
+        "button", DOMAIN, f"{entry.entry_id}_accept"
+    )
+    assert button_id is not None
+
+    await hass.services.async_call(
+        "button", "press", {ATTR_ENTITY_ID: button_id}, blocking=True
+    )
+
+    assert aioclient_mock.call_count == 1
+    assert dict(aioclient_mock.mock_calls[0][1].query) == {"transport": "FEET"}
+
+
+async def _end_of_path(
+    hass: HomeAssistant, path: str, settings: dict[str, Any]
+) -> FlowResult:
+    """Run the flow to one of the remaining ends and return the last result."""
+    result = await _start_flow(hass)
+    result = await _submit(hass, result["flow_id"], settings=settings)
+    flow_id = result["flow_id"]
+    if path == "cloud":
+        with patch_cloud(hass):
+            return await _choose(hass, flow_id, "cloud")
+    if path in ("internal", "path_only"):
+        result = await _choose(hass, flow_id, "cloud")
+        assert result["step_id"] == "cloud_setup"
+        if path == "internal":
+            await async_process_ha_core_config(hass, {"internal_url": INTERNAL_URL})
+            return await _choose(hass, flow_id, "webhook_anyway")
+        with patch(
+            "custom_components.ff_agent.config_flow.async_local_webhook_url",
+            return_value=(PATH, UrlKind.PATH_ONLY),
+        ):
+            return await _choose(hass, flow_id, "webhook_anyway")
+    # ntfy with an entity whose topic cannot be read, or with another topic
+    result = await _choose(hass, flow_id, "no_cloud")
+    result = await _choose(hass, flow_id, "ntfy")
+    result = await _choose(hass, flow_id, "ntfy_find")
+    if path == "ntfy_topic_unknown":
+        orphan = er.async_get(hass).async_get_or_create(
+            "event", "ntfy", "orphan", suggested_object_id="ff_agent_alarm_orphan"
+        )
+        return await _configure(hass, flow_id, {CONF_NTFY_ENTITY: orphan.entity_id})
+    ntfy_entry = add_ntfy_entry(
+        hass, {OTHER_NTFY_SUBENTRY_ID: OTHER_NTFY_TOPIC}, url=OWN_NTFY_SERVER
+    )
+    add_ntfy_entity(hass, ntfy_entry, OTHER_NTFY_SUBENTRY_ID, OTHER_NTFY_ENTITY_ID)
+    return await _configure(hass, flow_id, {CONF_NTFY_ENTITY: OTHER_NTFY_ENTITY_ID})
+
+
+@pytest.mark.parametrize(
+    ("path", "description"),
+    [
+        ("cloud", "cloud"),
+        ("internal", "internal"),
+        ("path_only", "path_only"),
+        ("ntfy_topic_unknown", "ntfy_topic_unknown"),
+        ("ntfy_other_address", "ntfy_other_address"),
+    ],
+)
+async def test_reply_settings_land_in_the_options_on_every_other_end(
+    hass: HomeAssistant, path: str, description: str
+) -> None:
+    """The remaining ends of the flow store the answers as well."""
+    result = await _end_of_path(hass, path, SETTINGS)
+
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    assert result["description"] == description
+    assert dict(result["result"].options) == {
+        CONF_RESET_MINUTES: 30,
+        CONF_DEFAULT_TRANSPORT: "bicycle",
+        CONF_REQUIRE_TOKEN: False,
+        CONF_LOCATION_ENTITY: LOCATION_ENTITY,
+    }
+
+
+async def test_reply_settings_can_be_changed_afterwards(hass: HomeAssistant) -> None:
+    """The options flow shows the values of the setup and saves new ones."""
+    result = await _create_via(hass, "external", SETTINGS)
+    entry: ConfigEntry = result["result"]
+
+    flow = await hass.config_entries.options.async_init(entry.entry_id)
+    assert flow["type"] is FlowResultType.FORM
+    saved = await hass.config_entries.options.async_configure(
+        flow["flow_id"],
+        {
+            CONF_REQUIRE_TOKEN: False,
+            CONF_RESET_MINUTES: 30,
+            CONF_DEFAULT_TRANSPORT: "feet",
+        },
+    )
+    await hass.async_block_till_done()
+
+    assert saved["type"] is FlowResultType.CREATE_ENTRY
+    assert entry.options[CONF_DEFAULT_TRANSPORT] == "feet"
+    assert CONF_LOCATION_ENTITY not in entry.options
+
+
+async def test_reply_settings_location_is_not_logged(
+    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+) -> None:
+    """The location entity is personal data and never reaches the log."""
+    caplog.set_level(logging.DEBUG, logger="custom_components.ff_agent")
+
+    await _create_via(hass, "external", SETTINGS)
+
+    assert LOCATION_ENTITY not in caplog.text
 
 
 # --- The cloud path -----------------------
@@ -584,11 +788,8 @@ async def test_ntfy_find_creates_the_entry(
 
     assert result["type"] is FlowResultType.CREATE_ENTRY
     assert result["description"] == "ntfy"
-    publish_url = f"https://ntfy.sh/{topic}/trigger"
-    assert result["description_placeholders"] == {
-        **LINKS,
-        "ntfy_publish_url": publish_url,
-    }
+    # The guide showed exactly this URL, so the closing text does not repeat it.
+    assert result["description_placeholders"] == LINKS
     _assert_placeholders(result)
     entry: ConfigEntry = result["result"]
     assert entry.data == {
@@ -672,6 +873,8 @@ async def test_ntfy_select_takes_an_existing_subscription(
     )
 
     assert result["type"] is FlowResultType.CREATE_ENTRY
+    # The topic differs from the one in the guide, so the full values are shown.
+    assert result["description"] == "ntfy_other_address"
     data = result["result"].data
     assert data[CONF_NTFY_ENTITY_UUID] == registry_entry.id
     assert data[CONF_NTFY_TOPIC] == OTHER_NTFY_TOPIC
@@ -679,6 +882,30 @@ async def test_ntfy_select_takes_an_existing_subscription(
     assert result["description_placeholders"]["ntfy_publish_url"] == (
         f"https://ntfy.example.com/{OTHER_NTFY_TOPIC}/trigger"
     )
+    _assert_placeholders(result)
+
+
+async def test_ntfy_other_server_with_the_same_topic_shows_the_full_values(
+    hass: HomeAssistant,
+) -> None:
+    """The guide named ntfy.sh, the subscription uses an own server: other URL."""
+    result = await _to_ntfy_guide(hass)
+    topic = result["description_placeholders"]["ntfy_topic"]
+    assert result["description_placeholders"]["ntfy_publish_url"].startswith(
+        "https://ntfy.sh/"
+    )
+    ntfy_entry = add_ntfy_entry(hass, {"subentry-flow": topic}, url=OWN_NTFY_SERVER)
+    add_ntfy_entity(hass, ntfy_entry, "subentry-flow")
+
+    result = await _choose(hass, result["flow_id"], "ntfy_find")
+
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    assert result["description"] == "ntfy_other_address"
+    assert result["description_placeholders"]["ntfy_publish_url"] == (
+        f"https://ntfy.example.com/{topic}/trigger"
+    )
+    assert result["result"].data[CONF_NTFY_SERVER] == OWN_NTFY_SERVER
+    _assert_placeholders(result)
 
 
 async def test_ntfy_select_refuses_foreign_entities(hass: HomeAssistant) -> None:

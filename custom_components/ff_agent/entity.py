@@ -6,7 +6,7 @@ from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
 from homeassistant.helpers.entity import Entity
 
 from .alarm import AlarmManager
-from .const import CONFIGURATION_URL, DOMAIN, MANUFACTURER, MODEL
+from .const import DOMAIN, MANUFACTURER, MODEL
 from .models import FFAgentConfigEntry
 
 
@@ -32,5 +32,7 @@ class FFAgentEntity(Entity):
             manufacturer=MANUFACTURER,
             model=MODEL,
             entry_type=DeviceEntryType.SERVICE,
-            configuration_url=CONFIGURATION_URL,
+            # An explicit None clears the link of devices created by earlier versions;
+            # leaving the field out would keep the stored value.
+            configuration_url=None,
         )
