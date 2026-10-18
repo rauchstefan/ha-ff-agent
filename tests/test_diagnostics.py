@@ -432,7 +432,9 @@ async def test_diagnostics_of_the_ntfy_mode_without_entity(
     """A missing entity is reported as such, without counters."""
     ntfy_entry.add_to_hass(hass)
     hass.config_entries.async_update_entry(
-        ntfy_entry, data={**ntfy_entry.data, "ntfy_entity_uuid": "missing"}
+        ntfy_entry,
+        # A topic nobody subscribed to, so the entry cannot adopt a subscription.
+        data={**ntfy_entry.data, "ntfy_entity_uuid": "missing", "ntfy_topic": "x"},
     )
     await _setup(hass, ntfy_entry)
 

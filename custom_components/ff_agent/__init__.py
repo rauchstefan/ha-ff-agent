@@ -33,8 +33,12 @@ from .const import (
     SOURCE_WEBHOOK,
     WEBHOOK_ALLOWED_METHODS,
 )
-from .models import FFAgentConfigEntry, FFAgentData
-from .ntfy_source import NtfyAlarmSource, async_describe_entity
+from .models import FFAgentConfigEntry, FFAgentData, NtfySubscription
+from .ntfy_source import (
+    NtfyAlarmSource,
+    async_describe_entity,
+    async_find_subscription_by_topic,
+)
 from .reply import ReplyClient
 from .services import async_setup_services
 from .webhook import async_build_handler
@@ -155,6 +159,62 @@ def _async_create_ntfy_issue(hass: HomeAssistant, entry: FFAgentConfigEntry) -> 
 
 
 @callback
+def _async_adopt_subscription(
+    hass: HomeAssistant, entry: FFAgentConfigEntry
+) -> NtfySubscription | None:
+    """Find the subscription of the stored topic and store its entity.
+
+    Subscribing to the topic again creates a new subentry and a new entity, so the
+    stored registry UUID is lost. The topic is the same, so the entry finds the new
+    entity by it. An entity that another entry uses is not taken.
+    """
+    topic = entry.data.get(CONF_NTFY_TOPIC)
+    if not topic:
+        return None
+    subscription = async_find_subscription_by_topic(hass, topic)
+    if subscription is None or any(
+        other.entry_id != entry.entry_id
+        and other.data.get(CONF_ALARM_SOURCE) == SOURCE_NTFY
+        and other.data.get(CONF_NTFY_ENTITY_UUID) == subscription.entity_uuid
+        for other in hass.config_entries.async_entries(DOMAIN)
+    ):
+        return None
+    hass.config_entries.async_update_entry(
+        entry,
+        data={
+            **entry.data,
+            CONF_NTFY_ENTITY_UUID: subscription.entity_uuid,
+            CONF_NTFY_SERVER: subscription.server or entry.data.get(CONF_NTFY_SERVER),
+        },
+    )
+    _LOGGER.debug("Adopted a new ntfy subscription of the stored topic")
+    return subscription
+
+
+@callback
+def _async_watch_for_subscription(
+    hass: HomeAssistant, entry: FFAgentConfigEntry
+) -> None:
+    """Wait for a new entity that subscribes to the stored topic, then reload."""
+
+    @callback
+    def _async_registry_created(
+        event: Event[er.EventEntityRegistryUpdatedData],
+    ) -> None:
+        """Adopt a new ntfy entity of the topic and reload the entry."""
+        if event.data["action"] != "create":
+            return
+        if _async_adopt_subscription(hass, entry) is not None:
+            hass.config_entries.async_schedule_reload(entry.entry_id)
+
+    entry.async_on_unload(
+        hass.bus.async_listen(
+            er.EVENT_ENTITY_REGISTRY_UPDATED, _async_registry_created
+        )
+    )
+
+
+@callback
 def _async_setup_ntfy(
     hass: HomeAssistant, entry: FFAgentConfigEntry, alarm: AlarmManager
 ) -> None:
@@ -164,6 +224,13 @@ def _async_setup_ntfy(
     working, and a repair issue tells the user what to do.
     """
     uuid = entry.data.get(CONF_NTFY_ENTITY_UUID)
+    subscription = async_describe_entity(hass, uuid) if uuid else None
+    if subscription is None:
+        # A new subscription of the same topic has a new entity: adopt it.
+        subscription = _async_adopt_subscription(hass, entry)
+        if subscription is not None:
+            uuid = subscription.entity_uuid
+
     registry = er.async_get(hass)
     entity_id = er.async_resolve_entity_id(registry, uuid) if uuid else None
     registry_entry = registry.async_get(entity_id) if entity_id else None
@@ -180,6 +247,7 @@ def _async_setup_ntfy(
                 _async_create_ntfy_issue(hass, entry)
                 if entry.runtime_data.source is not None:
                     entry.runtime_data.source.async_stop()
+                _async_watch_for_subscription(hass, entry)
             elif data["action"] == "update":
                 if NTFY_RELOAD_CHANGES.intersection(data["changes"]):
                     hass.config_entries.async_schedule_reload(entry.entry_id)
@@ -190,9 +258,9 @@ def _async_setup_ntfy(
             )
         )
 
-    subscription = async_describe_entity(hass, uuid) if uuid else None
     if subscription is None:
         _async_create_ntfy_issue(hass, entry)
+        _async_watch_for_subscription(hass, entry)
         return
 
     ir.async_delete_issue(

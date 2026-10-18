@@ -26,6 +26,7 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.ff_agent.const import (
     CONF_NTFY_ENTITY_UUID,
+    CONF_NTFY_TOPIC,
     DOMAIN,
     ISSUE_NTFY_ENTITY_MISSING,
 )
@@ -81,12 +82,20 @@ def _issue(hass: HomeAssistant, entry: MockConfigEntry) -> ir.IssueEntry | None:
 
 
 async def _setup_with_uuid(
-    hass: HomeAssistant, entry: MockConfigEntry, uuid: str | None
+    hass: HomeAssistant,
+    entry: MockConfigEntry,
+    uuid: str | None,
+    topic: str | None = OTHER_NTFY_TOPIC,
 ) -> None:
-    """Set up the entry with another stored registry UUID."""
+    """Set up the entry with another stored registry UUID.
+
+    By default the stored topic is one nobody subscribed to, so the entry cannot
+    adopt a subscription by its topic.
+    """
     entry.add_to_hass(hass)
     hass.config_entries.async_update_entry(
-        entry, data={**entry.data, CONF_NTFY_ENTITY_UUID: uuid}
+        entry,
+        data={**entry.data, CONF_NTFY_ENTITY_UUID: uuid, CONF_NTFY_TOPIC: topic},
     )
     assert await hass.config_entries.async_setup(entry.entry_id)
     await hass.async_block_till_done()
@@ -738,7 +747,9 @@ async def test_setup_without_a_valid_entity(
         uuid = None
     aioclient_mock.get(ACCEPT_URL)
 
-    await _setup_with_uuid(hass, ntfy_entry, uuid)
+    # Without a UUID there is no topic either (an entry whose topic was unreadable).
+    topic = None if case == "no uuid" else OTHER_NTFY_TOPIC
+    await _setup_with_uuid(hass, ntfy_entry, uuid, topic)
 
     assert ntfy_entry.state is ConfigEntryState.LOADED
     assert ntfy_entry.runtime_data.source is None
@@ -837,3 +848,109 @@ async def test_listener_logs_neither_topic_nor_entity_id(
         assert message in ours
     assert NTFY_TOPIC not in ours
     assert NTFY_ENTITY_ID not in ours
+
+
+# --- A new subscription of the same topic (self-healing) -----------------------
+
+
+async def test_new_subscription_of_the_same_topic_heals_the_entry(
+    hass: HomeAssistant, frozen: FrozenDateTimeFactory, ntfy_entry: MockConfigEntry
+) -> None:
+    """Removed, then subscribed again with the same topic: alarms arrive again."""
+    await async_setup_entry(hass, ntfy_entry)
+    old_uuid = ntfy_entry.data[CONF_NTFY_ENTITY_UUID]
+    er.async_get(hass).async_remove(NTFY_ENTITY_ID)
+    await hass.async_block_till_done()
+    assert _issue(hass, ntfy_entry) is not None
+
+    # The ntfy integration creates a new subentry and a new entity for the topic.
+    new_ntfy_entry = add_ntfy_entry(
+        hass, {OTHER_NTFY_SUBENTRY_ID: NTFY_TOPIC}, url=OWN_NTFY_SERVER
+    )
+    new_entity = add_ntfy_entity(
+        hass, new_ntfy_entry, OTHER_NTFY_SUBENTRY_ID, OTHER_NTFY_ENTITY_ID
+    )
+    await hass.async_block_till_done()
+
+    assert ntfy_entry.data[CONF_NTFY_ENTITY_UUID] == new_entity.id != old_uuid
+    assert ntfy_entry.data[CONF_NTFY_TOPIC] == NTFY_TOPIC
+    assert ntfy_entry.data["ntfy_server"] == OWN_NTFY_SERVER
+    assert _issue(hass, ntfy_entry) is None
+    assert ntfy_entry.state is ConfigEntryState.LOADED
+    assert ntfy_entry.runtime_data.source is not None
+    old = dt_util.utcnow() - timedelta(hours=1)
+    fire_ntfy(hass, old, entity_id=OTHER_NTFY_ENTITY_ID)
+    await hass.async_block_till_done()
+    fire_ntfy(hass, entity_id=OTHER_NTFY_ENTITY_ID)
+    await hass.async_block_till_done()
+    assert ntfy_entry.runtime_data.alarm.alarms_total == 1
+
+
+async def test_new_subscription_of_another_topic_keeps_the_issue(
+    hass: HomeAssistant, ntfy_entry: MockConfigEntry
+) -> None:
+    """Another topic is not the one FF Agent calls: the hint stays."""
+    await async_setup_entry(hass, ntfy_entry)
+    old_uuid = ntfy_entry.data[CONF_NTFY_ENTITY_UUID]
+    alarm = ntfy_entry.runtime_data.alarm
+    er.async_get(hass).async_remove(NTFY_ENTITY_ID)
+    await hass.async_block_till_done()
+
+    new_ntfy_entry = add_ntfy_entry(hass, {OTHER_NTFY_SUBENTRY_ID: OTHER_NTFY_TOPIC})
+    add_ntfy_entity(hass, new_ntfy_entry, OTHER_NTFY_SUBENTRY_ID, OTHER_NTFY_ENTITY_ID)
+    await hass.async_block_till_done()
+
+    assert _issue(hass, ntfy_entry) is not None
+    assert ntfy_entry.data[CONF_NTFY_ENTITY_UUID] == old_uuid
+    assert ntfy_entry.runtime_data.alarm is alarm
+
+
+async def test_setup_adopts_a_new_subscription_of_the_topic(
+    hass: HomeAssistant, ntfy_entry: MockConfigEntry, ntfy_entity: er.RegistryEntry
+) -> None:
+    """An unknown stored entity, but the topic is subscribed: no issue at all."""
+    await _setup_with_uuid(hass, ntfy_entry, "missing", NTFY_TOPIC)
+
+    assert ntfy_entry.data[CONF_NTFY_ENTITY_UUID] == ntfy_entity.id
+    assert _issue(hass, ntfy_entry) is None
+    assert ntfy_entry.runtime_data.source is not None
+
+
+async def test_setup_does_not_take_the_entity_of_another_entry(
+    hass: HomeAssistant,
+    ntfy_entry: MockConfigEntry,
+    ntfy_entity: er.RegistryEntry,
+    other_entry: MockConfigEntry,
+) -> None:
+    """The subscription of the topic belongs to another person: the hint stays."""
+    other_entry.add_to_hass(hass)
+    hass.config_entries.async_update_entry(
+        other_entry,
+        data={
+            **other_entry.data,
+            "alarm_source": "ntfy",
+            CONF_NTFY_ENTITY_UUID: ntfy_entity.id,
+        },
+    )
+
+    await _setup_with_uuid(hass, ntfy_entry, "missing", NTFY_TOPIC)
+
+    assert ntfy_entry.data[CONF_NTFY_ENTITY_UUID] == "missing"
+    assert _issue(hass, ntfy_entry) is not None
+    assert ntfy_entry.runtime_data.source is None
+
+
+async def test_other_registry_entities_do_not_disturb_the_watch(
+    hass: HomeAssistant, ntfy_entry: MockConfigEntry
+) -> None:
+    """Unrelated new entities and updates leave the entry as it is."""
+    await _setup_with_uuid(hass, ntfy_entry, "missing")
+    alarm = ntfy_entry.runtime_data.alarm
+    registry = er.async_get(hass)
+
+    created = registry.async_get_or_create("sensor", "demo", "unrelated")
+    registry.async_update_entity(created.entity_id, name="Unrelated")
+    await hass.async_block_till_done()
+
+    assert ntfy_entry.runtime_data.alarm is alarm
+    assert _issue(hass, ntfy_entry) is not None
