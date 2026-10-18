@@ -18,11 +18,33 @@
         "description": "Diese Angaben schickt Home Assistant bei jeder Zusage an FF Agent mit, über den Button und über die Action. Die Rückmelde-URL aus dem vorigen Schritt bleibt dabei unverändert; die Werte werden bei jeder Zusage angehängt. Jetzt wird nichts gesendet. Du kannst beides später unter „Konfigurieren“ ändern.",
         "data": {
           "default_transport": "Standard-Verkehrsmittel",
-          "location_entity": "Standort-Entität"
+          "location_source": "Standortquelle"
         },
         "data_description": {
           "default_transport": "Wird bei jeder Zusage mitgesendet, wenn die Action kein Verkehrsmittel angibt.",
-          "location_entity": "Optional: eine Person oder ein Geräte-Tracker, dessen aktueller Standort bei jeder Zusage mitgesendet wird. Leer lassen, um keinen Standort zu senden."
+          "location_source": "Woher der Standort kommt, der bei jeder Zusage mitgesendet wird. Bei „Koordinaten manuell eingeben“ und „Person oder Geräte-Tracker“ folgt ein weiterer Schritt. Der Standort ist ein personenbezogenes Datum."
+        }
+      },
+      "location_manual": {
+        "title": "Zusage: Koordinaten",
+        "description": "Trage den Standort in Dezimalgrad ein. Er wird bei jeder Zusage an FF Agent mitgesendet. Jetzt wird nichts gesendet. Du kannst die Koordinaten später unter „Konfigurieren“ ändern.\n\nDie Koordinaten sind personenbezogene Daten. Gib sie niemandem weiter und teile keine Screenshots dieser Seite.",
+        "data": {
+          "location_latitude": "Breitengrad",
+          "location_longitude": "Längengrad"
+        },
+        "data_description": {
+          "location_latitude": "Dezimalgrad von -90 bis 90 (Norden ist positiv).",
+          "location_longitude": "Dezimalgrad von -180 bis 180 (Osten ist positiv)."
+        }
+      },
+      "location_entity": {
+        "title": "Zusage: Person oder Geräte-Tracker",
+        "description": "Der aktuelle Standort dieser Entität wird bei jeder Zusage an FF Agent mitgesendet. Hat die Entität gerade keinen Standort, wird die Zusage ohne Standort gesendet. Jetzt wird nichts gesendet. Du kannst die Entität später unter „Konfigurieren“ ändern.",
+        "data": {
+          "location_entity": "Person oder Geräte-Tracker"
+        },
+        "data_description": {
+          "location_entity": "Eine Person oder ein Geräte-Tracker, zum Beispiel dein Handy."
         }
       },
       "alarm_source": {
@@ -110,7 +132,9 @@
       }
     },
     "error": {
-      "invalid_reply_url": "Das ist keine gültige Rückmelde-URL. Sie enthält /app2/missionreplies/ und endet auf /accept oder /reject.",
+      "invalid_latitude": "Der Breitengrad muss zwischen -90 und 90 liegen.",
+      "invalid_longitude": "Der Längengrad muss zwischen -180 und 180 liegen.",
+      "invalid_reply_url":"Das ist keine gültige Rückmelde-URL. Sie enthält /app2/missionreplies/ und endet auf /accept oder /reject.",
       "ntfy_not_set_up": "Die Integration ntfy ist noch nicht eingerichtet. Richte sie zuerst ein (Schritt 1 im vorigen Dialog) und versuche es dann erneut.",
       "ntfy_entity_not_found": "Kein ntfy-Abo mit diesem Thema gefunden. Prüfe Schritt 2 und versuche es nach einigen Sekunden erneut, oder wähle die Entität selbst aus.",
       "ntfy_entity_invalid": "Diese Entität ist keine aktive Event-Entität der Integration ntfy. Wähle die Entität eines ntfy-Themas.",
@@ -146,13 +170,13 @@
           "require_token": "Zusatz-Token verlangen",
           "reset_minutes": "Rücksetzzeit „Alarm aktiv“",
           "default_transport": "Standard-Verkehrsmittel",
-          "location_entity": "Standort-Entität"
+          "location_source": "Standortquelle"
         },
         "data_description": {
           "require_token": "Erst einschalten, wenn der Header in FF Agent eingetragen ist und ein Testalarm in der Diagnose `x-ff-agent-token` unter `header_names` zeigt. Empfohlen, wenn Automationen Tore oder Türen steuern. Aufrufe ohne gültiges Token werden dann abgelehnt.",
           "reset_minutes": "Minuten ohne neuen Alarm, nach denen „Alarm aktiv“ wieder ausgeht (1 bis 1440).",
           "default_transport": "Wird beim Zusagen mitgesendet, wenn die Action kein Verkehrsmittel angibt.",
-          "location_entity": "Optional: eine Person oder ein Geräte-Tracker, dessen Standort beim Zusagen mitgesendet wird. Leer lassen, um keinen Standort zu senden."
+          "location_source": "Woher der Standort kommt, der beim Zusagen mitgesendet wird. Bei „Koordinaten manuell eingeben“ und „Person oder Geräte-Tracker“ fragt der nächste Schritt nach den Werten. Ein Wechsel der Quelle löscht die Werte der alten Quelle."
         }
       },
       "ntfy": {
@@ -161,14 +185,40 @@
         "data": {
           "reset_minutes": "Rücksetzzeit „Alarm aktiv“",
           "default_transport": "Standard-Verkehrsmittel",
-          "location_entity": "Standort-Entität"
+          "location_source": "Standortquelle"
         },
         "data_description": {
           "reset_minutes": "Minuten ohne neuen Alarm, nach denen „Alarm aktiv“ wieder ausgeht (1 bis 1440).",
           "default_transport": "Wird beim Zusagen mitgesendet, wenn die Action kein Verkehrsmittel angibt.",
-          "location_entity": "Optional: eine Person oder ein Geräte-Tracker, dessen Standort beim Zusagen mitgesendet wird. Leer lassen, um keinen Standort zu senden."
+          "location_source": "Woher der Standort kommt, der beim Zusagen mitgesendet wird. Bei „Koordinaten manuell eingeben“ und „Person oder Geräte-Tracker“ fragt der nächste Schritt nach den Werten. Ein Wechsel der Quelle löscht die Werte der alten Quelle."
+        }
+      },
+      "location_manual": {
+        "title": "FF Agent: Koordinaten",
+        "description": "Trage den Standort in Dezimalgrad ein. Er wird bei jeder Zusage mitgesendet.\n\nDie Koordinaten sind personenbezogene Daten. Gib sie niemandem weiter und teile keine Screenshots dieser Seite.\n\n**Speichern lädt die Integration neu; ein gerade aktiver Alarm wird dabei zurückgesetzt.**",
+        "data": {
+          "location_latitude": "Breitengrad",
+          "location_longitude": "Längengrad"
+        },
+        "data_description": {
+          "location_latitude": "Dezimalgrad von -90 bis 90 (Norden ist positiv).",
+          "location_longitude": "Dezimalgrad von -180 bis 180 (Osten ist positiv)."
+        }
+      },
+      "location_entity": {
+        "title": "FF Agent: Person oder Geräte-Tracker",
+        "description": "Der aktuelle Standort dieser Entität wird bei jeder Zusage mitgesendet. Hat die Entität gerade keinen Standort, wird die Zusage ohne Standort gesendet.\n\n**Speichern lädt die Integration neu; ein gerade aktiver Alarm wird dabei zurückgesetzt.**",
+        "data": {
+          "location_entity": "Person oder Geräte-Tracker"
+        },
+        "data_description": {
+          "location_entity": "Eine Person oder ein Geräte-Tracker, zum Beispiel dein Handy."
         }
       }
+    },
+    "error": {
+      "invalid_latitude": "Der Breitengrad muss zwischen -90 und 90 liegen.",
+      "invalid_longitude": "Der Längengrad muss zwischen -180 und 180 liegen."
     }
   },
   "entity": {
@@ -232,6 +282,14 @@
         "ntfy": "Über den kostenlosen Dienst ntfy. Kein Abo nötig, Home Assistant muss nicht aus dem Internet erreichbar sein."
       }
     },
+    "location_source": {
+      "options": {
+        "none": "Kein Standort",
+        "home": "Zuhause-Position von Home Assistant",
+        "manual": "Koordinaten manuell eingeben",
+        "entity": "Person oder Geräte-Tracker (Live-Standort)"
+      }
+    },
     "transport": {
       "options": {
         "car": "Auto",
@@ -243,7 +301,7 @@
   "services": {
     "accept": {
       "name": "Zusagen",
-      "description": "Sagt für eine Person dem aktuellen Einsatz zu. Ohne Verkehrsmittel gilt der Standard des Eintrags; ein Standort wird nur gesendet, wenn du ihn hier angibst oder in den Optionen eine Standort-Entität gewählt hast.",
+      "description": "Sagt für eine Person dem aktuellen Einsatz zu. Ohne Verkehrsmittel gilt der Standard des Eintrags; ein Standort wird nur gesendet, wenn du ihn hier angibst oder in den Optionen eine Standortquelle gewählt hast.",
       "fields": {
         "config_entry_id": {
           "name": "Eintrag",

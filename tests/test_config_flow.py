@@ -16,7 +16,7 @@ from homeassistant.config_entries import ConfigEntry, ConfigEntryState
 from homeassistant.const import ATTR_ENTITY_ID, CONF_NAME, CONF_WEBHOOK_ID
 from homeassistant.core import HomeAssistant
 from homeassistant.core_config import async_process_ha_core_config
-from homeassistant.data_entry_flow import FlowResult, FlowResultType
+from homeassistant.data_entry_flow import FlowResult, FlowResultType, InvalidData
 from homeassistant.helpers import entity_registry as er
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 from pytest_homeassistant_custom_component.test_util.aiohttp import AiohttpClientMocker
@@ -28,6 +28,9 @@ from custom_components.ff_agent.const import (
     CONF_DEFAULT_TRANSPORT,
     CONF_HEADER_TOKEN,
     CONF_LOCATION_ENTITY,
+    CONF_LOCATION_LATITUDE,
+    CONF_LOCATION_LONGITUDE,
+    CONF_LOCATION_SOURCE,
     CONF_NTFY_ENTITY,
     CONF_NTFY_ENTITY_UUID,
     CONF_NTFY_SERVER,
@@ -54,7 +57,11 @@ from .const import (
     CLOUDHOOK_URL,
     EXTERNAL_URL,
     INTERNAL_URL,
+    LATITUDE,
     LOCATION_ENTITY,
+    LONGITUDE,
+    MANUAL_LATITUDE,
+    MANUAL_LONGITUDE,
     NTFY_ENTITY_ID,
     OTHER_NTFY_ENTITY_ID,
     OTHER_NTFY_SUBENTRY_ID,
@@ -78,6 +85,13 @@ LINKS = {
 TOPIC = re.compile(r"^[0-9a-f]{32}$")
 # What the step "reply_settings" gets in the helpers below: the default answer.
 DEFAULT_SETTINGS = {CONF_DEFAULT_TRANSPORT: "car"}
+# The fields of the follow-up steps of the location source. A test hands them to the
+# helpers together with the settings; the helpers send them in the right step.
+LOCATION_STEP_KEYS = {
+    CONF_LOCATION_ENTITY,
+    CONF_LOCATION_LATITUDE,
+    CONF_LOCATION_LONGITUDE,
+}
 
 
 async def _start_flow(hass: HomeAssistant) -> FlowResult:
@@ -95,7 +109,8 @@ async def _submit(
 ) -> FlowResult:
     """Enter name and reply URL, then answer the step "reply_settings" if it comes.
 
-    With ``settings=None`` the flow stops at that step.
+    With ``settings=None`` the flow stops at that step. Fields of the location
+    follow-up steps in ``settings`` are sent to that step.
     """
     result = await hass.config_entries.flow.async_configure(
         flow_id, {CONF_NAME: name, CONF_REPLY_URL: reply_url}
@@ -105,7 +120,13 @@ async def _submit(
         and result["type"] is FlowResultType.FORM
         and result["step_id"] == "reply_settings"
     ):
-        result = await hass.config_entries.flow.async_configure(flow_id, settings)
+        form = {k: v for k, v in settings.items() if k not in LOCATION_STEP_KEYS}
+        follow_up = {k: v for k, v in settings.items() if k in LOCATION_STEP_KEYS}
+        result = await hass.config_entries.flow.async_configure(flow_id, form)
+        if follow_up:
+            assert result["type"] is FlowResultType.FORM
+            assert result["step_id"] in ("location_manual", "location_entity")
+            result = await hass.config_entries.flow.async_configure(flow_id, follow_up)
     await hass.async_block_till_done()
     return result
 
@@ -214,7 +235,11 @@ async def test_first_question_with_cloud_only_changes_the_text(
 
 # --- The step "reply_settings" -----------------------
 
-SETTINGS = {CONF_DEFAULT_TRANSPORT: "bicycle", CONF_LOCATION_ENTITY: LOCATION_ENTITY}
+SETTINGS = {
+    CONF_DEFAULT_TRANSPORT: "bicycle",
+    CONF_LOCATION_SOURCE: "entity",
+    CONF_LOCATION_ENTITY: LOCATION_ENTITY,
+}
 
 
 async def _create_via(
@@ -246,13 +271,29 @@ async def test_reply_settings_follow_the_reply_url(hass: HomeAssistant) -> None:
     assert result["type"] is FlowResultType.FORM
     assert result["step_id"] == "reply_settings"
     schema = result["data_schema"].schema
-    assert set(schema) == {CONF_DEFAULT_TRANSPORT, CONF_LOCATION_ENTITY}
+    assert set(schema) == {CONF_DEFAULT_TRANSPORT, CONF_LOCATION_SOURCE}
     transport = next(key for key in schema if key == CONF_DEFAULT_TRANSPORT)
-    location = next(key for key in schema if key == CONF_LOCATION_ENTITY)
+    source = next(key for key in schema if key == CONF_LOCATION_SOURCE)
     assert isinstance(transport, vol.Required)
     assert transport.default() == "car"
-    assert isinstance(location, vol.Optional)
+    assert isinstance(source, vol.Required)
+    assert source.default() == "none"
     assert hass.config_entries.async_entries(DOMAIN) == []
+
+
+async def test_the_location_source_is_a_dropdown_in_the_agreed_order(
+    hass: HomeAssistant,
+) -> None:
+    """None first, then home, manual, and the entity as the last option."""
+    result = await _start_flow(hass)
+    result = await _submit(hass, result["flow_id"], settings=None)
+
+    schema = result["data_schema"].schema
+    selector = schema[next(key for key in schema if key == CONF_LOCATION_SOURCE)]
+
+    assert selector.config["options"] == ["none", "home", "manual", "entity"]
+    assert selector.config["mode"] == "dropdown"
+    assert selector.config["translation_key"] == "location_source"
 
 
 @pytest.mark.parametrize("path", ["external", "webhook_anyway", "ntfy"])
@@ -267,12 +308,13 @@ async def test_reply_settings_land_in_the_options(
         CONF_RESET_MINUTES: 30,
         CONF_DEFAULT_TRANSPORT: "bicycle",
         CONF_REQUIRE_TOKEN: False,
+        CONF_LOCATION_SOURCE: "entity",
         CONF_LOCATION_ENTITY: LOCATION_ENTITY,
     }
 
 
 async def test_reply_settings_without_a_location(hass: HomeAssistant) -> None:
-    """No location entity: the option is missing altogether, not None."""
+    """The default is no location: only the source is stored, no values."""
     result = await _create_via(hass, "external", {CONF_DEFAULT_TRANSPORT: "feet"})
 
     assert result["type"] is FlowResultType.CREATE_ENTRY
@@ -280,6 +322,7 @@ async def test_reply_settings_without_a_location(hass: HomeAssistant) -> None:
         CONF_RESET_MINUTES: 30,
         CONF_DEFAULT_TRANSPORT: "feet",
         CONF_REQUIRE_TOKEN: False,
+        CONF_LOCATION_SOURCE: "none",
     }
 
 
@@ -362,6 +405,7 @@ async def test_reply_settings_land_in_the_options_on_every_other_end(
         CONF_RESET_MINUTES: 30,
         CONF_DEFAULT_TRANSPORT: "bicycle",
         CONF_REQUIRE_TOKEN: False,
+        CONF_LOCATION_SOURCE: "entity",
         CONF_LOCATION_ENTITY: LOCATION_ENTITY,
     }
 
@@ -379,12 +423,14 @@ async def test_reply_settings_can_be_changed_afterwards(hass: HomeAssistant) -> 
             CONF_REQUIRE_TOKEN: False,
             CONF_RESET_MINUTES: 30,
             CONF_DEFAULT_TRANSPORT: "feet",
+            CONF_LOCATION_SOURCE: "none",
         },
     )
     await hass.async_block_till_done()
 
     assert saved["type"] is FlowResultType.CREATE_ENTRY
     assert entry.options[CONF_DEFAULT_TRANSPORT] == "feet"
+    assert entry.options[CONF_LOCATION_SOURCE] == "none"
     assert CONF_LOCATION_ENTITY not in entry.options
 
 
@@ -397,6 +443,272 @@ async def test_reply_settings_location_is_not_logged(
     await _create_via(hass, "external", SETTINGS)
 
     assert LOCATION_ENTITY not in caplog.text
+
+
+async def test_reply_settings_coordinates_are_not_logged(
+    hass: HomeAssistant, caplog: pytest.LogCaptureFixture
+) -> None:
+    """Typed-in coordinates are personal data and never reach the log."""
+    caplog.set_level(logging.DEBUG, logger="custom_components.ff_agent")
+
+    await _create_via(hass, "external", MANUAL_SETTINGS)
+
+    for value in (MANUAL_LATITUDE, MANUAL_LONGITUDE):
+        assert str(value) not in caplog.text
+
+
+# --- The location source and its follow-up steps -----------------------
+
+MANUAL_SETTINGS = {
+    CONF_DEFAULT_TRANSPORT: "car",
+    CONF_LOCATION_SOURCE: "manual",
+    CONF_LOCATION_LATITUDE: MANUAL_LATITUDE,
+    CONF_LOCATION_LONGITUDE: MANUAL_LONGITUDE,
+}
+
+
+async def _choose_source(hass: HomeAssistant, source: str) -> FlowResult:
+    """Answer the step "reply_settings" with the source and nothing more."""
+    result = await _start_flow(hass)
+    result = await _submit(hass, result["flow_id"], settings=None)
+    return await _configure(
+        hass,
+        result["flow_id"],
+        {CONF_DEFAULT_TRANSPORT: "car", CONF_LOCATION_SOURCE: source},
+    )
+
+
+def _suggested(result: FlowResult) -> dict[str, Any]:
+    """Return the suggested values of a form; fields without one are missing."""
+    return {
+        str(key): key.description["suggested_value"]
+        for key in result["data_schema"].schema
+        if key.description
+    }
+
+
+@pytest.mark.parametrize("source", ["none", "home"])
+async def test_sources_without_values_ask_nothing_more(
+    hass: HomeAssistant, source: str
+) -> None:
+    """The sources none and home go straight on to the question about the alarm."""
+    result = await _choose_source(hass, source)
+
+    assert result["type"] is FlowResultType.MENU
+    assert result["step_id"] == "alarm_source"
+
+
+async def test_the_home_source_stores_no_position(hass: HomeAssistant) -> None:
+    """The home position is read when sending, so it is not stored."""
+    settings = {CONF_DEFAULT_TRANSPORT: "car", CONF_LOCATION_SOURCE: "home"}
+
+    result = await _create_via(hass, "external", settings)
+
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    assert result["result"].options == {
+        CONF_RESET_MINUTES: 30,
+        CONF_DEFAULT_TRANSPORT: "car",
+        CONF_REQUIRE_TOKEN: False,
+        CONF_LOCATION_SOURCE: "home",
+    }
+
+
+async def test_the_manual_form_starts_with_the_home_position(
+    hass: HomeAssistant,
+) -> None:
+    """The coordinates are suggested from the home position of Home Assistant."""
+    hass.config.latitude = LATITUDE
+    hass.config.longitude = LONGITUDE
+
+    result = await _choose_source(hass, "manual")
+
+    assert result["type"] is FlowResultType.FORM
+    assert result["step_id"] == "location_manual"
+    schema = result["data_schema"].schema
+    assert set(schema) == {CONF_LOCATION_LATITUDE, CONF_LOCATION_LONGITUDE}
+    assert all(isinstance(key, vol.Required) for key in schema)
+    assert _suggested(result) == {
+        CONF_LOCATION_LATITUDE: LATITUDE,
+        CONF_LOCATION_LONGITUDE: LONGITUDE,
+    }
+    # Boxes with any number of decimals; the range is checked by the step itself.
+    for selector in schema.values():
+        assert selector.config["step"] == "any"
+        assert selector.config["mode"] == "box"
+        assert "min" not in selector.config
+        assert "max" not in selector.config
+
+
+async def test_the_manual_form_without_a_home_position_suggests_nothing(
+    hass: HomeAssistant,
+) -> None:
+    """Home Assistant starts with 0, 0: that is not a position to suggest."""
+    hass.config.latitude = 0
+    hass.config.longitude = 0
+
+    result = await _choose_source(hass, "manual")
+
+    assert result["step_id"] == "location_manual"
+    assert _suggested(result) == {}
+
+
+async def test_manual_coordinates_land_in_the_options(hass: HomeAssistant) -> None:
+    """Both values are stored as numbers, next to the source."""
+    result = await _create_via(hass, "external", MANUAL_SETTINGS)
+
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    options = result["result"].options
+    assert options == {
+        CONF_RESET_MINUTES: 30,
+        CONF_DEFAULT_TRANSPORT: "car",
+        CONF_REQUIRE_TOKEN: False,
+        CONF_LOCATION_SOURCE: "manual",
+        CONF_LOCATION_LATITUDE: MANUAL_LATITUDE,
+        CONF_LOCATION_LONGITUDE: MANUAL_LONGITUDE,
+    }
+    assert CONF_LOCATION_ENTITY not in options
+
+
+async def test_whole_degrees_are_stored_as_floats(hass: HomeAssistant) -> None:
+    """The value of a number box may arrive as an integer."""
+    settings = {
+        **MANUAL_SETTINGS,
+        CONF_LOCATION_LATITUDE: 12,
+        CONF_LOCATION_LONGITUDE: -65,
+    }
+
+    result = await _create_via(hass, "external", settings)
+
+    options = result["result"].options
+    assert options[CONF_LOCATION_LATITUDE] == 12.0
+    assert isinstance(options[CONF_LOCATION_LATITUDE], float)
+    assert isinstance(options[CONF_LOCATION_LONGITUDE], float)
+
+
+@pytest.mark.parametrize(
+    ("latitude", "longitude", "errors"),
+    [
+        (91, 6.789, {CONF_LOCATION_LATITUDE: "invalid_latitude"}),
+        (-90.5, 6.789, {CONF_LOCATION_LATITUDE: "invalid_latitude"}),
+        (float("nan"), 6.789, {CONF_LOCATION_LATITUDE: "invalid_latitude"}),
+        (1.2345, 180.5, {CONF_LOCATION_LONGITUDE: "invalid_longitude"}),
+        (1.2345, -181, {CONF_LOCATION_LONGITUDE: "invalid_longitude"}),
+        (1.2345, float("inf"), {CONF_LOCATION_LONGITUDE: "invalid_longitude"}),
+        (
+            95,
+            200,
+            {
+                CONF_LOCATION_LATITUDE: "invalid_latitude",
+                CONF_LOCATION_LONGITUDE: "invalid_longitude",
+            },
+        ),
+    ],
+)
+async def test_invalid_coordinates_are_an_error_in_the_form(
+    hass: HomeAssistant,
+    latitude: float,
+    longitude: float,
+    errors: dict[str, str],
+) -> None:
+    """A value outside of the range is no exception: the form shows an error."""
+    result = await _choose_source(hass, "manual")
+
+    result = await _configure(
+        hass,
+        result["flow_id"],
+        {CONF_LOCATION_LATITUDE: latitude, CONF_LOCATION_LONGITUDE: longitude},
+    )
+
+    assert result["type"] is FlowResultType.FORM
+    assert result["step_id"] == "location_manual"
+    assert result["errors"] == errors
+    assert hass.config_entries.async_entries(DOMAIN) == []
+
+
+async def test_after_a_mistake_the_form_keeps_the_input_and_a_correction_goes_on(
+    hass: HomeAssistant,
+) -> None:
+    """The typed values stay in the form; correct ones continue the setup."""
+    result = await _choose_source(hass, "manual")
+    result = await _configure(
+        hass,
+        result["flow_id"],
+        {CONF_LOCATION_LATITUDE: 91, CONF_LOCATION_LONGITUDE: MANUAL_LONGITUDE},
+    )
+    assert _suggested(result) == {
+        CONF_LOCATION_LATITUDE: 91,
+        CONF_LOCATION_LONGITUDE: MANUAL_LONGITUDE,
+    }
+
+    result = await _configure(
+        hass,
+        result["flow_id"],
+        {
+            CONF_LOCATION_LATITUDE: MANUAL_LATITUDE,
+            CONF_LOCATION_LONGITUDE: MANUAL_LONGITUDE,
+        },
+    )
+
+    assert result["type"] is FlowResultType.MENU
+    assert result["step_id"] == "alarm_source"
+
+
+async def test_the_entity_step_asks_for_an_entity(hass: HomeAssistant) -> None:
+    """The entity is a required field of its own step."""
+    result = await _choose_source(hass, "entity")
+
+    assert result["type"] is FlowResultType.FORM
+    assert result["step_id"] == "location_entity"
+    schema = result["data_schema"].schema
+    assert set(schema) == {CONF_LOCATION_ENTITY}
+    assert all(isinstance(key, vol.Required) for key in schema)
+    assert _suggested(result) == {}
+    for values in ({}, {CONF_LOCATION_ENTITY: ""}, {CONF_LOCATION_ENTITY: "light.x"}):
+        with pytest.raises(InvalidData):
+            await _configure(hass, result["flow_id"], values)
+
+
+@pytest.mark.parametrize("entity_id", ["person.test_person", "device_tracker.phone"])
+async def test_an_entity_lands_in_the_options(
+    hass: HomeAssistant, entity_id: str
+) -> None:
+    """A person or a device tracker is stored with the source entity."""
+    settings = {
+        CONF_DEFAULT_TRANSPORT: "car",
+        CONF_LOCATION_SOURCE: "entity",
+        CONF_LOCATION_ENTITY: entity_id,
+    }
+
+    result = await _create_via(hass, "external", settings)
+
+    options = result["result"].options
+    assert options[CONF_LOCATION_SOURCE] == "entity"
+    assert options[CONF_LOCATION_ENTITY] == entity_id
+    assert CONF_LOCATION_LATITUDE not in options
+
+
+async def test_manual_coordinates_reach_the_accept_button(
+    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+) -> None:
+    """An entry created with coordinates accepts with lat and lng."""
+    aioclient_mock.get(ACCEPT_URL)
+    result = await _create_via(hass, "external", MANUAL_SETTINGS)
+    entry: ConfigEntry = result["result"]
+    button_id = er.async_get(hass).async_get_entity_id(
+        "button", DOMAIN, f"{entry.entry_id}_accept"
+    )
+    assert button_id is not None
+
+    await hass.services.async_call(
+        "button", "press", {ATTR_ENTITY_ID: button_id}, blocking=True
+    )
+
+    assert aioclient_mock.call_count == 1
+    assert dict(aioclient_mock.mock_calls[0][1].query) == {
+        "transport": "CAR",
+        "lat": "12.345600",
+        "lng": "-65.432100",
+    }
 
 
 # --- The cloud path -----------------------
@@ -437,6 +749,7 @@ async def test_user_flow_creates_entry_with_external_url(
         CONF_RESET_MINUTES: 30,
         CONF_DEFAULT_TRANSPORT: "car",
         CONF_REQUIRE_TOKEN: False,
+        CONF_LOCATION_SOURCE: "none",
     }
     assert entry.state is ConfigEntryState.LOADED
 

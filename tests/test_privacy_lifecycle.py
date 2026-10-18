@@ -50,6 +50,7 @@ from custom_components.ff_agent.const import (
     CONF_DEFAULT_TRANSPORT,
     CONF_HEADER_TOKEN,
     CONF_LOCATION_ENTITY,
+    CONF_LOCATION_SOURCE,
     CONF_REGENERATE_WEBHOOK,
     CONF_REPLY_URL,
     CONF_REQUIRE_TOKEN,
@@ -250,8 +251,12 @@ async def test_whole_life_cycle_leaks_no_secret(
                 CONF_REQUIRE_TOKEN: True,
                 CONF_RESET_MINUTES: 30,
                 CONF_DEFAULT_TRANSPORT: "car",
-                CONF_LOCATION_ENTITY: LOCATION_ENTITY,
+                CONF_LOCATION_SOURCE: "entity",
             },
+        )
+        assert options["step_id"] == "location_entity"
+        options = await hass.config_entries.options.async_configure(
+            options["flow_id"], {CONF_LOCATION_ENTITY: LOCATION_ENTITY}
         )
         await hass.async_block_till_done()
         assert options["type"] is FlowResultType.CREATE_ENTRY

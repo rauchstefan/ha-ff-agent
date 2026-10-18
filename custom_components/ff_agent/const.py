@@ -65,7 +65,31 @@ MY_NTFY_INTEGRATION_URL: Final = (
 
 CONF_RESET_MINUTES: Final = "reset_minutes"
 CONF_DEFAULT_TRANSPORT: Final = "default_transport"
-CONF_LOCATION_ENTITY: Final = "location_entity"
+CONF_LOCATION_ENTITY: Final = "location_entity"  # only for the source "entity"
+# Where the location of an acceptance comes from. Options created before the source
+# existed have none; reply.configured_location_source() derives it.
+CONF_LOCATION_SOURCE: Final = "location_source"
+CONF_LOCATION_LATITUDE: Final = "location_latitude"  # float, only for "manual"
+CONF_LOCATION_LONGITUDE: Final = "location_longitude"  # float, only for "manual"
+LOCATION_SOURCE_NONE: Final = "none"
+LOCATION_SOURCE_HOME: Final = "home"  # position of Home Assistant, read when sending
+LOCATION_SOURCE_MANUAL: Final = "manual"
+LOCATION_SOURCE_ENTITY: Final = "entity"  # person or device tracker
+# The order is the display order of the dropdown.
+LOCATION_SOURCES: Final = (
+    LOCATION_SOURCE_NONE,
+    LOCATION_SOURCE_HOME,
+    LOCATION_SOURCE_MANUAL,
+    LOCATION_SOURCE_ENTITY,
+)
+DEFAULT_LOCATION_SOURCE: Final = LOCATION_SOURCE_NONE
+# The options that belong to a location source; the others are kept when it changes.
+LOCATION_VALUE_KEYS: Final = (
+    CONF_LOCATION_ENTITY,
+    CONF_LOCATION_LATITUDE,
+    CONF_LOCATION_LONGITUDE,
+)
+LOCATION_OPTION_KEYS: Final = (CONF_LOCATION_SOURCE, *LOCATION_VALUE_KEYS)
 CONF_REQUIRE_TOKEN: Final = "require_token"  # bool, default False (ADR 0002, 5.)
 
 TOKEN_HEADER: Final = "X-FF-Agent-Token"
@@ -140,6 +164,9 @@ TO_REDACT: Final = {
     "unique_id",
     "title",
     CONF_LOCATION_ENTITY,
+    # Coordinates are personal data.
+    CONF_LOCATION_LATITUDE,
+    CONF_LOCATION_LONGITUDE,
     CONF_NTFY_TOPIC,
     CONF_NTFY_ENTITY_UUID,
     CONF_NTFY_ENTITY,

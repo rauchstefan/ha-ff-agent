@@ -18,11 +18,33 @@
         "description": "Home Assistant sends these values to FF Agent with every acceptance, through the button and the action. The mission reply URL from the previous step stays as it is; the values are added to each acceptance. Nothing is sent now. You can change both later under \"Configure\".",
         "data": {
           "default_transport": "Default transport",
-          "location_entity": "Location entity"
+          "location_source": "Location source"
         },
         "data_description": {
           "default_transport": "Sent with every acceptance if the action does not name a transport.",
-          "location_entity": "Optional: a person or device tracker whose current location is sent with every acceptance. Leave empty to send no location."
+          "location_source": "Where the location comes from that is sent with every acceptance. For \"Enter coordinates manually\" and \"Person or device tracker\" another step follows. The location is personal data."
+        }
+      },
+      "location_manual": {
+        "title": "Accepting: coordinates",
+        "description": "Enter the location in decimal degrees. It is sent to FF Agent with every acceptance. Nothing is sent now. You can change the coordinates later under \"Configure\".\n\nThe coordinates are personal data. Do not share them or screenshots of this page.",
+        "data": {
+          "location_latitude": "Latitude",
+          "location_longitude": "Longitude"
+        },
+        "data_description": {
+          "location_latitude": "Decimal degrees from -90 to 90 (north is positive).",
+          "location_longitude": "Decimal degrees from -180 to 180 (east is positive)."
+        }
+      },
+      "location_entity": {
+        "title": "Accepting: person or device tracker",
+        "description": "The current location of this entity is sent to FF Agent with every acceptance. If the entity has no location at that moment, the acceptance is sent without one. Nothing is sent now. You can change the entity later under \"Configure\".",
+        "data": {
+          "location_entity": "Person or device tracker"
+        },
+        "data_description": {
+          "location_entity": "A person or a device tracker, for example your phone."
         }
       },
       "alarm_source": {
@@ -110,7 +132,9 @@
       }
     },
     "error": {
-      "invalid_reply_url": "This is not a valid mission reply URL. It contains /app2/missionreplies/ and ends with /accept or /reject.",
+      "invalid_latitude": "The latitude must be between -90 and 90.",
+      "invalid_longitude": "The longitude must be between -180 and 180.",
+      "invalid_reply_url":"This is not a valid mission reply URL. It contains /app2/missionreplies/ and ends with /accept or /reject.",
       "ntfy_not_set_up": "The ntfy integration is not set up yet. Set it up first (step 1 of the previous dialog) and then try again.",
       "ntfy_entity_not_found": "No ntfy subscription with this topic found. Check step 2 and try again after a few seconds, or choose the entity yourself.",
       "ntfy_entity_invalid": "This entity is not an enabled event entity of the ntfy integration. Choose the entity of an ntfy topic.",
@@ -146,13 +170,13 @@
           "require_token": "Require additional token",
           "reset_minutes": "Reset time of \"Alarm active\"",
           "default_transport": "Default transport",
-          "location_entity": "Location entity"
+          "location_source": "Location source"
         },
         "data_description": {
           "require_token": "Only turn this on once the header is entered in FF Agent and a test alarm shows `x-ff-agent-token` under `header_names` in the diagnostics. Recommended if automations control gates or doors. Calls without a valid token are rejected then.",
           "reset_minutes": "Minutes without a new alarm after which \"Alarm active\" turns off again (1 to 1440).",
           "default_transport": "Sent with an acceptance if the action does not name a transport.",
-          "location_entity": "Optional: a person or device tracker whose location is sent with an acceptance. Leave empty to send no location."
+          "location_source": "Where the location comes from that is sent with an acceptance. For \"Enter coordinates manually\" and \"Person or device tracker\" the next step asks for the values. Changing the source deletes the values of the old source."
         }
       },
       "ntfy": {
@@ -161,14 +185,40 @@
         "data": {
           "reset_minutes": "Reset time of \"Alarm active\"",
           "default_transport": "Default transport",
-          "location_entity": "Location entity"
+          "location_source": "Location source"
         },
         "data_description": {
           "reset_minutes": "Minutes without a new alarm after which \"Alarm active\" turns off again (1 to 1440).",
           "default_transport": "Sent with an acceptance if the action does not name a transport.",
-          "location_entity": "Optional: a person or device tracker whose location is sent with an acceptance. Leave empty to send no location."
+          "location_source": "Where the location comes from that is sent with an acceptance. For \"Enter coordinates manually\" and \"Person or device tracker\" the next step asks for the values. Changing the source deletes the values of the old source."
+        }
+      },
+      "location_manual": {
+        "title": "FF Agent: Coordinates",
+        "description": "Enter the location in decimal degrees. It is sent with every acceptance.\n\nThe coordinates are personal data. Do not share them or screenshots of this page.\n\n**Saving reloads the integration; an alarm that is active at that moment is reset.**",
+        "data": {
+          "location_latitude": "Latitude",
+          "location_longitude": "Longitude"
+        },
+        "data_description": {
+          "location_latitude": "Decimal degrees from -90 to 90 (north is positive).",
+          "location_longitude": "Decimal degrees from -180 to 180 (east is positive)."
+        }
+      },
+      "location_entity": {
+        "title": "FF Agent: Person or device tracker",
+        "description": "The current location of this entity is sent with every acceptance. If the entity has no location at that moment, the acceptance is sent without one.\n\n**Saving reloads the integration; an alarm that is active at that moment is reset.**",
+        "data": {
+          "location_entity": "Person or device tracker"
+        },
+        "data_description": {
+          "location_entity": "A person or a device tracker, for example your phone."
         }
       }
+    },
+    "error": {
+      "invalid_latitude": "The latitude must be between -90 and 90.",
+      "invalid_longitude": "The longitude must be between -180 and 180."
     }
   },
   "entity": {
@@ -232,6 +282,14 @@
         "ntfy": "Through the free service ntfy. No subscription needed, Home Assistant does not have to be reachable from the internet."
       }
     },
+    "location_source": {
+      "options": {
+        "none": "No location",
+        "home": "Home position of Home Assistant",
+        "manual": "Enter coordinates manually",
+        "entity": "Person or device tracker (live location)"
+      }
+    },
     "transport": {
       "options": {
         "car": "Car",
@@ -243,7 +301,7 @@
   "services": {
     "accept": {
       "name": "Accept",
-      "description": "Accepts the current mission for one person. Without a mode of transport the default of the entry is used; a location is only sent if you enter it here or set a location entity in the options.",
+      "description": "Accepts the current mission for one person. Without a mode of transport the default of the entry is used; a location is only sent if you enter it here or choose a location source in the options.",
       "fields": {
         "config_entry_id": {
           "name": "Entry",

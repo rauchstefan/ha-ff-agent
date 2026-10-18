@@ -19,6 +19,9 @@ from custom_components.ff_agent.const import (
     CONF_DEFAULT_TRANSPORT,
     CONF_HEADER_TOKEN,
     CONF_LOCATION_ENTITY,
+    CONF_LOCATION_LATITUDE,
+    CONF_LOCATION_LONGITUDE,
+    CONF_LOCATION_SOURCE,
     CONF_NTFY_ENTITY_UUID,
     CONF_NTFY_SERVER,
     CONF_NTFY_TOPIC,
@@ -30,6 +33,10 @@ from custom_components.ff_agent.const import (
     DEFAULT_RESET_MINUTES,
     DEFAULT_TRANSPORT,
     DOMAIN,
+    LOCATION_SOURCE_ENTITY,
+    LOCATION_SOURCE_HOME,
+    LOCATION_SOURCE_MANUAL,
+    LOCATION_SOURCE_NONE,
     SOURCE_NTFY,
     SOURCE_WEBHOOK,
 )
@@ -41,6 +48,8 @@ from .const import (
     EXTERNAL_URL,
     HEADER_TOKEN,
     LOCATION_ENTITY,
+    MANUAL_LATITUDE,
+    MANUAL_LONGITUDE,
     NTFY_SERVER,
     NTFY_TOPIC,
     OTHER_REPLY_ID,
@@ -96,6 +105,7 @@ def entry_options() -> dict[str, Any]:
         CONF_RESET_MINUTES: DEFAULT_RESET_MINUTES,
         CONF_DEFAULT_TRANSPORT: DEFAULT_TRANSPORT,
         CONF_REQUIRE_TOKEN: False,
+        CONF_LOCATION_SOURCE: LOCATION_SOURCE_NONE,
     }
 
 
@@ -144,18 +154,80 @@ def token_entry(
     )
 
 
-@pytest.fixture
-def location_entry(
-    mock_config_entry: MockConfigEntry, entry_data: dict[str, Any]
+def _entry_with_options(
+    mock_config_entry: MockConfigEntry,
+    entry_data: dict[str, Any],
+    extra: dict[str, Any],
 ) -> MockConfigEntry:
-    """Return a config entry whose acceptance sends the location of an entity."""
+    """Return the standard entry with additional options."""
     return MockConfigEntry(
         domain=DOMAIN,
         minor_version=2,
         title=mock_config_entry.title,
         unique_id=mock_config_entry.unique_id,
         data=entry_data,
-        options={**mock_config_entry.options, CONF_LOCATION_ENTITY: LOCATION_ENTITY},
+        options={**mock_config_entry.options, **extra},
+    )
+
+
+@pytest.fixture
+def location_entry(
+    mock_config_entry: MockConfigEntry, entry_data: dict[str, Any]
+) -> MockConfigEntry:
+    """Return a config entry whose acceptance sends the location of an entity."""
+    return _entry_with_options(
+        mock_config_entry,
+        entry_data,
+        {
+            CONF_LOCATION_SOURCE: LOCATION_SOURCE_ENTITY,
+            CONF_LOCATION_ENTITY: LOCATION_ENTITY,
+        },
+    )
+
+
+@pytest.fixture
+def legacy_location_entry(
+    mock_config_entry: MockConfigEntry, entry_data: dict[str, Any]
+) -> MockConfigEntry:
+    """Return an entry from before the location source: only the location entity."""
+    options = {
+        key: value
+        for key, value in mock_config_entry.options.items()
+        if key != CONF_LOCATION_SOURCE
+    }
+    return MockConfigEntry(
+        domain=DOMAIN,
+        minor_version=2,
+        title=mock_config_entry.title,
+        unique_id=mock_config_entry.unique_id,
+        data=entry_data,
+        options={**options, CONF_LOCATION_ENTITY: LOCATION_ENTITY},
+    )
+
+
+@pytest.fixture
+def home_location_entry(
+    mock_config_entry: MockConfigEntry, entry_data: dict[str, Any]
+) -> MockConfigEntry:
+    """Return a config entry whose acceptance sends the home position of HA."""
+    return _entry_with_options(
+        mock_config_entry, entry_data, {CONF_LOCATION_SOURCE: LOCATION_SOURCE_HOME}
+    )
+
+
+@pytest.fixture
+def manual_location_entry(
+    mock_config_entry: MockConfigEntry, entry_data: dict[str, Any]
+) -> MockConfigEntry:
+    """Return a config entry whose acceptance sends stored coordinates."""
+    return _entry_with_options(
+        mock_config_entry,
+        entry_data,
+        {
+            CONF_LOCATION_SOURCE: LOCATION_SOURCE_MANUAL,
+            CONF_LOCATION_LATITUDE: MANUAL_LATITUDE,
+            CONF_LOCATION_LONGITUDE: MANUAL_LONGITUDE,
+        },
     )
 
 

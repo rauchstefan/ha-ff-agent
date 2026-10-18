@@ -37,6 +37,8 @@ from .const import (
     LATITUDE,
     LOCATION_ENTITY,
     LONGITUDE,
+    MANUAL_LATITUDE,
+    MANUAL_LONGITUDE,
     NTFY_ENTITY_ID,
     NTFY_TOPIC,
     REJECT_URL,
@@ -306,6 +308,32 @@ async def test_diagnostics_show_the_outcome_of_the_last_reply(
     for secret in (REPLY_ID, str(LATITUDE), str(LONGITUDE), LOCATION_ENTITY):
         assert secret not in dumped
     assert result["entry"]["options"]["location_entity"] == REDACTED
+    # The source is a setting, not personal data.
+    assert result["entry"]["options"]["location_source"] == "entity"
+
+
+async def test_diagnostics_redact_manual_coordinates(
+    hass: HomeAssistant,
+    hass_client: ClientSessionGenerator,
+    aioclient_mock: AiohttpClientMocker,
+    manual_location_entry: MockConfigEntry,
+) -> None:
+    """Typed-in coordinates are redacted; the source stays readable."""
+    aioclient_mock.get(ACCEPT_URL)
+    await _setup(hass, manual_location_entry)
+    await async_send_reply(hass, manual_location_entry, ReplyAction.ACCEPT)
+
+    result = await get_diagnostics_for_config_entry(
+        hass, hass_client, manual_location_entry
+    )
+
+    options = result["entry"]["options"]
+    assert options["location_source"] == "manual"
+    assert options["location_latitude"] == REDACTED
+    assert options["location_longitude"] == REDACTED
+    dumped = json.dumps(result)
+    for value in (MANUAL_LATITUDE, MANUAL_LONGITUDE):
+        assert str(value) not in dumped
 
 
 @pytest.mark.parametrize(

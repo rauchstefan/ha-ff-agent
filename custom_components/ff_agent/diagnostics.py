@@ -1,9 +1,10 @@
 """Diagnostics for the FF Agent integration.
 
 Secrets (reply ID, webhook ID, cloudhook URL, token, ntfy topic, the registry UUID
-and the entity ID of the ntfy entity), the title and the location entity are
-redacted. Of the last webhook call and the last ntfy message only the shape is
-available, of the last reply only the outcome: no address, no coordinates.
+and the entity ID of the ntfy entity), the title, the location entity and the manual
+coordinates are redacted (the chosen location source is not). Of the last webhook
+call and the last ntfy message only the shape is available, of the last reply only
+the outcome: no address, no coordinates.
 """
 
 from __future__ import annotations

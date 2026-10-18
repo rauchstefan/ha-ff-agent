@@ -15,8 +15,10 @@ from __future__ import annotations
 
 import asyncio
 import logging
+from collections.abc import Mapping
 from datetime import datetime, timedelta
 from http import HTTPStatus
+from typing import Any
 
 import aiohttp
 from homeassistant.const import ATTR_LATITUDE, ATTR_LONGITUDE
@@ -29,9 +31,17 @@ from homeassistant.util import dt as dt_util
 from .const import (
     CONF_DEFAULT_TRANSPORT,
     CONF_LOCATION_ENTITY,
+    CONF_LOCATION_LATITUDE,
+    CONF_LOCATION_LONGITUDE,
+    CONF_LOCATION_SOURCE,
     DEFAULT_TRANSPORT,
     DOMAIN,
     LEGACY_TRANSPORTS,
+    LOCATION_SOURCE_ENTITY,
+    LOCATION_SOURCE_HOME,
+    LOCATION_SOURCE_MANUAL,
+    LOCATION_SOURCE_NONE,
+    LOCATION_SOURCES,
     MAX_CONTENT_TYPE_CHARS,
     REPLY_PATH,
     REPLY_REPEAT_GUARD_SECONDS,
@@ -226,6 +236,91 @@ def resolve_location(hass: HomeAssistant, entity_id: str) -> Location | None:
     return latitude, longitude
 
 
+def valid_latitude(value: object) -> bool:
+    """Return whether the value is a latitude (NaN and infinity are not)."""
+    try:
+        return -90 <= float(value) <= 90
+    except TypeError, ValueError, OverflowError:
+        return False
+
+
+def valid_longitude(value: object) -> bool:
+    """Return whether the value is a longitude (NaN and infinity are not)."""
+    try:
+        return -180 <= float(value) <= 180
+    except TypeError, ValueError, OverflowError:
+        return False
+
+
+def home_position(hass: HomeAssistant) -> Location | None:
+    """Return the home position of Home Assistant or None if it is not set.
+
+    Home Assistant starts with 0, 0 until the user sets the position.
+    """
+    latitude = hass.config.latitude
+    longitude = hass.config.longitude
+    usable = valid_latitude(latitude) and valid_longitude(longitude)
+    if not usable or (latitude, longitude) == (0, 0):
+        return None
+    return float(latitude), float(longitude)
+
+
+def resolve_home_location(hass: HomeAssistant) -> Location | None:
+    """Return the home position for an acceptance or None (send no location).
+
+    Read from the core configuration every time, so a change of the home position
+    applies to the next acceptance. The log never contains the coordinates.
+    """
+    location = home_position(hass)
+    if location is None:
+        _LOGGER.debug("Home position is not set, replying without location")
+    return location
+
+
+def resolve_manual_location(options: Mapping[str, Any]) -> Location | None:
+    """Return the coordinates stored in the options or None if they are unusable.
+
+    The log never contains the coordinates.
+    """
+    latitude = options.get(CONF_LOCATION_LATITUDE)
+    longitude = options.get(CONF_LOCATION_LONGITUDE)
+    if not (valid_latitude(latitude) and valid_longitude(longitude)):
+        _LOGGER.debug("Manual location is missing or invalid, replying without it")
+        return None
+    return float(latitude), float(longitude)
+
+
+def configured_location_source(options: Mapping[str, Any]) -> str:
+    """Return the location source of the options.
+
+    Options from before the source existed have none: a location entity means the
+    source "entity", otherwise there is no location. Unknown values are treated the
+    same way.
+    """
+    value = options.get(CONF_LOCATION_SOURCE)
+    if isinstance(value, str) and value in LOCATION_SOURCES:
+        return value
+    if options.get(CONF_LOCATION_ENTITY):
+        return LOCATION_SOURCE_ENTITY
+    return LOCATION_SOURCE_NONE
+
+
+def resolve_configured_location(
+    hass: HomeAssistant, options: Mapping[str, Any]
+) -> Location | None:
+    """Return the location of the configured source or None (send no location)."""
+    source = configured_location_source(options)
+    if source == LOCATION_SOURCE_HOME:
+        return resolve_home_location(hass)
+    if source == LOCATION_SOURCE_MANUAL:
+        return resolve_manual_location(options)
+    if source == LOCATION_SOURCE_ENTITY:
+        if entity_id := options.get(CONF_LOCATION_ENTITY):
+            return resolve_location(hass, entity_id)
+        _LOGGER.debug("No location entity chosen, replying without location")
+    return None
+
+
 def configured_transport(value: object) -> str:
     """Return the transport of the option; unknown values give the default."""
     if isinstance(value, str):
@@ -246,9 +341,10 @@ async def async_send_reply(
     """Send a reply for an entry; the common path of the buttons and the actions.
 
     Missing values come from the options of the entry: the transport from
-    ``default_transport``, the location from the entity ``location_entity``. Without
-    that option no location is sent. Explicit values win. A refusal contains no
-    address and is translated.
+    ``default_transport``, the location from the source ``location_source`` (none,
+    home position, manual coordinates or a location entity). Without a usable
+    location none is sent. Explicit values win. A refusal contains no address and is
+    translated.
     """
     api_transport: str | None = None
     if action is ReplyAction.ACCEPT:
@@ -263,9 +359,8 @@ async def async_send_reply(
                 translation_placeholders={"transport": transport},
             )
         api_transport = TRANSPORT_API_VALUES[transport]
-        entity_id = entry.options.get(CONF_LOCATION_ENTITY)
-        if location is None and entity_id:
-            location = resolve_location(hass, entity_id)
+        if location is None:
+            location = resolve_configured_location(hass, entry.options)
     else:
         location = None
 

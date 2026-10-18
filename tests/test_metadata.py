@@ -12,6 +12,7 @@ from homeassistant.util import yaml as yaml_util
 
 from custom_components.ff_agent.const import (
     DOMAIN,
+    LOCATION_SOURCES,
     MENU_ALARM_SOURCE,
     MENU_CLOUD_NOT_CONNECTED,
     MENU_CLOUD_SETUP,
@@ -125,10 +126,12 @@ def test_translations_cover_the_config_flow(language: str) -> None:
         "config.step.reply_settings.title",
         "config.step.reply_settings.description",
         "config.step.reply_settings.data.default_transport",
-        "config.step.reply_settings.data.location_entity",
+        "config.step.reply_settings.data.location_source",
         "config.step.reply_settings.data_description.default_transport",
-        "config.step.reply_settings.data_description.location_entity",
+        "config.step.reply_settings.data_description.location_source",
         "config.error.invalid_reply_url",
+        "config.error.invalid_latitude",
+        "config.error.invalid_longitude",
         "config.error.ntfy_not_set_up",
         "config.error.ntfy_entity_not_found",
         "config.error.ntfy_entity_invalid",
@@ -153,6 +156,7 @@ def test_translations_cover_the_config_flow(language: str) -> None:
         "config.step.ntfy_select.data_description.ntfy_entity",
         "selector.alarm_source.options.webhook",
         "selector.alarm_source.options.ntfy",
+        *(f"selector.location_source.options.{key}" for key in LOCATION_SOURCES),
         "issues.ntfy_entity_missing.title",
         "issues.ntfy_entity_missing.description",
     }
@@ -341,11 +345,38 @@ def test_translations_cover_the_options_and_the_reconfigure_flow(
         "require_token",
         "reset_minutes",
         "default_transport",
-        "location_entity",
+        "location_source",
     ):
         expected.add(f"options.step.init.data.{field}")
         expected.add(f"options.step.init.data_description.{field}")
     assert expected <= keys
+
+
+@pytest.mark.parametrize("language", ["en", "de"])
+def test_translations_cover_the_location_source(language: str) -> None:
+    """The dropdown, both follow-up steps of both flows and the errors have texts."""
+    texts = _load(INTEGRATION / "translations" / f"{language}.json")
+    # The order of the dropdown is the order of the options in the translation.
+    options = texts["selector"]["location_source"]["options"]
+    assert list(options) == list(LOCATION_SOURCES)
+    fields = {
+        "location_manual": {"location_latitude", "location_longitude"},
+        "location_entity": {"location_entity"},
+    }
+    for flow in ("config", "options"):
+        steps = texts[flow]["step"]
+        for step, names in fields.items():
+            assert steps[step]["title"]
+            assert steps[step]["description"]
+            assert set(steps[step]["data"]) == names
+            assert set(steps[step]["data_description"]) == names
+        assert texts[flow]["error"]["invalid_latitude"]
+        assert texts[flow]["error"]["invalid_longitude"]
+    for step in ("init", "ntfy"):
+        data = texts["options"]["step"][step]["data"]
+        assert "location_source" in data
+        assert "location_entity" not in data
+    assert "location_entity" not in texts["config"]["step"]["reply_settings"]["data"]
 
 
 @pytest.mark.parametrize("language", ["en", "de"])

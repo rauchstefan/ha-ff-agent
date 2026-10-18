@@ -31,6 +31,9 @@ OTHER_WEBHOOK_ID: Final = "test-webhook-id-placeholder-other"
 LATITUDE: Final = 1.2345
 LONGITUDE: Final = 6.789
 LOCATION_ENTITY: Final = "person.test_person"
+# Another invented position, for the coordinates typed in by hand.
+MANUAL_LATITUDE: Final = 12.3456
+MANUAL_LONGITUDE: Final = -65.4321
 NEW_CLOUDHOOK_URL: Final = "https://hooks.nabu.casa/test-placeholder-new"
 
 # ntfy: an invented topic and the entity of its subscription. Not real identifiers.
