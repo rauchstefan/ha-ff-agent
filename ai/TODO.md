@@ -31,6 +31,20 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
 
 ## Offen
 
+### 261018-readme-badges – README: Badges, HACS-Button, Hinweisboxen, Community-Abschnitte
+- **Status:** in Arbeit (claude/readme-update-ha-anker-solix-2ea3b2, 2026-10-18)
+- **Priorität:** mittel
+- **Rolle(n):** projektleiter, doku, reviewer
+- **Beschreibung:** README nach Vorbild `thomluther/ha-anker-solix` aufwerten: Badge-Leiste
+  (Release, Contributors, Issues, Discussions, HACS Custom, Lizenz, Python, CI),
+  My-Home-Assistant-Button „In HACS öffnen“, GitHub-Hinweisboxen, Haftungsausschluss,
+  Abschnitte Probleme melden / Mitmachen (+ CONTRIBUTING.md) / Unterstützen
+  (Stern, Buy me a coffee) / Weiterführende Links, Badge-Links als Referenzen am Ende.
+  GitHub Discussions am 2026-10-18 mit Freigabe des Nutzers eingeschaltet.
+- **Definition of Done:** README zweisprachig konsistent, kein Herstellername, Links
+  korrekt, CI grün, PR gemergt.
+- **Verweise:** https://github.com/thomluther/ha-anker-solix
+
 ### 261018-test-zusage-absage – Zusage und Absage gegen echtes FF Agent prüfen
 - **Status:** offen (Test durch den Nutzer)
 - **Priorität:** hoch
