@@ -68,8 +68,8 @@ def _png_size(path: Path) -> tuple[int, int]:
 def test_hacs_json_has_agreed_keys() -> None:
     """hacs.json holds exactly the agreed keys.
 
-    ``hide_default_branch`` keeps HACS from offering the default branch (shown as
-    a commit hash in the update dialog) and only offers real releases.
+    ``hide_default_branch`` asks HACS not to offer the default branch. HACS 2.x
+    does not evaluate it yet; version numbers come from regular releases.
     """
     assert _load(ROOT / "hacs.json") == {
         "name": "FF Agent",

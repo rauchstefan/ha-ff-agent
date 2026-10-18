@@ -2,6 +2,8 @@
 
 Stand: 2026-10-18. Alle URLs am 2026-10-18 abgerufen.
 
+> **Nachtrag 2026-10-18:** v0.4.0 ist seit 2026-10-18 ein reguläres Release. Die Nutzer-Schritte mit dem Beta-Schalter (Abschnitt 2) und Abschnitt 3.2 sind damit überholt. Die deutsche HACS-Bezeichnung lautet „Erneut herunterladen“ (EN „Redownload“), der Beta-Schalter „Beta-Versionen anzeigen“.
+
 ## 1. Fragestellung
 
 1. Warum zeigt HACS für `ff_agent` Commit-Hashes (7192103 / 36c857e) statt 0.4.0? Rolle von
@@ -69,7 +71,7 @@ Nicht geprüft: die genaue Beschriftung der UI-Menüpunkte in der HACS-Version d
 | Option | Wirkung | Bewertung |
 |---|---|---|
 | Reguläres Release (Pre-Release-Haken entfernen) | `last_version` wird gesetzt; HACS zeigt Tag ohne Beta-Schalter | Beste Lösung, löst Problem für alle Nutzer. Release braucht laut Projektregeln Freigabe des Nutzers. Fachlich: „Vorabversion“ ist dann nicht mehr als solche markiert. |
-| `hide_default_branch: true` in hacs.json | HACS bietet Default-Branch nicht mehr an (Doku: hacs.xyz/docs/publish/start/) | Empfohlen als Ergänzung. Verhindert versehentliche Hash-Installation. Wirkt sinnvoll erst mit mindestens einem Release; bei nur Pre-Releases ohne Beta-Schalter gäbe es sonst nichts zu installieren (abgeleitet, nicht getestet). |
+| `hide_default_branch: true` in hacs.json | HACS soll den Default-Branch nicht anbieten (Doku: hacs.xyz/docs/publish/start/); laut Review in HACS 2.x im Code nicht ausgewertet | Empfohlen als Ergänzung. Verhindert versehentliche Hash-Installation. Wirkt sinnvoll erst mit mindestens einem Release; bei nur Pre-Releases ohne Beta-Schalter gäbe es sonst nichts zu installieren (abgeleitet, nicht getestet). |
 | `zip_release` (+ `filename`) | Für Releases mit ZIP-Asset | Nicht nötig; Code liegt unter `custom_components/ff_agent/` im Repo. Zusätzlicher Pflegeaufwand. |
 | Status quo (nur Pre-Release) | Nutzer müssen Beta-Schalter setzen | README erklärt das bereits; kein Dauerzustand. |
 

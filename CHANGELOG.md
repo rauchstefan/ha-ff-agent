@@ -7,15 +7,17 @@ Alle nennenswerten Änderungen an dieser Integration. Format angelehnt an
 
 ### Geändert
 
-- HACS bietet den Branch `main` nicht mehr zur Installation an (`hide_default_branch`). Dadurch
-  zeigt der Update-Dialog Versionsnummern statt Commit-Kennungen.
+- HACS soll den Branch `main` nicht zur Installation anbieten (`hide_default_branch`). Der
+  Update-Dialog zeigt Versionsnummern statt Commit-Kennungen, seit 0.4.0 ein reguläres
+  Release ist.
 
 ### English
 
 #### Changed
 
-- HACS no longer offers the branch `main` for installation (`hide_default_branch`). As a
-  result, the update dialog shows version numbers instead of commit identifiers.
+- HACS should not offer the branch `main` for installation (`hide_default_branch`). The
+  update dialog shows version numbers instead of commit identifiers since 0.4.0 became a
+  regular release.
 
 ## [0.4.0] – 2026-10-18
 

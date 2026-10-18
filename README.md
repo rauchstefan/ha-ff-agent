@@ -642,7 +642,7 @@ App-Einstellungen leeren.
 
 **HACS zeigt statt einer Versionsnummer eine Zeichenfolge wie `7192103`:** Die Installation
 stammt vom Branch `main` (aus der Zeit, als es nur Vorabversionen gab). Lösung: In HACS bei
-„FF Agent“ das Menü (⋮) → *Neu herunterladen* wählen, Version 0.4.0 (oder neuer) auswählen
+„FF Agent“ das Menü (⋮) → *Erneut herunterladen* wählen, Version v0.4.0 (oder neuer) auswählen
 und Home Assistant neu starten.
 
 **„Alarm kommt nicht an“**
@@ -1309,7 +1309,7 @@ settings.
 
 **HACS shows a string such as `7192103` instead of a version number:** The installation comes
 from the branch `main` (from the time when there were only pre-releases). Solution: in HACS,
-open "FF Agent", choose the menu (⋮) → *Redownload*, select version 0.4.0 (or newer) and
+open "FF Agent", choose the menu (⋮) → *Redownload*, select version v0.4.0 (or newer) and
 restart Home Assistant.
 
 **"The alarm does not arrive"**
@@ -1416,7 +1416,7 @@ German.
 
 **Lizenz / License:** MIT, siehe / see [LICENSE](LICENSE).
 
-[releases-shield]: https://img.shields.io/github/v/release/rauchstefan/ha-ff-agent?include_prereleases&style=for-the-badge
+[releases-shield]: https://img.shields.io/github/v/release/rauchstefan/ha-ff-agent?style=for-the-badge
 [releases-url]: https://github.com/rauchstefan/ha-ff-agent/releases
 [contributors-shield]: https://img.shields.io/github/contributors/rauchstefan/ha-ff-agent?style=for-the-badge
 [contributors-url]: https://github.com/rauchstefan/ha-ff-agent/graphs/contributors
