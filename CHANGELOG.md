@@ -5,6 +5,15 @@ Alle nennenswerten Änderungen an dieser Integration. Format angelehnt an
 
 ## [Unreleased]
 
+## [0.4.0] – 2026-10-18 (Vorabversion)
+
+Vierte Vorabversion. Test- und Echtalarm aus FF Agent sind beim Entwickler über ntfy erfolgreich angekommen; Zusagen und Absagen sind noch nicht gegen ein echtes FF Agent geprüft.
+
+**Update:** Nach dem Update Home Assistant neu starten **und die Seite im Browser hart neu
+laden** (Strg+F5, am Mac Cmd+Umschalt+R). In der Companion-App die App neu starten bzw.
+den Frontend-Cache in den App-Einstellungen leeren. Sonst zeigen Dialoge der Integration
+unter Umständen keinen oder alten Text.
+
 ### Geändert
 
 - **Standortquelle statt Standort-Entität:** Das optionale Feld „Standort-Entität“ ist durch
@@ -21,7 +30,23 @@ Alle nennenswerten Änderungen an dieser Integration. Format angelehnt an
   Motiv (kein Logo von FF Agent, Home Assistant oder HACS). Die Quelle liegt unter
   `docs/assets/logo.svg`, die README zeigt das Symbol oben.
 
+### Dokumentation
+
+- **README überarbeitet:** Neue Badge-Leiste (Release, Contributors, Issues, Discussions,
+  HACS, Tests, Lizenz), Button „In HACS öffnen“ (My Home Assistant), Hinweisboxen zur
+  Vorabversion und zum Datenschutz sowie ein Haftungsausschluss. Neu sind die Abschnitte
+  „Probleme melden und Fragen“, „Mitmachen“, „Unterstützen“ und „Weiterführende Links“.
+- **CONTRIBUTING.md:** Neue Datei mit Hinweisen zum Mitmachen.
+- **GitHub Discussions:** Für Fragen eingeschaltet; die README verlinkt dorthin.
+
 ### English
+
+Fourth pre-release. A test alarm and a real alarm from FF Agent have arrived successfully through ntfy on the developer's system; accepting and declining have not yet been checked against a real FF Agent.
+
+**Update:** After updating, restart Home Assistant **and hard-reload the page in the
+browser** (Ctrl+F5, on a Mac Cmd+Shift+R). In the companion app, restart the app or clear
+the frontend cache in the app settings. Otherwise the dialogs of the integration may show
+no text or old text.
 
 #### Changed
 
@@ -38,6 +63,15 @@ Alle nennenswerten Änderungen an dieser Integration. Format angelehnt an
   square instead of the plain "FF" square. It is an original, generic motif (not a logo of
   FF Agent, Home Assistant or HACS). The source is `docs/assets/logo.svg`, and the README
   shows the icon at the top.
+
+#### Documentation
+
+- **README revised:** New badge bar (release, contributors, issues, discussions, HACS, tests,
+  license), an "Open in HACS" button (My Home Assistant), notice boxes on the pre-release
+  status and on privacy, and a disclaimer. New sections are "Issues and questions",
+  "Contributing", "Support the project" and "Further resources".
+- **CONTRIBUTING.md:** New file with notes on contributing.
+- **GitHub Discussions:** Enabled for questions; the README links there.
 
 ## [0.3.0] – 2026-10-18 (Vorabversion)
 
@@ -204,6 +238,8 @@ Siehe README, Abschnitt „Bekannte Einschränkungen“. Die wichtigsten:
 - Belegt ist nur das Verkehrsmittel „Auto“.
 - Eine Antwort mit Status 2xx heißt nur „gesendet“, nicht sicher „verbucht“.
 
+[Unreleased]: https://github.com/rauchstefan/ha-ff-agent/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/rauchstefan/ha-ff-agent/releases/tag/v0.4.0
 [0.3.0]: https://github.com/rauchstefan/ha-ff-agent/releases/tag/v0.3.0
 [0.2.0]: https://github.com/rauchstefan/ha-ff-agent/releases/tag/v0.2.0
 [0.1.0]: https://github.com/rauchstefan/ha-ff-agent/releases/tag/v0.1.0
