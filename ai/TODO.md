@@ -34,55 +34,33 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
 <!-- Themensammlung des Nutzers nach Test von v0.2.0 (2026-10-18). Abarbeitung erst nach
      seinem Go. Screenshots liegen nur im Chat, nicht im Repo. -->
 
-### 261018-leere-dialogtexte – Leere Menütexte in Einrichtung und Neukonfiguration (v0.2.0)
-- **Status:** offen (wartet auf Go des Nutzers)
-- **Priorität:** hoch
-- **Rolle(n):** Nutzer (Gegenprobe), entwickler, tester, reviewer
-- **Beschreibung:** Rückmeldung des Nutzers nach Installation von v0.2.0 über HACS. Die
-  Menü-Dialoge zeigen nur den Titel „FF Agent“ und Pfeile, aber keinen Titel, keine
-  Beschreibung und keine Optionstexte:
-  - Neu konfigurieren > „Home Assistant Cloud …“ gewählt: Menü mit 3 leeren Einträgen
-    (passt zu `alarm_source_cloud`/`no_cloud`/`cloud_setup*`, Nutzerpunkt 2)
-  - Neu konfigurieren > „ntfy“ gewählt: Menü mit 2 leeren Einträgen (passt zu `ntfy`,
-    Nutzerpunkt 3)
-  - Neue Einrichtung: nach dem ersten Schritt Menü mit 2 leeren Einträgen (passt zu
-    `alarm_source`, Nutzerpunkt 4)
-
-  Befund des Projektleiters (noch nicht verifiziert): Der Screenshot der
-  Neukonfiguration zeigt Texte aus v0.1.0 („… oder den Webhook-Zugang neu erzeugen“,
-  Feld „Webhook-Zugang neu erzeugen“), die mit dddc3f9 ersetzt wurden. Die Auswahl-Optionen
-  (Abschnitt `selector`) sind dagegen schon neu. Das spricht dafür, dass Home Assistant
-  die `config`-Übersetzungen von v0.1.0 noch im Speicher hält, weil nach dem HACS-Update
-  kein Neustart erfolgte. Neue Schritte haben dann keine Texte, und das Feld
-  `alarm_source` erscheint mit seinem Schlüssel statt „Weg für den Alarm“.
-  - **Nachtrag 2026-10-18:** Der Nutzer bestätigt, dass Home Assistant nach dem Update
-    neu gestartet wurde. Die Neustart-Hypothese ist damit verworfen. Geprüft: Der Tag
-    v0.2.0 enthält die neuen Texte (`alarm_source_cloud` vorhanden, „Webhook-Zugang neu
-    erzeugen“ nicht mehr), `manifest.json` steht auf 0.2.0.
-  - Offene Hypothesen für die Analyse:
-    - Browser/Frontend hält alte Übersetzungen (Gegenprobe: harter Reload, anderer
-      Browser oder privates Fenster)
-    - Auf der Instanz liegen andere Dateien als im Tag (Gegenprobe: `translations/de.json`
-      unter `custom_components/ff_agent/` auf der Instanz ansehen)
-    - Echter Fehler in Übersetzungsschlüsseln oder `description_placeholders`
-      (`_link_placeholders()`), etwa ein ungültiger Platzhalter, der das Frontend die
-      ganze Übersetzung verwerfen lässt. Ohne `strings.json`, nur `translations/`.
-  - Unabhängig davon prüfen, ob README/Release-Notes nach einem Update auf den nötigen
-    Neustart hinweisen; sonst Hinweis ergänzen.
-- **Definition of Done:** Ursache geklärt. Nach Update plus Neustart zeigen alle Menüs
-  der Einrichtung und Neukonfiguration Titel, Beschreibung und Optionstexte (de und en).
-  Ist es ein Code-Fehler: Fix mit Regressionstest, der für jeden `step_id` und jede
-  Menüoption einen Übersetzungseintrag verlangt. Ist es nur der Neustart: Hinweis in
-  README und CHANGELOG.
-- **Verweise:** Nutzerpunkte 2–4 im Chat vom 2026-10-18; `config_flow.py`
-  (`_async_show_menu`, `async_step_reconfigure`), `translations/de.json`, `en.json`
+### 261018-leere-dialogtexte – Hinweis auf Browser-Cache nach Update (leere Menütexte in v0.2.0)
+- **Status:** offen (wartet auf Go des Nutzers); Ursache geklärt, kein Code-Fehler
+- **Priorität:** niedrig
+- **Rolle(n):** doku
+- **Beschreibung:** Rückmeldung des Nutzers nach Installation von v0.2.0 über HACS
+  (Nutzerpunkte 2–4): Die Menüs der Einrichtung und der Neukonfiguration zeigten nur
+  den Titel „FF Agent“ und Pfeile ohne Texte. Die Neukonfiguration zeigte noch Texte aus
+  v0.1.0 („Webhook-Zugang neu erzeugen“), die Auswahl-Optionen dagegen schon neue.
+  - Ursache: **Browser-Cache.** Home Assistant war neu gestartet, ohne Wirkung. Erst ein
+    harter Reload (Strg+F5) brachte die neuen Texte (Gegenprobe des Nutzers am
+    2026-10-18, Menü „Nutzt du Home Assistant Cloud?“ vollständig).
+  - Der Tag v0.2.0 enthält die richtigen Übersetzungen; am Code ist nichts zu ändern.
+  - Offen bleibt nur ein Hinweis für Nutzer: Nach einem Update Home Assistant neu
+    starten und den Browser hart neu laden (Strg+F5, in der App ggf. Cache leeren),
+    falls Dialoge leer oder veraltet aussehen.
+- **Definition of Done:** README (Abschnitt Installation/Update oder Fehlersuche) und
+  CHANGELOG des nächsten Release nennen Neustart plus harten Browser-Reload nach einem
+  Update. Kein Herstellername.
+- **Verweise:** Nutzerpunkte 2–4 im Chat vom 2026-10-18
 
 ### 261018-reconfig-alarmquelle-text – Feld „Alarmquelle“ in der Neukonfiguration als Frage mit Hinweis
 - **Status:** offen (wartet auf Go des Nutzers)
 - **Priorität:** mittel
 - **Rolle(n):** entwickler, tester, reviewer
 - **Beschreibung:** Nutzerpunkt 1. In der Neukonfiguration steht über der Auswahl der
-  Alarmquelle nur „alarm_source“ (siehe 261018-leere-dialogtexte zur Ursache). Gewünscht
+  Alarmquelle „alarm_source“; das lag am Browser-Cache (261018-leere-dialogtexte). Der
+  aktuelle Text „Weg für den Alarm“ ist ebenfalls nur ein generisches Label. Gewünscht
   ist statt eines generischen Labels eine **Frage**, wie die Integration die Alarme
   erhält, etwa „Wie bekommt Home Assistant den Alarm?“. Bei der Option Home Assistant
   Cloud soll direkt stehen, was sie voraussetzt: ein Abo (Home Assistant Cloud) **oder**
