@@ -61,7 +61,7 @@ Agent auf. Daten kommen ausschließlich per Push von FF Agent, es gibt kein Abfr
 1. In HACS oben rechts das Menü (⋮) öffnen, *Benutzerdefinierte Repositories* wählen, die
    URL `https://github.com/rauchstefan/ha-ff-agent` eintragen und als Typ „Integration“
    hinzufügen.
-2. „FF Agent“ öffnen. Solange es nur die Vorabversion 0.2.0 gibt: im Menü (⋮) bzw. in den
+2. „FF Agent“ öffnen. Solange es nur Vorabversionen gibt (aktuell 0.2.0): im Menü (⋮) bzw. in den
    Einstellungen des Repositorys Beta-/Vorabversionen aktivieren. Dann herunterladen und Home
    Assistant neu starten.
 3. Unter *Einstellungen → Geräte & Dienste → Integration hinzufügen* „FF Agent“ wählen.

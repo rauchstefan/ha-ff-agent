@@ -11,11 +11,15 @@ Zweite Vorabversion. **Noch nicht gegen ein echtes FF Agent getestet.** Besonder
 Weg über ntfy ist bisher nur mit Mocks geprüft, nicht gegen einen echten ntfy-Dienst und
 nicht mit einem echten Alarm aus FF Agent.
 
+**Update:** Nach dem Update Home Assistant neu starten. Bestehende Einträge laufen
+unverändert über den Webhook weiter. Wer auf ntfy wechseln will, richtet die
+Core-Integration ntfy ein und wählt unter „Neu konfigurieren“ den neuen Alarmweg.
+
 ### Behoben
 
 - **Neutraler Hersteller in der Geräte-Info:** Die Geräte-Info zeigt jetzt
   „ha-ff-agent (inoffiziell)“ als Hersteller. Das Projekt ist ein inoffizielles
-  Community-Projekt und nennt in keinem Text einen Firmennamen von FF Agent.
+  Community-Projekt; die Integration nennt keinen Firmennamen von FF Agent.
 - **Fundort der Rückmelde-URL:** Die URL steht in FF Agent nicht unter „Automatisierung“,
   sondern unter *Personen → (dein Name) → Bereich „Übung/Einsatz“ → „Weblinks für
   Einsatzmeldung“*. Korrigiert sind die Hilfetexte im Einrichtungsdialog (Deutsch und
@@ -43,6 +47,17 @@ nicht mit einem echten Alarm aus FF Agent.
   wechseln; „Neue geheime Adresse erzeugen“ gilt für Webhook und ntfy.
 - Bestehende Einträge werden beim Update automatisch übernommen und bleiben beim Webhook
   (Config-Eintrag Version 1.2).
+
+### Bekannte Einschränkungen
+
+Details in der README unter „Bekannte Einschränkungen“ und „Grenzen von ntfy“. Die
+wichtigsten:
+
+- Testalarm und echter Alarm sind in Home Assistant nicht unterscheidbar.
+- ntfy: Ein Alarm während einer Unterbrechung der ntfy-Verbindung geht verloren.
+- Zu- und Absage gehen nur, wenn die Person für den aktiven Einsatz alarmiert wurde. Eine
+  Antwort mit Status 2xx heißt nur „gesendet“, nicht sicher „verbucht“.
+- Einsatzdetails gibt es noch nicht.
 
 ## [0.1.0] – 2026-10-17 (Vorabversion)
 
