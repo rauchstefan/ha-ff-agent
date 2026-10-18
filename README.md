@@ -26,7 +26,7 @@ mission software for fire brigades and emergency services) available in Home Ass
 > **Inoffizielles Community-Projekt, nicht mit dem Hersteller von FF Agent verbunden.**
 > **Unofficial community project, not affiliated with the vendor of FF Agent.**
 >
-> **Vorabversion 0.3.0 / Pre-release 0.3.0:** Test- und Echtalarm aus FF Agent
+> **Vorabversion 0.4.0 / Pre-release 0.4.0:** Test- und Echtalarm aus FF Agent
 > kommen an; Zusage und Absage sind noch nicht gegen ein echtes FF Agent getestet. In HACS bei „FF Agent“ die Anzeige von Beta-/Vorabversionen aktivieren, um sie
 > zu installieren. / Test and real alarms from FF Agent arrive; accepting and declining
 > have not yet been tested against a real FF Agent. In HACS, enable showing
@@ -119,7 +119,7 @@ starten.
 1. In HACS oben rechts das Menü (⋮) öffnen, *Benutzerdefinierte Repositories* wählen, die
    URL `https://github.com/rauchstefan/ha-ff-agent` eintragen und als Typ „Integration“
    hinzufügen.
-2. „FF Agent“ öffnen. Solange es nur Vorabversionen gibt (aktuell 0.3.0): im Menü (⋮) bzw.
+2. „FF Agent“ öffnen. Solange es nur Vorabversionen gibt (aktuell 0.4.0): im Menü (⋮) bzw.
    in den Einstellungen des Repositorys Beta-/Vorabversionen aktivieren. Dann herunterladen
    und Home Assistant neu starten.
 3. Unter *Einstellungen → Geräte & Dienste → Integration hinzufügen* „FF Agent“ wählen.
@@ -810,7 +810,7 @@ HACS. Then install "FF Agent" there and restart Home Assistant.
 
 1. In HACS open the menu (⋮) at the top right, choose *Custom repositories*, enter the URL
    `https://github.com/rauchstefan/ha-ff-agent` and add it with type "Integration".
-2. Open "FF Agent". As long as there are only pre-releases (currently 0.3.0): enable
+2. Open "FF Agent". As long as there are only pre-releases (currently 0.4.0): enable
    beta/pre-releases in the menu (⋮) or in the settings of the repository. Then download
    and restart Home Assistant.
 3. Under *Settings → Devices & services → Add integration* choose "FF Agent".
