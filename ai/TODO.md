@@ -31,6 +31,19 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
 
 ## Offen
 
+### 261018-standort-quelle – Standortquelle wählbar (HA-Zuhause, Koordinaten, Entität)
+- **Status:** in Arbeit (lokal-2026-10-18-standort-quelle, 2026-10-18)
+- **Priorität:** hoch
+- **Rolle(n):** entwickler, tester, reviewer, doku
+- **Beschreibung:** Das Feld „Standort-Entität“ im Einrichtungsdialog wirkt seltsam. Der Nutzer
+  will als Standort bei der Zusage wählen können: kein Standort, die Zuhause-Position von
+  Home Assistant, manuell eingetragene Koordinaten (Breiten-/Längengrad) oder – als letzte
+  Option – wie bisher eine Person/einen Geräte-Tracker.
+- **Definition of Done:** Auswahl im Config- und Options-Flow; Zusage sendet den Standort
+  der gewählten Quelle; bestehende Einträge mit Entität laufen unverändert weiter; Tests
+  grün bei 100 % Abdeckung; README und CHANGELOG angepasst.
+- **Verweise:** Chat vom 2026-10-18
+
 ### 261018-test-zusage-absage – Zusage und Absage gegen echtes FF Agent prüfen
 - **Status:** offen (Test durch den Nutzer)
 - **Priorität:** hoch
