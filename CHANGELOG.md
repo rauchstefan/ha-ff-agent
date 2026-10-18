@@ -53,12 +53,12 @@ no text or old text.
 - **Location source instead of location entity:** The optional field "Location entity" is
   replaced by the required choice "Location source", in the setup step "Accepting: transport
   and location" and under "Configure". The choices are "No location" (default), "Home position
-  from Home Assistant" (read when accepting), "Enter coordinates manually" (latitude and
+  of Home Assistant" (read when accepting), "Enter coordinates manually" (latitude and
   longitude in decimal degrees) and "Person or device tracker (live location)". Existing
   entries with a location entity keep working unchanged. Changing the source deletes the
   values of the old source. Coordinates are redacted in the diagnostics and are never logged.
-  The action `ff_agent.accept` with `latitude` and `longitude` still takes precedence; a
-  rejection never sends a location.
+  The action `ff_agent.accept` with `latitude` and `longitude` still takes precedence;
+  declining never sends a location.
 - **New icon:** The icon of the integration is now a house with "FF" on a red rounded
   square instead of the plain "FF" square. It is an original, generic motif (not a logo of
   FF Agent, Home Assistant or HACS). The source is `docs/assets/logo.svg`, and the README
