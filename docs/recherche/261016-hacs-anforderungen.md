@@ -198,6 +198,8 @@ ha-ff-agent/
 }
 ```
 
+Stand 2026-10-18: Die produktive `hacs.json` enthält zusätzlich `"hide_default_branch": true` (Fix `261018-hacs-version`, siehe `docs/recherche/261018-hacs-update-dialog.md`).
+
 ### 4.3 manifest.json (Beispiel, Werte vom Architekten festzulegen)
 
 ```json
