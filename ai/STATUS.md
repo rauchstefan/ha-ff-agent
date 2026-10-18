@@ -3,10 +3,10 @@
 Was ist der aktuelle Stand der Integration? Diese Datei beantwortet das für jede neue
 Session. Von Hand gepflegt.
 
-- **Version:** 0.1.0, GitHub-Release `v0.1.0` als **Vorabversion** (2026-10-17). `main` ist
-  weiter: Die Änderungen aus #4 und #6 stehen im CHANGELOG unter „Unreleased“. Ein neues
-  Release (v0.2.0) gibt es nur mit Freigabe des Nutzers.
-- **Seit v0.1.0 auf main (2026-10-18):**
+- **Version:** 0.2.0. GitHub-Release `v0.2.0` als **Vorabversion** (2026-10-18, Tag auf
+  dabe583). Davor `v0.1.0` (2026-10-17, ebenfalls Vorabversion).
+- **Neu in v0.2.0:**
+  - neutraler Hersteller „ha-ff-agent (inoffiziell)“ (rauchstefan/ha-ff-agent#7)
   - Fundort der Rückmelde-URL korrigiert; Verkehrsmittel `car`/`feet`/`bicycle`
     (rauchstefan/ha-ff-agent#4)
   - Alarmquelle wählbar, Home Assistant Cloud/Webhook oder ntfy, mit geführten
@@ -38,7 +38,7 @@ Session. Von Hand gepflegt.
   - `tests.yml`: ruff, pytest mit pytest-homeassistant-custom-component, Python 3.14,
     Abdeckungs-Gate 95 %, aktuell 100 %
   - Dependabot
-- **Letzte Änderung:** 2026-10-18 – Merge von rauchstefan/ha-ff-agent#4 und #6
+- **Letzte Änderung:** 2026-10-18 – Pre-Release v0.2.0
 
 ## Was funktioniert
 

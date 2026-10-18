@@ -53,7 +53,7 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
   ganz zu entfernen hieße, die Historie erneut umzuschreiben.
 
 ### 261018-release-0-2-0 – Release v0.2.0 als Vorabversion
-- **Status:** Release-PR gemergt (rauchstefan/ha-ff-agent#7, dabe583, CI grün; tester PASS, reviewer freigegeben). Wartet auf das Go des Nutzers für Tag und GitHub-Release v0.2.0 (Pre-Release).
+- **Status:** erledigt (2026-10-18, Pre-Release v0.2.0 auf dabe583: https://github.com/rauchstefan/ha-ff-agent/releases/tag/v0.2.0; Go des Nutzers im Chat)
 - **Priorität:** hoch
 - **Rolle(n):** entwickler, tester, reviewer, Projektleiter
 - **Beschreibung:** Auftrag des Nutzers: „Bereite ein Release v0.2.0 als Vorabversion

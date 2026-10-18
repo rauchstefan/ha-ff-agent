@@ -22,6 +22,33 @@ Das Journal ist Verlauf, keine Wissensbasis: Dauerhaftes gehört nach `docs/` od
 
 <!-- Neue Einträge direkt unter dieser Zeile einfügen -->
 
+## 2026-10-18 – lokal-2026-10-16-hacs-recherche – Release v0.2.0 (Vorabversion)
+- **Nutzer-Aufträge:**
+  - „Bereite ein Release v0.2.0 als Vorabversion vor.“
+  - Hersteller: neutraler Eintrag (Rückfrage).
+  - „Go: Lege Tag und GitHub-Release v0.2.0 als Pre-Release auf dabe583 an.“
+- **Delegiert:** entwickler (Sonnet) für den Release-PR, tester (Sonnet) und reviewer (Opus)
+  parallel.
+- **Erledigt:**
+  - PR rauchstefan/ha-ff-agent#7 per Squash gemergt (dabe583):
+    - `MANUFACTURER = "ha-ff-agent (inoffiziell)"`
+    - Version 0.2.0
+    - CHANGELOG `[0.2.0]`
+    - README und Testanleitung
+    - Test: kein Herstellername in Code und Nutzerdoku
+    - Test: Manifest-Version = oberste CHANGELOG-Version
+    - Regel in CLAUDE.md
+  - tester PASS, reviewer freigegeben. Seine Text-Hinweise hat der Projektleiter direkt
+    auf dem Branch korrigiert: Reichweite der Firmennamen-Aussage, Einschränkungen,
+    Update-Hinweis, „Vorabversionen“.
+  - **Pre-Release v0.2.0** auf dabe583 angelegt; die Release-Notes stammen aus dem
+    CHANGELOG plus Installationshinweis.
+- **Offen / Übergabe:**
+  - 261018-recherche-namen (Entscheidung des Nutzers)
+  - Ergebnisse des echten Tests (Rückmeldeliste)
+  - 261018-ntfy-feinschliff, 261018-configflow-aufteilen, 261017-zusage-standort-transport,
+    261017-quality-todos, 261017-hacs-default
+
 ## 2026-10-18 – lokal-2026-10-16-hacs-recherche – Merge von #4 und #6
 - **Nutzer-Auftrag:** „Ich bin mit dem Testen fertig. Merge #4 und #6.“
 - **Erledigt:**
