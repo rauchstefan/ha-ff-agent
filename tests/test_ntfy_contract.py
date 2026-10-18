@@ -172,3 +172,55 @@ def test_get_url_takes_allow_cloud() -> None:
 def test_restored_attribute() -> None:
     """The placeholder state of the registry is marked with "restored"."""
     assert ha_const.ATTR_RESTORED == "restored"
+
+
+def _assigns_available_false(node: ast.AST) -> bool:
+    """Return whether the code below the node sets _attr_available to False."""
+    for child in ast.walk(node):
+        if isinstance(child, ast.Assign | ast.AnnAssign):
+            targets = child.targets if isinstance(child, ast.Assign) else [child.target]
+            names = {
+                target.attr if isinstance(target, ast.Attribute) else target.id
+                for target in targets
+                if isinstance(target, ast.Attribute | ast.Name)
+            }
+            value = child.value
+            if (
+                "_attr_available" in names
+                and isinstance(value, ast.Constant)
+                and value.value is False
+            ):
+                return True
+    return False
+
+
+def test_ntfy_entity_is_not_unavailable_when_added() -> None:
+    """Adding the entity does not write "unavailable" by itself.
+
+    The filter treats the first state after the registry placeholder as the restored
+    value. That relies on the entity not going through an "unavailable" of its own
+    while it is added: no available property, no _attr_available = False in the
+    class body, in __init__ or in async_added_to_hass.
+    """
+    for path, name in (
+        (NTFY / "entity.py", "NtfyBaseEntity"),
+        (NTFY / "event.py", "NtfyEventEntity"),
+    ):
+        cls = next(
+            node
+            for node in _tree(path).body
+            if isinstance(node, ast.ClassDef) and node.name == name
+        )
+        methods = {
+            node.name: node
+            for node in cls.body
+            if isinstance(node, ast.FunctionDef | ast.AsyncFunctionDef)
+        }
+        assert "available" not in methods
+        class_level = [
+            node for node in cls.body if isinstance(node, ast.Assign | ast.AnnAssign)
+        ]
+        assert not any(_assigns_available_false(node) for node in class_level)
+        for method in ("__init__", "async_added_to_hass"):
+            if method in methods:
+                assert not _assigns_available_false(methods[method])
