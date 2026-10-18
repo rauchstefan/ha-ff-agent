@@ -90,9 +90,12 @@ def test_manifest_describes_a_push_service() -> None:
     assert "single_config_entry" not in manifest
 
 
-def test_manifest_version_is_unchanged() -> None:
-    """The version only changes together with a release."""
-    assert _load(INTEGRATION / "manifest.json")["version"] == "0.1.0"
+def test_manifest_version_matches_the_latest_changelog_release() -> None:
+    """The manifest version is the newest released version in the CHANGELOG."""
+    changelog = (ROOT / "CHANGELOG.md").read_text("utf-8")
+    latest = re.search(r"^## \[(\d+\.\d+\.\d+)\]", changelog, re.MULTILINE)
+    assert latest is not None
+    assert _load(INTEGRATION / "manifest.json")["version"] == latest.group(1)
 
 
 def test_manifest_key_order() -> None:

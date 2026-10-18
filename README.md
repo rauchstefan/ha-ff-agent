@@ -6,7 +6,7 @@ Feuerwehren und Hilfsorganisationen) in Home Assistant verfügbar macht.
 
 > **Inoffizielles Community-Projekt, nicht mit dem Hersteller von FF Agent verbunden.**
 >
-> **Vorabversion 0.1.0:** noch nicht gegen ein echtes FF Agent getestet. In HACS bei
+> **Vorabversion 0.2.0:** noch nicht gegen ein echtes FF Agent getestet. In HACS bei
 > „FF Agent“ die Anzeige von Beta-/Vorabversionen aktivieren, um sie zu installieren.
 
 ## Was die Integration tut und was nicht
@@ -61,7 +61,7 @@ Agent auf. Daten kommen ausschließlich per Push von FF Agent, es gibt kein Abfr
 1. In HACS oben rechts das Menü (⋮) öffnen, *Benutzerdefinierte Repositories* wählen, die
    URL `https://github.com/rauchstefan/ha-ff-agent` eintragen und als Typ „Integration“
    hinzufügen.
-2. „FF Agent“ öffnen. Solange es nur die Vorabversion 0.1.0 gibt: im Menü (⋮) bzw. in den
+2. „FF Agent“ öffnen. Solange es nur die Vorabversion 0.2.0 gibt: im Menü (⋮) bzw. in den
    Einstellungen des Repositorys Beta-/Vorabversionen aktivieren. Dann herunterladen und Home
    Assistant neu starten.
 3. Unter *Einstellungen → Geräte & Dienste → Integration hinzufügen* „FF Agent“ wählen.
@@ -601,7 +601,7 @@ MIT, siehe [LICENSE](LICENSE).
 ## English summary
 
 Unofficial Home Assistant custom integration (HACS) for **FF Agent**, an alerting app for
-fire brigades and emergency services. It is not affiliated with the vendor. Version 0.1.0
+fire brigades and emergency services. It is not affiliated with the vendor. Version 0.2.0
 is a pre-release that has not yet been tested against a real FF Agent account.
 
 - **What it does:** FF Agent calls a personal webhook on every alarm. It either points at

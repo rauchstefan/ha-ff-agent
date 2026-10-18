@@ -1,7 +1,7 @@
 # Erster echter Test: Anleitung für den Nutzer
 
 TODO-ID: `261017-echter-test` · Freigabe des Nutzers am 2026-10-17 erteilt · Stand:
-Release v0.1.0 (Vorabversion), Installation über HACS
+Release v0.2.0 (Vorabversion), Installation über HACS
 
 Ziel: Herausfinden, wie sich FF Agent wirklich verhält. Die Annahmen aus ADR 0002
 (A1–A13) werden geprüft. Was du siehst, trägst du in die **Rückmeldeliste** am Ende ein
@@ -38,18 +38,18 @@ Voraussetzung: HACS ist in deiner Instanz installiert.
 2. Repository `https://github.com/rauchstefan/ha-ff-agent`, Typ **Integration**,
    hinzufügen.
 3. In HACS nach **FF Agent** suchen und öffnen.
-4. Es gibt nur die Vorabversion **v0.1.0**. Damit HACS sie anbietet, beim Repository die
+4. Es gibt nur Vorabversionen (v0.1.0 und v0.2.0); wir testen **v0.2.0**. Damit HACS sie anbietet, beim Repository die
    Anzeige von Beta- bzw. Vorabversionen aktivieren (Menü ⋮ des Repositorys oder dessen
    Einstellungen). Ohne diese Einstellung bietet HACS den Stand von `main` mit einem
-   Commit-Kürzel als Version an. Das ginge auch, aber für den Test wollen wir v0.1.0.
+   Commit-Kürzel als Version an. Das ginge auch, aber für den Test wollen wir v0.2.0.
    - Wie der Schalter in deiner HACS-Version heißt und wo er liegt, bitte notieren
      (Rückmeldeliste, Punkt 12). Damit verbessern wir das README.
-5. **Herunterladen**, Version **v0.1.0** wählen.
+5. **Herunterladen**, Version **v0.2.0** wählen.
 6. Home Assistant **neu starten** (Einstellungen → System → Neu starten).
 7. Im Log steht danach eine Warnung, dass eine Custom-Integration geladen wurde, die
    nicht von Home Assistant getestet ist. Das ist normal.
 
-Ohne HACS: `custom_components/ff_agent` aus dem Release-ZIP von v0.1.0 nach
+Ohne HACS: `custom_components/ff_agent` aus dem Release-ZIP von v0.2.0 nach
 `/config/custom_components/ff_agent` kopieren und neu starten.
 
 ## 2. Einrichtung in Home Assistant

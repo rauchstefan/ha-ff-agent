@@ -5,8 +5,17 @@ Alle nennenswerten Änderungen an dieser Integration. Format angelehnt an
 
 ## [Unreleased]
 
+## [0.2.0] – 2026-10-18 (Vorabversion)
+
+Zweite Vorabversion. **Noch nicht gegen ein echtes FF Agent getestet.** Besonders der
+Weg über ntfy ist bisher nur mit Mocks geprüft, nicht gegen einen echten ntfy-Dienst und
+nicht mit einem echten Alarm aus FF Agent.
+
 ### Behoben
 
+- **Neutraler Hersteller in der Geräte-Info:** Die Geräte-Info zeigt jetzt
+  „ha-ff-agent (inoffiziell)“ als Hersteller. Das Projekt ist ein inoffizielles
+  Community-Projekt und nennt in keinem Text einen Firmennamen von FF Agent.
 - **Fundort der Rückmelde-URL:** Die URL steht in FF Agent nicht unter „Automatisierung“,
   sondern unter *Personen → (dein Name) → Bereich „Übung/Einsatz“ → „Weblinks für
   Einsatzmeldung“*. Korrigiert sind die Hilfetexte im Einrichtungsdialog (Deutsch und
@@ -69,4 +78,5 @@ Siehe README, Abschnitt „Bekannte Einschränkungen“. Die wichtigsten:
 - Belegt ist nur das Verkehrsmittel „Auto“.
 - Eine Antwort mit Status 2xx heißt nur „gesendet“, nicht sicher „verbucht“.
 
+[0.2.0]: https://github.com/rauchstefan/ha-ff-agent/releases/tag/v0.2.0
 [0.1.0]: https://github.com/rauchstefan/ha-ff-agent/releases/tag/v0.1.0
