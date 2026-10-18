@@ -64,6 +64,9 @@ Agent auf. Daten kommen ausschließlich per Push von FF Agent, es gibt kein Abfr
 2. „FF Agent“ öffnen. Solange es nur Vorabversionen gibt (aktuell 0.2.0): im Menü (⋮) bzw. in den
    Einstellungen des Repositorys Beta-/Vorabversionen aktivieren. Dann herunterladen und Home
    Assistant neu starten.
+   **Nach jedem Update:** Home Assistant neu starten und die Seite im Browser hart neu
+   laden (Strg+F5, am Mac Cmd+Umschalt+R). In der Companion-App die App neu starten bzw.
+   den Frontend-Cache in den App-Einstellungen leeren.
 3. Unter *Einstellungen → Geräte & Dienste → Integration hinzufügen* „FF Agent“ wählen.
 
 **Manuell:**
@@ -71,6 +74,9 @@ Agent auf. Daten kommen ausschließlich per Push von FF Agent, es gibt kein Abfr
 1. Den Ordner `custom_components/ff_agent` in das Verzeichnis `custom_components` deiner
    Home-Assistant-Konfiguration kopieren.
 2. Home Assistant neu starten.
+   **Nach jedem Update:** Home Assistant neu starten und die Seite im Browser hart neu
+   laden (Strg+F5, am Mac Cmd+Umschalt+R). In der Companion-App die App neu starten bzw.
+   den Frontend-Cache in den App-Einstellungen leeren.
 3. Die Integration wie oben hinzufügen.
 
 ## Wie kommt der Alarm an?
@@ -553,6 +559,11 @@ gezeigt.
 → Diagnose herunterladen.* Sie enthält keine Geheimnisse und zeigt unter anderem
 `url_kind`, `calls_total`, `rejected_total`, die Form des letzten Aufrufs und das Ergebnis
 der letzten Rückmeldung (ohne Adresse).
+
+**Dialoge ohne Text oder mit alten Texten:** Die Ursache ist meist der Browser-Cache. Ein
+Neustart von Home Assistant allein reicht nicht: Lade die Seite hart neu (Strg+F5, am Mac
+Cmd+Umschalt+R). In der Companion-App die App neu starten bzw. den Frontend-Cache in den
+App-Einstellungen leeren.
 
 **„Alarm kommt nicht an“**
 

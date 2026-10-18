@@ -1,5 +1,11 @@
 # Plan 261018: Rückmeldungen zu v0.2.0 (sieben Punkte, ein PR)
 
+> **Entscheidungen des Nutzers (2026-10-18), siehe „Offene Fragen“:** Punkt 6 entfällt, die
+> Button-Namen bleiben „Zusagen“/„Absagen“. Der Reset-Button heißt „Alarm zurücksetzen“ und
+> darf auf der Geräteseite zuerst stehen. Der Standort im Einrichtungsschritt bleibt wie in
+> den Optionen (Person und Geräte-Tracker), keine Zonen. Umgesetzt sind damit die Punkte 1–5
+> und 7.
+
 - **Branch/PR:** `feat/261018-v0-2-feedback`, ein PR, Squash-Merge nach Gate.
 - **TODOs:** 261018-leere-dialogtexte, -reconfig-alarmquelle-text, -ntfy-abschluss-redundant,
   -geraet-ohne-link, -einrichtung-zusage-optionen, -reihenfolge-zusage, -alarm-reset.
@@ -372,7 +378,12 @@ Bekannte Einschränkungen unverändert. English summary: Reset-Aktion nennen.
 
 ---
 
-## 6. „Zusagen“ vor „Absagen“ (261018-reihenfolge-zusage)
+## 6. „Zusagen“ vor „Absagen“ (261018-reihenfolge-zusage) – ENTFÄLLT
+
+**Entfällt (Entscheidung des Nutzers, 2026-10-18).** Die Button-Namen bleiben „Zusagen“ und
+„Absagen“ (englisch „Accept“ und „Decline“), nichts wird umbenannt. Der Rest dieses
+Abschnitts bleibt als Recherche erhalten; die Erkenntnis zur Sortierung steht als Fallstrick
+in `docs/architektur.md`.
 
 **Recherche (Frontend-Quellcode, Branch `dev`, abgerufen 2026-10-18)**
 - Die Geräteseite `src/panels/config/devices/ha-config-device-page.ts` sortiert alle
@@ -463,7 +474,8 @@ mit dem Hinweis, dass bestehende Entity-IDs bleiben.
   - **Neu:** Button und Aktion „Alarm zurücksetzen“ (`ff_agent.reset_alarm`); Einrichtung
     fragt Standard-Verkehrsmittel und Standort-Entität ab.
   - **Geändert:** Frage „Wie bekommt Home Assistant den Alarm?“ mit Voraussetzungen in der
-    Neukonfiguration; kürzerer ntfy-Abschluss; deutsche Button-Namen „Komme“/„Komme nicht“
+    Neukonfiguration; kürzerer ntfy-Abschluss; (deutsche Button-Namen „Komme“/„Komme nicht“
+    entfallen mit Punkt 6)
     (bestehende Entity-IDs bleiben).
   - **Entfernt:** Link „Besuchen“ in der Geräte-Info.
   - **Update:** Neustart plus harter Browser-Reload.
@@ -485,13 +497,13 @@ Jeder Commit hält die Tests grün; nach jedem Push CI prüfen.
 3. `feat: shorten the ntfy closing dialog when the address was shown` (Punkt 3)
 4. `feat: ask for transport and location during setup` (Punkt 4)
 5. `feat: add button and action to reset the alarm` (Punkt 5)
-6. `feat: name the reply buttons so that accepting comes first` (Punkt 6)
+6. ~~`feat: name the reply buttons so that accepting comes first` (Punkt 6)~~ entfällt
 7. `docs: update README, CHANGELOG and architecture for the v0.2.0 feedback` (Punkt 7 und
    gemeinsame Doku; README-Teile der Punkte 2–6 dürfen auch in deren Commits)
 
 ## Definition of Done (gesamt)
 
-- [ ] Alle sieben Punkte umgesetzt wie oben, de und en mit identischen Schlüsseln.
+- [ ] Alle Punkte außer dem entfallenen Punkt 6 umgesetzt wie oben, de und en mit identischen Schlüsseln.
 - [ ] CI grün: pytest, ruff, hassfest, HACS-Validierung.
 - [ ] Neue/angepasste Tests aus allen Abschnitten vorhanden; keine Prüfung auf alte Texte
       oder Platzhalter übrig.
@@ -503,7 +515,17 @@ Jeder Commit hält die Tests grün; nach jedem Push CI prüfen.
       Frage, ntfy-Abschluss ist kurz, Geräte-Info ohne „Besuchen“, Einrichtung fragt
       Verkehrsmittel/Standort, „Komme“ steht vor „Komme nicht“, Reset funktioniert.
 
-## Offene Fragen an den Nutzer
+## Offene Fragen an den Nutzer (entschieden am 2026-10-18)
+
+**Entscheidungen:**
+
+1. **Button-Namen:** Punkt 6 entfällt. Die Namen bleiben „Zusagen“/„Absagen“ (en wie bisher).
+2. **Feste Adresse:** Es bleibt bei der Standort-Entität (Person und Geräte-Tracker) wie in
+   den Optionen, keine Zonen.
+3. **Reset-Button:** Name „Alarm zurücksetzen“ (en „Reset alarm“). Er darf auf der
+   Geräteseite zuerst stehen.
+
+Ursprüngliche Fragen:
 
 1. **Button-Namen:** Einverstanden mit „Komme“/„Komme nicht“? Alternativen:
    „Ich komme“/„Ich komme nicht“ oder „Zusage: ja“/„Zusage: nein“. Ohne Antwort setzt der

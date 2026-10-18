@@ -5,6 +5,36 @@ Alle nennenswerten Änderungen an dieser Integration. Format angelehnt an
 
 ## [Unreleased]
 
+**Update:** Nach dem Update Home Assistant neu starten **und die Seite im Browser hart neu
+laden** (Strg+F5, am Mac Cmd+Umschalt+R). In der Companion-App die App neu starten bzw.
+den Frontend-Cache in den App-Einstellungen leeren. Sonst zeigen Dialoge der Integration
+unter Umständen keinen oder alten Text.
+
+### Neu
+
+- **Alarm zurücksetzen:** Neuer Button „Alarm zurücksetzen“ und neue Action
+  `ff_agent.reset_alarm` schalten „Alarm aktiv“ sofort aus und beenden die Rücksetzzeit.
+  „Letzter Alarm“ und das 30-Sekunden-Fenster gegen Doppelalarme bleiben unverändert.
+  Ohne aktiven Alarm passiert nichts; an FF Agent wird nichts gesendet.
+- **Verkehrsmittel und Standort bei der Einrichtung:** Die Einrichtung fragt jetzt nach der
+  Rückmelde-URL das Standard-Verkehrsmittel und die optionale Standort-Entität ab (Person
+  oder Gerät-Tracker). Beides war bisher nur unter „Konfigurieren“ einstellbar und bleibt
+  dort änderbar.
+
+### Geändert
+
+- **Neukonfiguration:** Die Auswahl des Alarmwegs heißt „Wie bekommt Home Assistant den
+  Alarm?“ und nennt die Voraussetzungen (Cloud-Abo oder aus dem Internet erreichbare
+  Adresse bzw. kostenlos über ntfy ohne Abo).
+- **Kürzerer ntfy-Abschluss:** Der Abschlussdialog wiederholt die Werte für FF Agent nur
+  noch, wenn die gewählte Entität eine andere Adresse hat als der Dialog davor. Sonst
+  genügt ein Hinweis auf den Testalarm.
+
+### Entfernt
+
+- **Link „Besuchen“ in der Geräte-Info:** Das Gerät verweist nicht mehr auf eine Website.
+  Der Link bestehender Geräte verschwindet nach dem Neustart.
+
 ## [0.2.0] – 2026-10-18 (Vorabversion)
 
 Zweite Vorabversion. **Noch nicht gegen ein echtes FF Agent getestet.** Besonders der
