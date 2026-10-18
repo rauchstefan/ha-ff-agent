@@ -208,9 +208,7 @@ def _async_watch_for_subscription(
             hass.config_entries.async_schedule_reload(entry.entry_id)
 
     entry.async_on_unload(
-        hass.bus.async_listen(
-            er.EVENT_ENTITY_REGISTRY_UPDATED, _async_registry_created
-        )
+        hass.bus.async_listen(er.EVENT_ENTITY_REGISTRY_UPDATED, _async_registry_created)
     )
 
 
