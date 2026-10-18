@@ -27,8 +27,9 @@ ROOT = Path(__file__).parent.parent
 INTEGRATION = ROOT / "custom_components" / DOMAIN
 # Firmenname des Herstellers von FF Agent, absichtlich nicht im Klartext
 # (öffentliches Repo). Die Prüfung ist eine case-insensitive Teilstring-Suche.
+_ENCODED_VENDOR_WORDS = ("bWFja295", "Y29uc3VsdGluZw==")
 _FORBIDDEN_VENDOR_WORDS = tuple(
-    base64.b64decode(word).decode() for word in ("bWFja295", "Y29uc3VsdGluZw==")
+    base64.b64decode(word).decode().lower() for word in _ENCODED_VENDOR_WORDS
 )
 # Menus of the config flow: step ID -> options.
 MENUS = {
@@ -544,10 +545,14 @@ def test_texts_name_no_vendor_and_no_price(language: str) -> None:
 
 
 def test_no_vendor_name_in_code_and_user_docs() -> None:
-    """No company name of FF Agent in the code, README or CHANGELOG.
+    """No company name of FF Agent in the code, user docs or project docs.
 
     This is an unofficial community project; the device info shows a neutral
-    manufacturer and no text names the vendor or operator of FF Agent.
+    manufacturer and no text names the vendor or operator of FF Agent. The
+    repository is public, so names of third parties must not reappear anywhere:
+    not in the integration, README or CHANGELOG, and not in the project docs
+    (``docs/``, ``ai/``, ``CLAUDE.md``, ``CONTRIBUTING.md``, agent definitions).
+    This test file is not scanned because it holds the words (encoded).
     """
     files = [
         path
@@ -556,10 +561,20 @@ def test_no_vendor_name_in_code_and_user_docs() -> None:
     ]
     files += [ROOT / "README.md", ROOT / "CHANGELOG.md"]
     assert len(files) > 10
-    for path in files:
+    docs = [
+        *(ROOT / "docs").rglob("*.md"),
+        *(ROOT / "ai").glob("*.md"),
+        ROOT / "CLAUDE.md",
+        ROOT / "CONTRIBUTING.md",
+        *(ROOT / ".claude" / "agents").glob("*.md"),
+    ]
+    assert len(docs) > 10
+    for path in [*files, *docs]:
         text = path.read_text("utf-8").lower()
         for forbidden in _FORBIDDEN_VENDOR_WORDS:
-            assert forbidden not in text, f"{forbidden!r} found in {path.name}"
+            assert forbidden not in text, (
+                f"{forbidden!r} found in {path.relative_to(ROOT)}"
+            )
 
 
 def test_manifest_does_not_depend_on_ntfy() -> None:
