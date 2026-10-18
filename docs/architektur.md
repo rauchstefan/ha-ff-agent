@@ -133,12 +133,21 @@ nicht zurück.
   (Registry-UUID), `ntfy_topic`, `ntfy_server`. Webhook-ID und Token bleiben im
   ntfy-Modus ruhend erhalten, damit ein Wechsel zurück ohne Sonderfall geht.
 - **`options`:** `require_token` (Standard aus), `reset_minutes`, `default_transport`
-  (`car`, `feet` oder `bicycle`; an FF Agent gehen `CAR`, `FEET`, `BICYCLE`), `location_entity` (optional, `person` oder `device_tracker`). Beide Werte
-  fragt auch der Einrichtungsschritt `reply_settings` ab, sie landen beim Anlegen in `options`.
+  (`car`, `feet` oder `bicycle`; an FF Agent gehen `CAR`, `FEET`, `BICYCLE`) und
+  `location_source` (`none`, `home`, `manual` oder `entity`; Standard `none`).
+  Zur Quelle gehören nur ihre eigenen Werte: bei `manual` `location_latitude` und
+  `location_longitude`, bei `entity` `location_entity` (`person` oder `device_tracker`);
+  bei `home` wird nichts gespeichert, die Zuhause-Position von Home Assistant liest
+  `reply.py` erst beim Senden. Der Einrichtungsschritt `reply_settings` fragt
+  Verkehrsmittel und Quelle ab, bei `manual`/`entity` folgt ein Schritt
+  (`location_manual`/`location_entity`); die Werte landen beim Anlegen in `options`.
+  Optionen ohne `location_source` (aus der Zeit davor) leitet `configured_location_source()` ab:
+  mit `location_entity` gilt `entity`, sonst `none`. Eine Migration gibt es dafür nicht
+  (Entscheidung im PR zu `261018-standort-quelle`).
 - **Flows:**
   - `user` mit Name und Rückmelde-URL; ohne Online-Test, weil jeder Test eine echte
     Rückmeldung wäre. Danach der Schritt `reply_settings` (Standard-Verkehrsmittel,
-    optional Standort-Entität; ohne Zonen, die Werte hängt `reply.py` bei jeder Zusage
+    Standortquelle; ohne Zonen, die Werte hängt `reply.py` bei jeder Zusage
     an; an der gespeicherten Rückmelde-UUID ändert sich nichts) und die Frage „Nutzt du Home Assistant Cloud?“ (Menü
     `alarm_source` bzw. `alarm_source_cloud`) und je Pfad ein Einrichtungsdialog
     (`cloud_setup`/`cloud_setup_retry`/`cloud_not_connected` bzw. `ntfy`, `ntfy_select`).
@@ -168,7 +177,7 @@ nicht zurück.
   ntfy-Entität. Die `entity_id` enthält das Thema, wenn das Abo keinen Anzeigenamen hat.
   Von eingehenden Headern wird nur der Name erfasst, nie der Wert. Die Geheimnisse stehen nie in
   Logs, Entitätsattributen oder `unique_id`s. In Diagnostics werden sie redigiert, ebenso
-  Titel und `location_entity`.
+  Titel, `location_entity` sowie `location_latitude`/`location_longitude`.
 - **Webhook-Inhalt:** Gespeichert wird nur seine Form (Schlüssel, Typen, Längen), keine
   Werte.
 - **Recorder:** Er speichert nur Zeitpunkte und Zustände. Spätere Detail-Entitäten nutzen
