@@ -550,7 +550,6 @@ Entitäten* mit der Suche nach dem Namen des Eintrags. Es sind sieben Entitäten
 - Rest-Risiko Verlust: Kommt eine Meldung genau in dem Moment an, in dem FF Agent startet
   oder neu lädt (bevor die Integration der ntfy-Entität zuhört), kann ein Alarm verloren
   gehen. Das Zeitfenster ist sehr klein.
-- Der Weg über ntfy ist noch nicht gegen ein echtes FF Agent getestet.
 
 ## Optional: iCal über Remote Calendar
 
@@ -1145,7 +1144,6 @@ buttons).
 - Residual risk of loss: if a message arrives at the very moment FF Agent starts or reloads
   (before the integration listens to the ntfy entity), an alarm can be lost. The time
   window is very small.
-- The way through ntfy has not been tested against a real FF Agent yet.
 
 ## Optional: iCal through Remote Calendar
 
