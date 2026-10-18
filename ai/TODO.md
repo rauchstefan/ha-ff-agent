@@ -108,6 +108,48 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
 - **Verweise:** Chat vom 2026-10-18; `custom_components/ff_agent/entity.py`,
   `const.py`, `tests/test_entities.py`
 
+### 261018-einrichtung-zusage-optionen – Verkehrsmittel und Standort schon bei der Einrichtung abfragen
+- **Status:** offen (wartet auf Go des Nutzers; Rückfrage zur „Adresse“ offen)
+- **Priorität:** mittel
+- **Rolle(n):** architekt (kurzes Design), entwickler, tester, reviewer, doku
+- **Beschreibung:** Wunsch des Nutzers: Bei der Einrichtung soll man das Verkehrsmittel
+  und die Adresse für die Zusage festlegen können. Die Werte sollen in die vom Nutzer
+  eingetragene, generische Zusage-URL von FF Agent einfließen. Damit der erste Dialog
+  übersichtlich bleibt, kommt diese Abfrage als **eigener Schritt nach** der Eingabe
+  der URL (vor der Wahl der Alarmquelle oder danach, im Design festlegen).
+  - Stand im Code: Die Integration speichert die URL nicht, sondern nur Host und UUID,
+    und hängt beim Zusagen `transport` sowie `lat`/`lng` als Query-Parameter an
+    (`reply.py`). Verkehrsmittel (`default_transport`) und Standort-Entität
+    (`location_entity`) gibt es bisher nur in den Optionen, nicht in der Einrichtung.
+  - Kern der Aufgabe also: beide Felder als Schritt in die Einrichtung übernehmen,
+    Vorbelegung wie in den Optionen, später in den Optionen änderbar.
+  - **Rückfrage an den Nutzer:** Ist mit „Adresse“ die vorhandene Standort-Entität
+    gemeint (z. B. `person.x` oder `device_tracker`), oder eine feste Adresse bzw.
+    feste Koordinaten? Eine feste Adresse als Text unterstützt die Integration bisher
+    nicht; ob FF Agent einen Adress-Parameter kennt, ist ungeklärt (ggf. researcher).
+- **Definition of Done:** Nach der URL folgt ein Schritt mit Verkehrsmittel und Standort
+  (optional). Die Werte landen in den Optionen des Eintrags und wirken auf Button und
+  Aktion „Zusagen“. de und en, Config-Flow-Tests, README aktualisiert.
+- **Verweise:** Chat vom 2026-10-18; `config_flow.py`, `reply.py`, `const.py`
+  (`CONF_DEFAULT_TRANSPORT`, `CONF_LOCATION_ENTITY`)
+
+### 261018-reihenfolge-zusage – „Zusagen“ vor „Absagen“ anzeigen
+- **Status:** offen (wartet auf Go des Nutzers)
+- **Priorität:** niedrig
+- **Rolle(n):** researcher (kurz), entwickler, tester, reviewer
+- **Beschreibung:** Wunsch des Nutzers: In der Integration (Geräteseite, Bereich
+  Steuerelemente) steht „Absagen“ vor „Zusagen“. Gewünscht ist die umgekehrte
+  Reihenfolge. Vermutung: Home Assistant sortiert Entitäten dort alphabetisch nach Namen,
+  die Reihenfolge in `button.py` wirkt also nicht. Vorher klären, welche Stellschrauben
+  es gibt (Namen, z. B. „Rückmeldung: Zusage“/„Rückmeldung: Absage“ ändern nichts an
+  der Sortierung; ggf. andere Benennung oder keine Lösung ohne Umbenennung). Mögliche
+  Folgen für Entity-IDs und Automationen der Nutzer beachten.
+- **Definition of Done:** Auf der Geräteseite steht „Zusagen“ vor „Absagen“, ohne dass
+  bestehende Entity-IDs brechen; oder dem Nutzer ist begründet, warum es nicht geht,
+  mit Alternativvorschlag.
+- **Verweise:** Chat vom 2026-10-18; `custom_components/ff_agent/button.py`,
+  `translations/*.json` (`entity.button`)
+
 ### 261018-recherche-namen – Namen Dritter in öffentlichen Recherche-Dateien
 - **Status:** offen (Entscheidung des Nutzers)
 - **Priorität:** mittel
