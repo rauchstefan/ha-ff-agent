@@ -107,22 +107,31 @@ Agent auf. Daten kommen ausschließlich per Push von FF Agent, es gibt kein Abfr
 
 <!-- docs-installation-instructions -->
 
-**Mit einem Klick:** Dieser Button öffnet deine eigene Home-Assistant-Instanz und fügt das
-Repository in HACS hinzu. Danach dort „FF Agent“ installieren und Home Assistant neu
-starten.
+**Über die HACS-Suche (empfohlen):** Die Integration ist im HACS-Standard-Store gelistet.
+Du brauchst dafür kein Custom Repository.
 
-[![In HACS öffnen][my-hacs-badge]][my-hacs-url]
-
-**Über HACS (Custom Repository), alternativ von Hand:**
-
-1. In HACS oben rechts das Menü (⋮) öffnen, *Benutzerdefinierte Repositories* wählen, die
-   URL `https://github.com/rauchstefan/ha-ff-agent` eintragen und als Typ „Integration“
-   hinzufügen.
+1. In Home Assistant *HACS* öffnen, zu *Integrationen* wechseln und oben nach „FF Agent“
+   suchen.
 2. „FF Agent“ öffnen, die neueste Version (aktuell 1.0.0) wählen, herunterladen und
    Home Assistant neu starten.
 3. Unter *Einstellungen → Geräte & Dienste → Integration hinzufügen* „FF Agent“ wählen.
 
-**Manuell:**
+**Oder mit einem Klick:** Dieser Button öffnet die Repository-Seite in HACS auf deiner
+eigenen Home-Assistant-Instanz.
+
+[![In HACS öffnen][my-hacs-badge]][my-hacs-url]
+
+**Alternative: als Custom Repository.** Nötig nur, wenn „FF Agent“ bei dir noch nicht in
+der HACS-Suche erscheint, oder wenn du eine andere Version willst, etwa eine Vorabversion.
+
+1. In HACS oben rechts das Menü (⋮) öffnen, *Benutzerdefinierte Repositories* wählen, die
+   URL `https://github.com/rauchstefan/ha-ff-agent` eintragen und als Typ „Integration“
+   hinzufügen.
+2. „FF Agent“ öffnen, die gewünschte Version wählen, herunterladen und Home Assistant neu
+   starten.
+3. Unter *Einstellungen → Geräte & Dienste → Integration hinzufügen* „FF Agent“ wählen.
+
+**Manuell (dritte Option, ohne HACS):**
 
 1. Den Ordner `custom_components/ff_agent` in das Verzeichnis `custom_components` deiner
    Home-Assistant-Konfiguration kopieren.
@@ -804,20 +813,28 @@ from FF Agent; nothing is polled.
 
 ## Installing
 
-**With one click:** this button opens your own Home Assistant and adds the repository to
-HACS. Then install "FF Agent" there and restart Home Assistant.
+**Through the HACS search (recommended):** The integration is listed in the HACS default
+store. You do not need a custom repository.
 
-[![Open in HACS][my-hacs-badge]][my-hacs-url]
-
-**Through HACS (custom repository), alternatively by hand:**
-
-1. In HACS open the menu (⋮) at the top right, choose *Custom repositories*, enter the URL
-   `https://github.com/rauchstefan/ha-ff-agent` and add it with type "Integration".
+1. In Home Assistant open *HACS*, go to *Integrations* and search for "FF Agent" at the top.
 2. Open "FF Agent", choose the latest version (currently 1.0.0), download it and restart
    Home Assistant.
 3. Under *Settings → Devices & services → Add integration* choose "FF Agent".
 
-**Manually:**
+**Or with one click:** this button opens the repository page in HACS on your own Home
+Assistant instance.
+
+[![Open in HACS][my-hacs-badge]][my-hacs-url]
+
+**Alternative: as a custom repository.** Only needed if "FF Agent" does not yet appear in the
+HACS search for you, or if you want a different version, such as a pre-release.
+
+1. In HACS open the menu (⋮) at the top right, choose *Custom repositories*, enter the URL
+   `https://github.com/rauchstefan/ha-ff-agent` and add it with type "Integration".
+2. Open "FF Agent", choose the wanted version, download it and restart Home Assistant.
+3. Under *Settings → Devices & services → Add integration* choose "FF Agent".
+
+**Manually (third option, without HACS):**
 
 1. Copy the folder `custom_components/ff_agent` into the `custom_components` directory of
    your Home Assistant configuration.
@@ -1424,8 +1441,8 @@ German.
 [issues-url]: https://github.com/rauchstefan/ha-ff-agent/issues
 [discussions-shield]: https://img.shields.io/github/discussions/rauchstefan/ha-ff-agent?style=for-the-badge
 [discussions-url]: https://github.com/rauchstefan/ha-ff-agent/discussions
-[hacs-shield]: https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=for-the-badge
-[hacs-url]: https://hacs.xyz/docs/faq/custom_repositories/
+[hacs-shield]: https://img.shields.io/badge/HACS-Integration-41BDF5.svg?style=for-the-badge
+[hacs-url]: https://hacs.xyz/
 [ci-shield]: https://img.shields.io/github/actions/workflow/status/rauchstefan/ha-ff-agent/tests.yml?branch=main&label=Tests&style=for-the-badge
 [ci-url]: https://github.com/rauchstefan/ha-ff-agent/actions/workflows/tests.yml
 [license-shield]: https://img.shields.io/github/license/rauchstefan/ha-ff-agent?style=for-the-badge

@@ -22,6 +22,23 @@ Das Journal ist Verlauf, keine Wissensbasis: Dauerhaftes gehört nach `docs/` od
 
 <!-- Neue Einträge direkt unter dieser Zeile einfügen -->
 
+## 2026-10-25 – main – README-Installation auf HACS-Suche umstellen
+- **Nutzer-Auftrag:** Projektleiter-Auftrag nach Review-Kommentar von @frenck zu hacs/default#12188:
+  Installationsabschnitt (de und en) soll mit der HACS-Suche beginnen, Custom Repository als
+  Alternative.
+- **Delegiert:** keine Agenten, Änderung direkt durch die Doku-Session.
+- **Erledigt:**
+  - README.md: Abschnitte „Installation“ und „Installing“ umgebaut (HACS-Suche zuerst, Button
+    danach, Custom Repository als Alternative, Manuell als dritte Option).
+  - Badge „HACS Custom“ auf „HACS Integration“, Ziel hacs.xyz.
+  - Commit: **ausstehend.** Diese Session hatte kein Shell-Werkzeug, daher kein Commit und kein
+    Push. Der Commit-Hash ist hier nachzutragen, sobald committet ist.
+- **Offen / Übergabe:** README-Änderung committen und pushen, Hash in `ai/TODO.md` (Eintrag
+  261025-readme-hacs-install) und hier nachtragen. `tests/test_metadata.py` nicht ausgeführt
+  (kein Python lokal), keine verbotenen Begriffe eingeführt.
+- **Für die nächste Session:** Der HACS-Button öffnet `my.home-assistant.io/redirect/hacs_repository`.
+  Ob er für Nutzer mit Default-Store direkt auf die Repo-Seite führt, ist nicht im Repo geprüft.
+
 ## 2026-10-18 – claude/readme-update-ha-anker-solix-2ea3b2 – Namen Dritter entfernt, TODO aufgeräumt
 - **Nutzer-Auftrag:** „Entferne Firmenname, Personennamen und Adresse aus den öffentlichen
   Recherche-Dateien und räum die TODO-Liste auf.“

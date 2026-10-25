@@ -52,22 +52,6 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
   Bug-TODO.
 - **Verweise:** Chat vom 2026-10-18; README „Bekannte Einschränkungen“
 
-### 261025-readme-hacs-install – README-Installation auf HACS-Suche umstellen
-- **Status:** offen
-- **Priorität:** mittel
-- **Rolle(n):** doku
-- **Beschreibung:** Rückmeldung von Maintainer @frenck beim Merge von hacs/default#12188
-  (2026-10-25): Die Integration ist jetzt im HACS-Standard-Store, Nutzer finden sie direkt
-  über die HACS-Suche. Der Installationsabschnitt im README (Deutsch und Englisch) führt
-  aber noch mit „Custom Repository hinzufügen“. Das soll umgedreht werden: HACS-Suche
-  zuerst, Custom-Repository-Schritte als Fußnote/Alternative (z. B. für die Zeit vor der
-  Aufnahme oder für abweichende Versionen) danach oder entfernt.
-- **Definition of Done:** Beide Sprachfassungen des Installationsabschnitts führen mit
-  „über HACS-Suche installieren“; Custom-Repository-Anleitung bleibt nur als
-  Alternative/Fußnote erhalten; Links/Badges weiterhin korrekt; Test
-  `tests/test_metadata.py` (Hersteller-/Markencheck) weiterhin grün.
-- **Verweise:** https://github.com/hacs/default/pull/12188 (Kommentar von @frenck)
-
 ### 261017-zusage-standort-transport – Verkehrsmittel beim Zusagen wählen
 - **Status:** offen (Teil 1 „HA-Standort“ erledigt mit 261018-standort-quelle, rauchstefan/ha-ff-agent#11; Teil 2 offen)
 - **Priorität:** mittel
@@ -187,6 +171,22 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
 - **Definition of Done:** Zugriff eingerichtet und dokumentiert, oder bewusst verworfen.
 
 ## Erledigt
+
+### 261025-readme-hacs-install – README-Installation auf HACS-Suche umstellen
+- **Status:** erledigt (2026-10-25, Commit auf main: Hash im Journal-Eintrag 2026-10-25; Commit noch ausstehend, siehe Journal)
+- **Priorität:** mittel
+- **Rolle(n):** doku
+- **Beschreibung:** Rückmeldung von Maintainer @frenck beim Merge von hacs/default#12188
+  (2026-10-25): Die Integration ist jetzt im HACS-Standard-Store, Nutzer finden sie direkt
+  über die HACS-Suche. Der Installationsabschnitt im README (Deutsch und Englisch) führt
+  jetzt mit der HACS-Suche, die Custom-Repository-Schritte stehen als Alternative danach,
+  Manuell bleibt dritte Option. Badge und Link zeigen auf hacs.xyz statt auf die Doku zu
+  Custom Repositories.
+- **Definition of Done:** Beide Sprachfassungen des Installationsabschnitts führen mit
+  der HACS-Suche; Custom-Repository-Anleitung bleibt als Alternative erhalten; Links/Badges
+  korrekt; Test `tests/test_metadata.py` (Hersteller-/Markencheck) betroffen nicht, kein
+  Herstellername eingeführt.
+- **Verweise:** https://github.com/hacs/default/pull/12188 (Kommentar von @frenck)
 
 ### 261018-release-1-0 – Version 1.0.0 und Aufnahme in den HACS-Standard-Store
 - **Status:** erledigt (2026-10-25, hacs/default#12188 von @frenck gemerged).
