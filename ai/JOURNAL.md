@@ -22,6 +22,18 @@ Das Journal ist Verlauf, keine Wissensbasis: Dauerhaftes gehört nach `docs/` od
 
 <!-- Neue Einträge direkt unter dieser Zeile einfügen -->
 
+## 2026-10-25 – main – Dependabot-PRs #17 und #18 mergen
+- **Nutzer-Auftrag:** Offene PRs prüfen; danach beide per Squash mergen und den Kommentar in
+  `requirements_test.txt` anpassen.
+- **Delegiert:** keine Agenten. Reine Abhängigkeits-Bumps mit grüner CI (Ruff, Pytest, Hassfest,
+  HACS, Repository visibility), Diffs selbst geprüft.
+- **Erledigt:** #17 (`actions/setup-python` 7.0.0 → 7.1.0, SHA-Pin erhalten) und #18
+  (`pytest-homeassistant-custom-component` 0.13.372 → 0.13.373, HA 2026.10.2) per Squash gemergt.
+  Kommentar in `requirements_test.txt` auf 0.13.373 / HA 2026.10.2 aktualisiert.
+- **Offen / Übergabe:** nichts.
+- **Für die nächste Session:** Dependabot ändert den Versionskommentar in
+  `requirements_test.txt` nicht mit; bei künftigen Bumps von Hand nachziehen.
+
 ## 2026-10-25 – main – README-Installation auf HACS-Suche umstellen
 - **Nutzer-Auftrag:** Projektleiter-Auftrag nach Review-Kommentar von @frenck zu hacs/default#12188:
   Installationsabschnitt (de und en) soll mit der HACS-Suche beginnen, Custom Repository als
