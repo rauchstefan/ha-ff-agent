@@ -173,7 +173,7 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
 ## Erledigt
 
 ### 261025-readme-hacs-install – README-Installation auf HACS-Suche umstellen
-- **Status:** erledigt (2026-10-25, Commit auf main: Hash im Journal-Eintrag 2026-10-25; Commit noch ausstehend, siehe Journal)
+- **Status:** erledigt (2026-10-25, Commit d52c10a auf main)
 - **Priorität:** mittel
 - **Rolle(n):** doku
 - **Beschreibung:** Rückmeldung von Maintainer @frenck beim Merge von hacs/default#12188
