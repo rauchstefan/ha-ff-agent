@@ -52,28 +52,21 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
   Bug-TODO.
 - **Verweise:** Chat vom 2026-10-18; README „Bekannte Einschränkungen“
 
-### 261018-release-1-0 – Version 1.0.0 und Aufnahme in den HACS-Standard-Store
-- **Status:** teilweise erledigt (2026-10-18). Release v1.0.0 ist da (rauchstefan/ha-ff-agent#15,
-  Tag auf 1b22692). PR hacs/default#12188 ist gestellt und wartet auf das Review der
-  HACS-Betreuer. Regelmäßig nachsehen und Rückfragen im PR beantworten (Freigabe des
-  Nutzers je Antwort). Der Nutzer hat entschieden, nicht auf 261018-test-zusage-absage
-  zu warten.
-- **Priorität:** hoch
-- **Rolle(n):** tester, reviewer, doku, projektleiter
-- **Beschreibung:** Auftrag des Nutzers vom 2026-10-18: Wenn alles abgeschlossen ist,
-  Version 1.0.0 releasen und im HACS-Store (hacs/default) veröffentlichen. Voraussetzung:
-  Zusage und Absage sind gegen ein echtes FF Agent getestet. Für hacs/default prüfen:
-  Anforderungen (Brands-Eintrag bzw. lokaler brand-Ordner, Releases, Topics,
-  Beschreibung), siehe docs/recherche/261016-hacs-anforderungen.md.
-  **Marketplace (ab HA 2026.11):** Laut docs/recherche/261018-marketplace.md läuft die
-  Aufnahme weiter per PR an hacs/default. Die Voraussetzungen sind am 2026-10-18 erfüllt:
-  Release, `brand/` im Tag, Topics, Beschreibung, HACS-Action ohne `ignore`. Custom Repos
-  bleiben möglich, und bestehende HACS-Installationen werden automatisch migriert. Vor dem
-  PR die Seiten zu repository-structure und releases sowie das Format von `categories`
-  nachlesen.
-- **Definition of Done:** Release v1.0.0 (Freigabe des Nutzers), PR an hacs/default
-  gestellt (Freigabe des Nutzers, da öffentlicher Beitrag unter seinem Konto).
-- **Verweise:** docs/recherche/261018-hacs-update-dialog.md
+### 261025-readme-hacs-install – README-Installation auf HACS-Suche umstellen
+- **Status:** offen
+- **Priorität:** mittel
+- **Rolle(n):** doku
+- **Beschreibung:** Rückmeldung von Maintainer @frenck beim Merge von hacs/default#12188
+  (2026-10-25): Die Integration ist jetzt im HACS-Standard-Store, Nutzer finden sie direkt
+  über die HACS-Suche. Der Installationsabschnitt im README (Deutsch und Englisch) führt
+  aber noch mit „Custom Repository hinzufügen“. Das soll umgedreht werden: HACS-Suche
+  zuerst, Custom-Repository-Schritte als Fußnote/Alternative (z. B. für die Zeit vor der
+  Aufnahme oder für abweichende Versionen) danach oder entfernt.
+- **Definition of Done:** Beide Sprachfassungen des Installationsabschnitts führen mit
+  „über HACS-Suche installieren“; Custom-Repository-Anleitung bleibt nur als
+  Alternative/Fußnote erhalten; Links/Badges weiterhin korrekt; Test
+  `tests/test_metadata.py` (Hersteller-/Markencheck) weiterhin grün.
+- **Verweise:** https://github.com/hacs/default/pull/12188 (Kommentar von @frenck)
 
 ### 261017-zusage-standort-transport – Verkehrsmittel beim Zusagen wählen
 - **Status:** offen (Teil 1 „HA-Standort“ erledigt mit 261018-standort-quelle, rauchstefan/ha-ff-agent#11; Teil 2 offen)
@@ -194,6 +187,18 @@ Gemeinsame Aufgabenliste aller Sessions. Gepflegt vom Projektleiter. Regeln im D
 - **Definition of Done:** Zugriff eingerichtet und dokumentiert, oder bewusst verworfen.
 
 ## Erledigt
+
+### 261018-release-1-0 – Version 1.0.0 und Aufnahme in den HACS-Standard-Store
+- **Status:** erledigt (2026-10-25, hacs/default#12188 von @frenck gemerged).
+- **Priorität:** hoch
+- **Rolle(n):** tester, reviewer, doku, projektleiter
+- **Beschreibung:** Release v1.0.0 (rauchstefan/ha-ff-agent#15, Tag auf 1b22692) und
+  Aufnahme in den HACS-Standard-Store. PR hacs/default#12188 wurde am 2026-10-25 gemerged;
+  laut hacs-bot erscheint die Integration binnen 8 Stunden im HACS-Store. Der Nutzer hat
+  entschieden, nicht auf 261018-test-zusage-absage zu warten. Folgearbeit aus dem
+  Review-Kommentar von @frenck: siehe 261025-readme-hacs-install.
+- **Verweise:** https://github.com/hacs/default/pull/12188,
+  docs/recherche/261018-hacs-update-dialog.md
 
 ### 261018-recherche-namen – Namen Dritter in öffentlichen Recherche-Dateien
 - **Status:** erledigt (2026-10-18, Branch fix/261018-recherche-namen; Entscheidung des Nutzers: neutralisieren)

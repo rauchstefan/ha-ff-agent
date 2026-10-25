@@ -8,9 +8,12 @@ Session. Von Hand gepflegt.
   ausdrücklich freigegeben, obwohl Zusage und Absage nicht real getestet sind. Davor
   `v0.4.0` (e05621a, regulär), `v0.3.0` (619a53e), `v0.2.0` (dabe583) und `v0.1.0`
   (Vorabversionen).
-- **HACS-Standardliste:** PR hacs/default#12188 gestellt (2026-10-18). Die Prüfung dort
-  kann Monate dauern. Ab HA 2026.11 heißt HACS „Marketplace“, der Katalog kommt weiter
-  aus hacs/default (docs/recherche/261018-marketplace.md).
+- **HACS-Standardliste:** PR hacs/default#12188 wurde am 2026-10-25 von @frenck gemerged.
+  Laut hacs-bot erscheint die Integration binnen 8 Stunden im HACS-Store, direkt per Suche
+  installierbar (nicht mehr nur als Custom Repository). Folgearbeit TODO
+  261025-readme-hacs-install: README-Installationsabschnitt auf HACS-Suche umstellen. Ab
+  HA 2026.11 heißt HACS „Marketplace“, der Katalog kommt weiter aus hacs/default
+  (docs/recherche/261018-marketplace.md).
 - **Neu in v0.4.0:** Standortquelle wählbar (keine, HA-Zuhause, Koordinaten, Entität;
   rauchstefan/ha-ff-agent#11), neues Symbol (#10), README mit Badges, HACS-Button,
   Hinweisboxen und Community-Abschnitten, CONTRIBUTING.md, Discussions eingeschaltet
@@ -55,7 +58,8 @@ Session. Von Hand gepflegt.
   - `tests.yml`: ruff, pytest mit pytest-homeassistant-custom-component, Python 3.14,
     Abdeckungs-Gate 95 %, aktuell 100 %
   - Dependabot
-- **Letzte Änderung:** 2026-10-18 – Release v1.0.0, PR an hacs/default
+- **Letzte Änderung:** 2026-10-25 – PR hacs/default#12188 gemerged, Integration im
+  HACS-Store
 
 ## Was funktioniert
 
