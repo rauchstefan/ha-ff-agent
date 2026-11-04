@@ -22,6 +22,22 @@ Das Journal ist Verlauf, keine Wissensbasis: Dauerhaftes gehört nach `docs/` od
 
 <!-- Neue Einträge direkt unter dieser Zeile einfügen -->
 
+## 2026-11-04 – claude/neue-dependencies-8b7f44 – Dependabot-PRs #19, #20 und #21 mergen
+- **Nutzer-Auftrag:** „Es gibt 3 neue Dependencies. Bitte prüfen und umsetzen“
+- **Delegiert:** keine Agenten. Reine Patch-Bumps mit grüner CI (Ruff, Pytest, Hassfest, HACS,
+  Repository visibility), Diffs und Release-Notes selbst geprüft; Vorgehen wie am 2026-10-25.
+- **Erledigt:** per Squash gemergt:
+  - #19 `home-assistant/actions/hassfest` cd6f363 → 86d4564 (SHA-Pin erhalten, nur Release-Tooling
+    der Action geändert)
+  - #20 `pytest-homeassistant-custom-component` 0.13.373 → 0.13.375 (HA 2026.10.4)
+  - #21 `ruff` 0.17.1 → 0.17.3 (Bugfixes, keine neuen Default-Regeln); nach #20 per
+    `@dependabot rebase` neu aufgesetzt, CI danach erneut grün.
+  - Versionskommentar in `requirements_test.txt` auf 0.13.375 / HA 2026.10.4 nachgezogen.
+- **Offen / Übergabe:** nichts.
+- **Für die nächste Session:** Dependabot-PRs auf `requirements_test.txt` kollidieren
+  untereinander (benachbarte Zeilen). Nach dem ersten Merge `@dependabot rebase` kommentieren und
+  die neue CI abwarten (`gh pr checks <n> --watch`), statt selbst zu ändern.
+
 ## 2026-10-25 – main – Dependabot-PRs #17 und #18 mergen
 - **Nutzer-Auftrag:** Offene PRs prüfen; danach beide per Squash mergen und den Kommentar in
   `requirements_test.txt` anpassen.
